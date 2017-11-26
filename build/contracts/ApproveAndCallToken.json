@@ -279,7 +279,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 936,
+          "SourceUnit": 2080,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/TokenRecipient.sol",
           "file": "./TokenRecipient.sol",
           "scope": 292,
@@ -294,7 +294,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 1675,
+          "SourceUnit": 2819,
           "absolutePath": "zeppelin-solidity/contracts/token/StandardToken.sol",
           "file": "zeppelin-solidity/contracts/token/StandardToken.sol",
           "scope": 292,
@@ -310,20 +310,20 @@
       {
         "attributes": {
           "contractDependencies": [
-            1208,
-            1304,
-            1333,
-            1674
+            2352,
+            2448,
+            2477,
+            2818
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             291,
-            1674,
-            1208,
-            1304,
-            1333
+            2818,
+            2352,
+            2448,
+            2477
           ],
           "name": "ApproveAndCallToken",
           "scope": 292
@@ -340,7 +340,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "StandardToken",
-                  "referencedDeclaration": 1674,
+                  "referencedDeclaration": 2818,
                   "type": "contract StandardToken"
                 },
                 "id": 251,
@@ -511,7 +511,7 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "TokenRecipient",
-                              "referencedDeclaration": 935,
+                              "referencedDeclaration": 2079,
                               "type": "contract TokenRecipient"
                             },
                             "id": 263,
@@ -549,7 +549,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 935,
+                              "referencedDeclaration": 2079,
                               "type": "type(contract TokenRecipient)",
                               "value": "TokenRecipient"
                             },
@@ -614,9 +614,9 @@
                                 }
                               ],
                               "overloadedDeclarations": [
-                                1556
+                                2700
                               ],
-                              "referencedDeclaration": 1556,
+                              "referencedDeclaration": 2700,
                               "type": "function (address,uint256) returns (bool)",
                               "value": "approve"
                             },
@@ -701,7 +701,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "receiveApproval",
-                                      "referencedDeclaration": 934,
+                                      "referencedDeclaration": 2078,
                                       "type": "function (address,uint256,address,bytes memory) external"
                                     },
                                     "children": [
@@ -742,7 +742,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 1686,
+                                          "referencedDeclaration": 2830,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -775,7 +775,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 1713,
+                                      "referencedDeclaration": 2857,
                                       "type": "contract ApproveAndCallToken",
                                       "value": "this"
                                     },
@@ -897,5 +897,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T09:45:03.101Z"
+  "updatedAt": "2017-11-26T15:15:19.204Z"
 }

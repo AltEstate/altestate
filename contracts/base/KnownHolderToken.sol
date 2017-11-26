@@ -6,7 +6,7 @@ import 'zeppelin-solidity/contracts/token/StandardToken.sol';
 contract KnownHolderToken is StandardToken {
   UserRegistryInterface public userRegistry;
 
-  function KnownHolderToken(address registry) {
+  function KnownHolderToken(address registry) public {
     require(registry != 0x0);
     userRegistry = UserRegistryInterface(registry);
   }

@@ -10,6 +10,6 @@ contract AltToken is NamedToken, KnownHolderToken, ApproveAndCallToken, CappedTo
     NamedToken("Alt Estate", "ALT", 10)
     ApproveAndCallToken()
     CappedToken(10 ** 12) // 100 tokens!
-    KnownHolderToken(_registry) {
+    KnownHolderToken(_registry) public {
   }
 }

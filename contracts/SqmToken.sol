@@ -10,6 +10,7 @@ contract SqmToken is NamedToken, KnownHolderToken, ApproveAndCallToken, CappedTo
     KnownHolderToken(_registry)
     NamedToken(_name, _ticker, _decimals)
     CappedToken(_cap) 
+    public
   {
   }
 }

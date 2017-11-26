@@ -187,7 +187,7 @@ contract StandardToken is ERC20, BasicToken {
 contract KnownHolderToken is StandardToken {
   UserRegistryInterface public userRegistry;
 
-  function KnownHolderToken(address registry) {
+  function KnownHolderToken(address registry) public {
     require(registry != 0x0);
     userRegistry = UserRegistryInterface(registry);
   }
@@ -225,7 +225,7 @@ contract NamedToken is StandardToken {
   string public ticker;
   uint public decimals;
   
-  function NamedToken(string _name, string _ticker, uint _decimals) {
+  function NamedToken(string _name, string _ticker, uint _decimals) public {
     name = _name;
     ticker = _ticker;
     decimals = _decimals;
@@ -351,6 +351,6 @@ contract AltToken is NamedToken, KnownHolderToken, ApproveAndCallToken, CappedTo
     NamedToken("Alt Estate", "ALT", 10)
     ApproveAndCallToken()
     CappedToken(10 ** 12) // 100 tokens!
-    KnownHolderToken(_registry) {
+    KnownHolderToken(_registry) public {
   }
 }

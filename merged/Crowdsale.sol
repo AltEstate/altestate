@@ -1,18 +1,6 @@
 pragma solidity ^0.4.15;
 
 /**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/179
- */
-contract ERC20Basic {
-  uint256 public totalSupply;
-  function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-}
-
-/**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
@@ -46,39 +34,15 @@ library SafeMath {
 }
 
 /**
- * @title Basic token
- * @dev Basic version of StandardToken, with no allowances.
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/179
  */
-contract BasicToken is ERC20Basic {
-  using SafeMath for uint256;
-
-  mapping(address => uint256) balances;
-
-  /**
-  * @dev transfer token for a specified address
-  * @param _to The address to transfer to.
-  * @param _value The amount to be transferred.
-  */
-  function transfer(address _to, uint256 _value) public returns (bool) {
-    require(_to != address(0));
-    require(_value <= balances[msg.sender]);
-
-    // SafeMath.sub will throw if there is not enough balance.
-    balances[msg.sender] = balances[msg.sender].sub(_value);
-    balances[_to] = balances[_to].add(_value);
-    Transfer(msg.sender, _to, _value);
-    return true;
-  }
-
-  /**
-  * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of.
-  * @return An uint256 representing the amount owned by the passed address.
-  */
-  function balanceOf(address _owner) public view returns (uint256 balance) {
-    return balances[_owner];
-  }
-
+contract ERC20Basic {
+  uint256 public totalSupply;
+  function balanceOf(address who) public view returns (uint256);
+  function transfer(address to, uint256 value) public returns (bool);
+  event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
 /**
@@ -90,173 +54,6 @@ contract ERC20 is ERC20Basic {
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
-}
-
-/**
- * @title Standard ERC20 token
- *
- * @dev Implementation of the basic standard token.
- * @dev https://github.com/ethereum/EIPs/issues/20
- * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
- */
-contract StandardToken is ERC20, BasicToken {
-
-  mapping (address => mapping (address => uint256)) internal allowed;
-
-
-  /**
-   * @dev Transfer tokens from one address to another
-   * @param _from address The address which you want to send tokens from
-   * @param _to address The address which you want to transfer to
-   * @param _value uint256 the amount of tokens to be transferred
-   */
-  function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    require(_to != address(0));
-    require(_value <= balances[_from]);
-    require(_value <= allowed[_from][msg.sender]);
-
-    balances[_from] = balances[_from].sub(_value);
-    balances[_to] = balances[_to].add(_value);
-    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-    Transfer(_from, _to, _value);
-    return true;
-  }
-
-  /**
-   * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
-   *
-   * Beware that changing an allowance with this method brings the risk that someone may use both the old
-   * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
-   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
-   * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-   * @param _spender The address which will spend the funds.
-   * @param _value The amount of tokens to be spent.
-   */
-  function approve(address _spender, uint256 _value) public returns (bool) {
-    allowed[msg.sender][_spender] = _value;
-    Approval(msg.sender, _spender, _value);
-    return true;
-  }
-
-  /**
-   * @dev Function to check the amount of tokens that an owner allowed to a spender.
-   * @param _owner address The address which owns the funds.
-   * @param _spender address The address which will spend the funds.
-   * @return A uint256 specifying the amount of tokens still available for the spender.
-   */
-  function allowance(address _owner, address _spender) public view returns (uint256) {
-    return allowed[_owner][_spender];
-  }
-
-  /**
-   * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until
-   * the first transaction is mined)
-   * From MonolithDAO Token.sol
-   */
-  function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
-    allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true;
-  }
-
-  function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
-    uint oldValue = allowed[msg.sender][_spender];
-    if (_subtractedValue > oldValue) {
-      allowed[msg.sender][_spender] = 0;
-    } else {
-      allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
-    }
-    Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true;
-  }
-
-}
-
-/**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Ownable {
-  address public owner;
-
-
-  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  function Ownable() public {
-    owner = msg.sender;
-  }
-
-
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));
-    OwnershipTransferred(owner, newOwner);
-    owner = newOwner;
-  }
-
-}
-
-/**
- * @title Mintable token
- * @dev Simple ERC20 Token example, with mintable token creation
- * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
- * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
- */
-
-contract MintableToken is StandardToken, Ownable {
-  event Mint(address indexed to, uint256 amount);
-  event MintFinished();
-
-  bool public mintingFinished = false;
-
-
-  modifier canMint() {
-    require(!mintingFinished);
-    _;
-  }
-
-  /**
-   * @dev Function to mint tokens
-   * @param _to The address that will receive the minted tokens.
-   * @param _amount The amount of tokens to mint.
-   * @return A boolean that indicates if the operation was successful.
-   */
-  function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    totalSupply = totalSupply.add(_amount);
-    balances[_to] = balances[_to].add(_amount);
-    Mint(_to, _amount);
-    Transfer(address(0), _to, _amount);
-    return true;
-  }
-
-  /**
-   * @dev Function to stop minting new tokens.
-   * @return True if the operation was successful.
-   */
-  function finishMinting() onlyOwner canMint public returns (bool) {
-    mintingFinished = true;
-    MintFinished();
-    return true;
-  }
 }
 
 contract UserRegistryInterface {
@@ -278,7 +75,7 @@ contract MultiOwners {
     mapping(address => bool) owners;
     address public publisher;
 
-    function MultiOwners() {
+    function MultiOwners() public {
         owners[msg.sender] = true;
         publisher = msg.sender;
     }
@@ -288,20 +85,20 @@ contract MultiOwners {
         _; 
     }
 
-    function isOwner() constant returns (bool) {
+    function isOwner() public constant returns (bool) {
         return owners[msg.sender] ? true : false;
     }
 
-    function checkOwner(address maybe_owner) constant returns (bool) {
+    function checkOwner(address maybe_owner) public constant returns (bool) {
         return owners[maybe_owner] ? true : false;
     }
 
-    function grant(address _owner) onlyOwner {
+    function grant(address _owner) onlyOwner public {
         owners[_owner] = true;
         AccessGrant(_owner);
     }
 
-    function revoke(address _owner) onlyOwner {
+    function revoke(address _owner) onlyOwner public {
         require(_owner != publisher);
         require(msg.sender != _owner);
 
@@ -310,14 +107,31 @@ contract MultiOwners {
     }
 }
 
-// 
+contract TokenRecipient {
+  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+}
 
-
-
-
-contract MintableTokenInterface {
-  function mint(address beneficiary, uint amount) public returns(bool);
+contract TokenInterface is ERC20 {
+  string public name;
+  string public symbol;
   uint public decimals;
+}
+
+contract MintableTokenInterface is TokenInterface {
+  address public owner;
+  function mint(address beneficiary, uint amount) public returns(bool);
+}
+
+contract WhitelistRecord {
+  bool public allow;
+  uint public min;
+  uint public max;
+
+  function WhitelistRecord(uint _minAmount, uint _maxAmount) public {
+    allow = true;
+    min = _minAmount;
+    max = _maxAmount;
+  }
 }
 
 /**
@@ -330,84 +144,116 @@ contract MintableTokenInterface {
  * - Pulling tokens (temporal balance inside sale)
  * - Revert\refund
  * - Amount bonuses
+ * - Total supply bonuses
  * - Early birds bonuses
  * - Extra distribution (team, foundation and also)
+ * - Soft and hard caps
  * - Finalization logics
 **/
-contract Crowdsale is MultiOwners {
-  using SafeMath for uint256;
+contract Crowdsale is MultiOwners, TokenRecipient {
+  using SafeMath for uint;
 
+  //  ██████╗ ██████╗ ███╗   ██╗███████╗████████╗███████╗
+  // ██╔════╝██╔═══██╗████╗  ██║██╔════╝╚══██╔══╝██╔════╝
+  // ██║     ██║   ██║██╔██╗ ██║███████╗   ██║   ███████╗
+  // ██║     ██║   ██║██║╚██╗██║╚════██║   ██║   ╚════██║
+  // ╚██████╗╚██████╔╝██║ ╚████║███████║   ██║   ███████║
+  //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚══════╝
+  uint public constant VERSION = 0x1;
   enum State {
     Setup,          // Non active yet (require to be setuped)
     Active,         // Crowdsale in a live
-    Finalization,   // Finalization state (forward funds, transfer tokens (if not yet), refunding if it requires)
+    Success,        // Finalization state (forward funds, transfer tokens (if not yet), refunding via owner if it requires (KYC))
+    Refund,         // Unsucceseful crowdsale (refund ether)
     History         // Close and store only historical fact of existence
   }
 
-  // Current crowdsale state
-  State public state;
 
-  // Should be whitelisted to buy tokens
-  bool public isWhitelisted;
-  // Should be known user to buy tokens
-  bool public isKnownOnly;
-  // Enable amount bonuses in crowdsale?
-  bool public isAmountBonus;
-  // Enable early bird bonus in crowdsale?
-  bool public isEarlyBonus;
-  // Allow to refund money?
-  bool public isRefundable;
-  // Allow to buy tokens for another tokens?
-  bool public isTokenExcange;
+  //  ██████╗ ██████╗ ███╗   ██╗███████╗██╗███╗   ██╗ ██████╗ 
+  // ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║████╗  ██║██╔════╝ 
+  // ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██╔██╗ ██║██║  ███╗
+  // ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║╚██╗██║██║   ██║
+  // ╚██████╗╚██████╔╝██║ ╚████║██║     ██║██║ ╚████║╚██████╔╝
+  //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+                                                           
+  bool public isWhitelisted;            // Should be whitelisted to buy tokens
+  bool public isKnownOnly;              // Should be known user to buy tokens
+  bool public isAmountBonus;            // Enable amount bonuses in crowdsale?
+  bool public isEarlyBonus;             // Enable early bird bonus in crowdsale?
+  bool public isRefundable;             // Allow to refund money?
+  bool public isTokenExcange;           // Allow to buy tokens for another tokens?
+  bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
+  bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
+  bool public isMintingShipment;        // Will ship token via minting?
+  bool public isPullingTokens;          // Should beneficiaries pull their tokens?
 
   // List of allowed beneficiaries
-  mapping (address => bool) whitelist;  
+  mapping (address => WhitelistRecord) public whitelist;
+  address[] public whitelisted;
+  uint public whitelistedCount;
+
   // Known users registry (required to known rules)
   UserRegistryInterface public userRegistry;
 
-  // Amount bonuses
-  // Key is min amount of buy
-  // 10000 - totaly free
-  //  5000 - 50% sale
-  //     0 - 100% (no bonus)
-  //
-  // discont = 10000 - bonus
-  // priceWithBonus = price * discount / 10000
-  // 
-  // price = 100
-  // bonus = 2500
-  // discount = 7500
-  // priceWithBonus = 100 * 7500 / 10000 = 750000 / 10000 = 75
-  mapping (uint => uint) amountBonuses;
-  uint[] public amountSlices;
+  mapping (uint => uint) public amountBonuses; 
+                                        // Amount bonuses
+  uint[] public amountSlices;           // Key is min amount of buy
+  uint public amountSlicesCount;        // 10000 - totaly free
+                                        //  5000 - 50% sale
+                                        //     0 - 100% (no bonus)
 
-  // Time bonuses
-  // Same as amount but key is seconds after start
-  mapping (uint => uint) timeBonuses;
-  uint[] public timeSlices;
+  
+  mapping (uint => uint) public timeBonuses;   
+                                        // Time bonuses
+  uint[] public timeSlices;             // Same as amount but key is seconds after start
+  uint public timeSlicesCount;
 
+  MintableTokenInterface public token;  // The token being sold
+  uint public tokenDecimals;            // Token decimals
+
+  mapping (address => TokenInterface) public allowedTokens;
+                                        // allowed tokens list
+  mapping (address => uint) public tokensValues;
+                                        // TOKEN to ETH conversion rate (oraclized)
+
+  uint public startTime;                // start and end timestamps where 
+  uint public endTime;                  // investments are allowed (both inclusive)
+
+  address public wallet;                // address where funds are collected
+  uint public price;                    // how many token (1 * 10 ** decimals) a buyer gets per wei
+  uint public hardCap;
+
+  address public extraTokensHolder;     // address to mint/transfer extra tokens (0 – 0%, 1000 - 100.0%)
+  uint public extraDistributionPart;    // % of extra distribution
+
+  // ███████╗████████╗ █████╗ ████████╗███████╗
+  // ██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝██╔════╝
+  // ███████╗   ██║   ███████║   ██║   █████╗  
+  // ╚════██║   ██║   ██╔══██║   ██║   ██╔══╝  
+  // ███████║   ██║   ██║  ██║   ██║   ███████╗
+  // ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚══════╝
+  // amount of raised money in wei
+  uint public weiRaised;
+  // Current crowdsale state
+  State public state;
   // Temporal balances to pull tokens after token sale
   // requires to ship required balance to smart contract
-  mapping (address => uint) pullingBalances;
-  mapping (address => bool) pullingAllowance;
+  mapping (address => uint) public temporalBalances;
+  uint public temporalTotalSupply;
 
-  // The token being sold
-  MintableTokenInterface public token;
+  mapping (address => uint) public weiDeposit;
+  mapping (address => mapping(address => uint)) public altDeposit;
 
-  // start and end timestamps where investments are allowed (both inclusive)
-  uint256 public startTime;
-  uint256 public endTime;
+  mapping (address => bool) public claimRefundAllowance;
 
-  // address where funds are collected
-  address public wallet;
 
-  // how many token units a buyer gets per wei
-  uint256 public price;
-
-  // amount of raised money in wei
-  uint256 public weiRaised;
-
-  bool public isSane;
+  // ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
+  // ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
+  // █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
+  // ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
+  // ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
+  // ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+                                                      
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -415,129 +261,422 @@ contract Crowdsale is MultiOwners {
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
    */
-  event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+  event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
   event BitcoinSale(address indexed beneficiary, uint value, uint amount, bytes32 indexed bitcoinHash);
-
+  event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
+  event ShipTokens(address indexed owner, uint indexed amount);
   function Crowdsale(
-    uint256 _startTime, 
-    uint256 _endTime, 
-    uint256 _price, 
-    address _token, 
-    address _wallet,
-    address _registry) public {
-    // require(_startTime >= now);
-    require(_endTime >= _startTime && _endTime > now);
-    require(_price > 0);
-    require(_wallet != address(0));
-    require(_token != 0);
-    require(_registry != 0);
+    // Should be whitelisted to buy tokens
+    bool _isWhitelisted,
+    // Should be known user to buy tokens
+    bool _isKnownOnly,
+    // Enable amount bonuses in crowdsale?
+    bool _isAmountBonus,
+    // Enable early bird bonus in crowdsale?
+    bool _isEarlyBonus,
+    // Allow to refund money?
+    bool _isRefundable,
+    // Allow to buy tokens for another tokens?
+    bool _isTokenExcange,
+    // Allow to issue tokens with tx hash (ex bitcoin)
+    bool _isAllowToIssue,
+    // Should mint extra tokens for future distribution?
+    bool _isExtraDistribution,
+    // Will ship token via minting? 
+    bool _isMintingShipment,
+    // Should beneficiaries pull their tokens? 
+    bool _isPullingTokens,
 
-    userRegistry = UserRegistryInterface(_registry);
+    // primary values:
+    uint _price,
+    uint _start, uint _end,
+    uint _hardCap,
+    address _token
+  ) public {
+    state = State.Setup;
+    isWhitelisted = _isWhitelisted;
+    isKnownOnly = _isKnownOnly;
+    isAmountBonus = _isAmountBonus;
+    isEarlyBonus = _isEarlyBonus;
+    isRefundable = _isRefundable;
+    isTokenExcange = _isTokenExcange;
+    isAllowToIssue = _isAllowToIssue;
+    isExtraDistribution = _isExtraDistribution;
+    isMintingShipment = _isMintingShipment;
+    isPullingTokens = isRefundable || _isPullingTokens;
+
+    require(endTime > now);
+    startTime = _start;
+    endTime = _end;
+    hardCap = _hardCap;
+
     token = MintableTokenInterface(_token);
-    startTime = _startTime;
-    endTime = _endTime;
+    tokenDecimals = token.decimals();
     price = _price;
-    wallet = _wallet;
-
-    isSane = true;
   }
 
-  // function setTime(uint _life) onlyOwner public {
-  //   require(startTime == 0);
-  //   require(endTime == 0);
-  //   startTime = now;
-  //   endTime = startTime + _life;
-  // }
-  
-  // function setPrice(uint _price) onlyOwner public {
-  //   require(price == 0);
-  //   price = _price;
-  // }
-  
-  // function setWallet(address _wallet) onlyOwner public {
-  //   require(wallet == 0);
-  //   wallet = _wallet;
-  // }
-  
-  // function setRegistry(address _registry) onlyOwner public {
-  //   require(address(userRegistry) == 0);
-  //   userRegistry = UserRegistryInterface(_registry);
-  // }
-  
-  // function setToken(address _token) onlyOwner public {
-  //   require(address(token) == 0);
-  //   token = MintableTokenInterface(_token);
-  // }
-  
-  // function saneIt() onlyOwner public {
-  //   require(!isSane);
-  //   require(startTime <= now);
-  //   require(endTime > now);
-  //   require(price > 0);
-  //   require(wallet != address(0));
-  //   require(token != address(0));
-  //   require(userRegistry != address(0));
-  //   isSane = true;
-  // }
+  modifier inState(State _target) {
+    require(state == _target);
+    _;
+  }
 
+  // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
+  // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
+  // ███████╗█████╗     ██║   ██║   ██║██████╔╝    ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
+  // ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝     ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
+  // ███████║███████╗   ██║   ╚██████╔╝██║         ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
+  // ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝         ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+  
+  function setWallet(address _wallet) 
+    inState(State.Setup) onlyOwner public 
+  {
+    require(wallet == address(0));
+    wallet = _wallet;
+  }
+  
+  function setRegistry(address _registry) 
+    inState(State.Setup) onlyOwner public 
+  {
+    require(address(userRegistry) == 0);
+    userRegistry = UserRegistryInterface(_registry);
+  }
+
+  function setExtraTokensHolder(address _holder) 
+    inState(State.Setup) onlyOwner public
+  {
+    require(_holder != address(0));
+    extraTokensHolder = _holder;
+  }
+
+  function setWhitelistThem(address[] _beneficiaries, uint[] _min, uint[] _max)
+    inState(State.Setup) onlyOwner public
+  {
+    require(_beneficiaries.length > 0);
+    require(_beneficiaries.length == _min.length);
+    require(_max.length == _min.length);
+
+    for (uint index = 0; index < _beneficiaries.length; index++) {
+      whitelist[_beneficiaries[index]] = new WhitelistRecord(
+        _min[index],
+        _max[index]
+      );
+
+      whitelisted.push(_beneficiaries[index]);
+      whitelistedCount++;
+    }
+  }
+
+  function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 
+    inState(State.Setup) onlyOwner public 
+  {
+    // Only once in life time
+    require(amountSlicesCount == 0);
+    require(_amountSlices.length > 1);
+    require(_prices.length == _amountSlices.length);
+    uint lastSlice = 0;
+    for (uint index = 0; index < _amountSlices.length; index++) {
+      require(_amountSlices[index] >= lastSlice);
+      lastSlice = _amountSlices[index];
+      amountSlices.push(lastSlice);
+      amountBonuses[lastSlice] = _prices[index];
+    }
+    amountSlicesCount = amountSlices.length;
+  }
+
+  function setTimeBonuses(uint[] _timeSlices, uint[] _prices) 
+    inState(State.Setup) onlyOwner public 
+  {
+    // Only once in life time
+    require(timeSlicesCount == 0);
+    require(_timeSlices.length > 1);
+    require(_prices.length == _timeSlices.length);
+    uint lastSlice = 0;
+    for (uint index = 0; index < _timeSlices.length; index++) {
+      require(_timeSlices[index] >= lastSlice);
+      lastSlice = _timeSlices[index];
+      timeSlices.push(lastSlice);
+      timeBonuses[lastSlice] = _prices[index];
+    }
+    timeSlicesCount = timeSlices.length;
+  }
+  
+  function setTokenExcange(address _token, uint _value)
+    inState(State.Setup) onlyOwner public
+  {
+    allowedTokens[_token] = TokenInterface(_token);
+    updateTokenValue(_token, _value); 
+  }
+
+  function saneIt() 
+    inState(State.Setup) onlyOwner public 
+  {
+    require(startTime <= now);
+    require(endTime > now);
+
+    require(price > 0);
+
+    require(wallet != address(0));
+    require(token != address(0));
+
+    if (isWhitelisted) {
+      require(whitelistedCount > 0);
+    }
+
+    if (isKnownOnly) {
+      require(userRegistry != address(0));
+    }
+
+    if (isAmountBonus) {
+      require(amountSlicesCount > 0);
+    }
+
+    if (isEarlyBonus) {
+      require(timeSlicesCount > 0);
+    }
+
+    if (isExtraDistribution) {
+      require(extraTokensHolder != address(0));
+    }
+
+    if (isMintingShipment) {
+      require(token.owner() == address(this));
+    } else {
+      require(token.balanceOf(address(this)) >= hardCap);
+    }
+
+    state = State.Active;
+  }
+
+  // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗
+  // ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔════╝
+  // █████╗   ╚███╔╝ █████╗  ██║     ██║   ██║   ██║   █████╗  
+  // ██╔══╝   ██╔██╗ ██╔══╝  ██║     ██║   ██║   ██║   ██╔══╝  
+  // ███████╗██╔╝ ██╗███████╗╚██████╗╚██████╔╝   ██║   ███████╗
+  // ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝
+
+  function calculateEthAmount(
+    uint _weiAmount,
+    uint _time,
+    uint _totalSupply
+  ) public constant returns(uint, uint, uint) 
+  {
+    _totalSupply;
+
+    uint beneficiaryTokens;
+    uint priceWithBonus;
+    uint bonus;
+    uint extraTokens;
+
+    if (_time < startTime || _time > endTime) {
+      return (0, 0, 0);
+    } else {
+      if (isAmountBonus) {
+        bonus = bonus.add(calculateAmountBonus(_weiAmount));
+      }
+
+      if (isEarlyBonus) {
+        bonus = bonus.add(calculateTimeBonus(_time - startTime));
+      }
+    }
+
+    priceWithBonus = price.mul(10000 - bonus).div(10000);
+    beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(priceWithBonus);
+
+    if (isExtraDistribution) {
+      extraTokens = beneficiaryTokens.mul(1000 - extraDistributionPart).mul(extraDistributionPart);
+    }
+
+    return (beneficiaryTokens.add(extraTokens), beneficiaryTokens, extraTokens);
+  }
+
+  function calculateAmountBonus(uint _changeAmount) public constant returns(uint) {
+    uint bonus = 0;
+    for (uint index = 0; index < amountSlices.length; index++) {
+      if(amountSlices[index] > _changeAmount) {
+        break;
+      }
+
+      bonus = amountBonuses[amountSlices[index]];
+    }
+
+    return bonus;
+  }
+
+  function calculateTimeBonus(uint _at) public constant returns(uint) {
+    uint bonus = 0;
+    for (uint index = 0; index < timeSlices.length; index++) {
+      if(timeBonuses[index] > _at) {
+        break;
+      }
+      bonus = timeBonuses[timeSlices[index]];
+    }
+
+    return bonus;
+  }
+
+  function validPurchase(
+    address _beneficiary, 
+    uint _weiAmount, 
+    uint _tokenAmount,
+    uint _extraAmount,
+    uint _totalAmount) 
+  public constant returns(bool) 
+  {
+    _extraAmount;
+    _weiAmount;
+
+    if (isKnownOnly && !userRegistry.knownAddress(_beneficiary)) {
+      return false;
+    }
+
+    uint finalBeneficiaryBalance = temporalBalances[_beneficiary].add(_tokenAmount);
+    uint finalTotalSupply = temporalTotalSupply.add(_totalAmount);
+
+    if (isWhitelisted) {
+      WhitelistRecord record = whitelist[_beneficiary];
+      if (!record.allow() || 
+          record.min() > finalBeneficiaryBalance ||
+          record.max() < finalBeneficiaryBalance) {
+        return false;
+      }
+    }
+
+    if (hardCap < finalTotalSupply) {
+        return false;
+    }
+
+    return true;
+  }
+
+  function updateTokenValue(address _token, uint _value) onlyOwner public {
+    tokensValues[_token] = _value;
+  }
+
+  //  ██████╗ ██╗   ██╗████████╗███████╗██╗██████╗ ███████╗
+  // ██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██║██╔══██╗██╔════╝
+  // ██║   ██║██║   ██║   ██║   ███████╗██║██║  ██║█████╗  
+  // ██║   ██║██║   ██║   ██║   ╚════██║██║██║  ██║██╔══╝  
+  // ╚██████╔╝╚██████╔╝   ██║   ███████║██║██████╔╝███████╗
+  //  ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚═╝╚═════╝ ╚══════╝
   // fallback function can be used to buy tokens
   function () external payable {
     buyTokens(msg.sender);
   }
 
-  // low level token purchase function
-  function buyTokens(address _beneficiary) public payable {
-    require(isSane);
-    require(_beneficiary != address(0));
-    require(validPurchase());
-    
-    
-    bool known = userRegistry.knownAddress(_beneficiary);
-    require(known);
-
-    uint256 weiAmount = msg.value;
-
-    uint decimals = token.decimals();
-
-    // calculate token amount to be created
-    uint256 tokens = weiAmount.mul(10 ** decimals).div(price);
-
-    // update state
-    weiRaised = weiRaised.add(weiAmount);
-
-    token.mint(_beneficiary, tokens);
-    TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
-
-    forwardFunds();
+  function buyTokens(address _beneficiary) inState(State.Active) public payable {
+    uint shipAmount = sellTokens(_beneficiary, msg.value);
+    require(shipAmount > 0);
+    forwardEther();
   }
 
-  function buyWithBitcoin(address _beneficiary, uint _amount, bytes32 _hash) onlyOwner public {
-    require(isSane);
-    require(userRegistry.knownAddress(_beneficiary));
-    uint decimals = token.decimals();
-    uint value = _amount.mul(price).div(10 ** decimals);
-    weiRaised = weiRaised.add(value);
-    token.mint(_beneficiary, _amount);
+  function buyWithBitcoin(address _beneficiary, uint _amount, bytes32 _hash) 
+    inState(State.Active) onlyOwner public 
+  {
+    uint value = _amount.mul(price).div(10 ** tokenDecimals);
+    uint shipAmount = sellTokens(_beneficiary, value);
+    require(shipAmount > 0);
     BitcoinSale(_beneficiary, value, _amount, _hash);
-    TokenPurchase(_beneficiary, _beneficiary, value, _amount);
-
   }
 
-  // send ether to the fund collection wallet
-  // override to create custom fund forwarding mechanisms
-  function forwardFunds() internal {
-    wallet.transfer(msg.value);
+  function receiveApproval(address _from, 
+                           uint256 _value, 
+                           address _token, 
+                           bytes _extraData) public {
+    _extraData;
+    require(address(allowedTokens[_token]) != address(0));
+    uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
+    uint shipAmount = sellTokens(_from, weiValue);
+    require(shipAmount > 0);
+    TokenSell(_from, _token, _value, weiValue, shipAmount);
   }
 
-  // @return true if the transaction can buy tokens
-  function validPurchase() internal view returns (bool) {
-    bool withinPeriod = now >= startTime && now <= endTime;
-    bool nonZeroPurchase = msg.value != 0;
-    return withinPeriod && nonZeroPurchase;
+  function refund(address _beneficiary) onlyOwner public {
+    require(isRefundable);
+    claimRefundAllowance[_beneficiary] = true;
   }
 
-  // @return true if crowdsale event has ended
-  // function () public view returns (bool) {
-    // return now > endTime;
-  // }
+  // if crowdsale is unsuccessful, investors can claim refunds here
+  function claimRefund(address _beneficiary) public returns(bool) {
+    require(isRefundable);
+    require(claimRefundAllowance[_beneficiary] || state == State.Refund);
+
+    // refund all deposited wei
+    _beneficiary.transfer(weiDeposit[_beneficiary]);
+
+    // refund all deposited alt tokens
+    if (isTokenExcange) {
+      // token.transfer(_beneficiary, altDeposit[_beneficiary]);
+    }
+  }
+
+  // ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗
+  // ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔════╝
+  // ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████╗
+  // ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ╚════██║
+  // ██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗███████║
+  // ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝
+  // low level token purchase function
+  function sellTokens(address _beneficiary, uint weiAmount) 
+    inState(State.Active) internal returns(uint)
+  {
+    uint beneficiaryTokens;
+    uint extraTokens;
+    uint totalTokens;
+    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(weiAmount, block.timestamp, token.totalSupply());
+
+    require(validPurchase(_beneficiary,   // Check if current purchase is valid
+                          weiAmount, 
+                          beneficiaryTokens,
+                          extraTokens,
+                          totalTokens));
+
+    weiRaised = weiRaised.add(weiAmount); // update state (wei amount)
+    shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
+    TokenPurchase(msg.sender,             // Fire purchase event
+                  _beneficiary, 
+                  weiAmount, 
+                  beneficiaryTokens);
+    ShipTokens(_beneficiary, beneficiaryTokens);
+
+    if (isExtraDistribution) {            // calculate and
+      shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)
+                 extraTokens);
+      ShipTokens(extraTokensHolder, extraTokens);
+    }
+
+    return beneficiaryTokens;
+  }
+
+  function shipTokens(address _beneficiary, uint _amount) 
+    inState(State.Active) internal 
+  {
+    if (!isPullingTokens) {
+      if (isMintingShipment) {
+        token.mint(_beneficiary, _amount);
+      } else {
+        token.transferFrom(address(this), _beneficiary, _amount);
+      }
+    } 
+
+    temporalBalances[_beneficiary] = temporalBalances[_beneficiary].add(_amount);
+  }
+
+  function forwardEther() internal {
+    if (isRefundable) {
+      weiDeposit[msg.sender] = msg.value;
+    } else {
+      wallet.transfer(msg.value);
+    }
+  }
+
+  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal {
+    TokenInterface allowedToken = allowedTokens[_tokenAddress];
+
+    if (isRefundable) {
+      allowedToken.transferFrom(_beneficiary, address(this), _amount);
+      altDeposit[_tokenAddress][_beneficiary] = _amount;
+    } else {
+      allowedToken.transferFrom(_beneficiary, wallet, _amount);
+    }
+  }
 }

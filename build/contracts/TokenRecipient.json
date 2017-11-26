@@ -39,7 +39,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/TokenRecipient.sol",
       "exportedSymbols": {
         "TokenRecipient": [
-          935
+          2079
         ]
       }
     },
@@ -53,7 +53,7 @@
             ".16"
           ]
         },
-        "id": 923,
+        "id": 2067,
         "name": "PragmaDirective",
         "src": "0:24:10"
       },
@@ -69,10 +69,10 @@
           "documentation": null,
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            935
+            2079
           ],
           "name": "TokenRecipient",
-          "scope": 936
+          "scope": 2080
         },
         "children": [
           {
@@ -86,7 +86,7 @@
               ],
               "name": "receiveApproval",
               "payable": false,
-              "scope": 935,
+              "scope": 2079,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -98,7 +98,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_from",
-                      "scope": 934,
+                      "scope": 2078,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -111,12 +111,12 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 924,
+                        "id": 2068,
                         "name": "ElementaryTypeName",
                         "src": "79:7:10"
                       }
                     ],
-                    "id": 925,
+                    "id": 2069,
                     "name": "VariableDeclaration",
                     "src": "79:13:10"
                   },
@@ -124,7 +124,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_value",
-                      "scope": 934,
+                      "scope": 2078,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -137,12 +137,12 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 926,
+                        "id": 2070,
                         "name": "ElementaryTypeName",
                         "src": "94:7:10"
                       }
                     ],
-                    "id": 927,
+                    "id": 2071,
                     "name": "VariableDeclaration",
                     "src": "94:14:10"
                   },
@@ -150,7 +150,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_token",
-                      "scope": 934,
+                      "scope": 2078,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -163,12 +163,12 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 928,
+                        "id": 2072,
                         "name": "ElementaryTypeName",
                         "src": "110:7:10"
                       }
                     ],
-                    "id": 929,
+                    "id": 2073,
                     "name": "VariableDeclaration",
                     "src": "110:14:10"
                   },
@@ -176,7 +176,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_extraData",
-                      "scope": 934,
+                      "scope": 2078,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes memory",
@@ -189,17 +189,17 @@
                           "name": "bytes",
                           "type": "bytes storage pointer"
                         },
-                        "id": 930,
+                        "id": 2074,
                         "name": "ElementaryTypeName",
                         "src": "126:5:10"
                       }
                     ],
-                    "id": 931,
+                    "id": 2075,
                     "name": "VariableDeclaration",
                     "src": "126:16:10"
                   }
                 ],
-                "id": 932,
+                "id": 2076,
                 "name": "ParameterList",
                 "src": "78:65:10"
               },
@@ -210,22 +210,22 @@
                   ]
                 },
                 "children": [],
-                "id": 933,
+                "id": 2077,
                 "name": "ParameterList",
                 "src": "150:0:10"
               }
             ],
-            "id": 934,
+            "id": 2078,
             "name": "FunctionDefinition",
             "src": "54:97:10"
           }
         ],
-        "id": 935,
+        "id": 2079,
         "name": "ContractDefinition",
         "src": "26:128:10"
       }
     ],
-    "id": 936,
+    "id": 2080,
     "name": "SourceUnit",
     "src": "0:154:10"
   },
@@ -235,5 +235,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T09:45:03.104Z"
+  "updatedAt": "2017-11-26T15:15:19.216Z"
 }

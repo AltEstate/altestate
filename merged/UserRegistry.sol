@@ -19,7 +19,7 @@ contract MultiOwners {
     mapping(address => bool) owners;
     address public publisher;
 
-    function MultiOwners() {
+    function MultiOwners() public {
         owners[msg.sender] = true;
         publisher = msg.sender;
     }
@@ -29,20 +29,20 @@ contract MultiOwners {
         _; 
     }
 
-    function isOwner() constant returns (bool) {
+    function isOwner() public constant returns (bool) {
         return owners[msg.sender] ? true : false;
     }
 
-    function checkOwner(address maybe_owner) constant returns (bool) {
+    function checkOwner(address maybe_owner) public constant returns (bool) {
         return owners[maybe_owner] ? true : false;
     }
 
-    function grant(address _owner) onlyOwner {
+    function grant(address _owner) onlyOwner public {
         owners[_owner] = true;
         AccessGrant(_owner);
     }
 
-    function revoke(address _owner) onlyOwner {
+    function revoke(address _owner) onlyOwner public {
         require(_owner != publisher);
         require(msg.sender != _owner);
 

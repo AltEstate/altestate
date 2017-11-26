@@ -9,22 +9,23 @@ import './TokenRecipient.sol';
 contract TokenInterface is ERC20 {
   string public name;
   string public symbol;
-  uint8 public decimals;
+  uint public decimals;
 }
 
 contract MintableTokenInterface is TokenInterface {
+  address public owner;
   function mint(address beneficiary, uint amount) public returns(bool);
 }
 
 contract WhitelistRecord {
   bool public allow;
-  uint public minAmount;
-  uint public maxAmount;
+  uint public min;
+  uint public max;
 
   function WhitelistRecord(uint _minAmount, uint _maxAmount) public {
     allow = true;
-    minAmount = _minAmount;
-    maxAmount = _maxAmount;
+    min = _minAmount;
+    max = _maxAmount;
   }
 }
 
@@ -158,6 +159,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
   event BitcoinSale(address indexed beneficiary, uint value, uint amount, bytes32 indexed bitcoinHash);
   event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
+  event ShipTokens(address indexed owner, uint indexed amount);
   function Crowdsale(
     // Should be whitelisted to buy tokens
     bool _isWhitelisted,
@@ -185,7 +187,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _start, uint _end,
     uint _hardCap,
     address _token
-  ) {
+  ) public {
     state = State.Setup;
     isWhitelisted = _isWhitelisted;
     isKnownOnly = _isKnownOnly;
@@ -348,30 +350,32 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝
 
   function calculateEthAmount(
-    uint weiAmount,
-    uint time,
-    uint totalSupply
-  ) public constant returns(uint, uint) 
+    uint _weiAmount,
+    uint _time,
+    uint _totalSupply
+  ) public constant returns(uint, uint, uint) 
   {
+    _totalSupply;
+
     uint beneficiaryTokens;
     uint priceWithBonus;
     uint bonus;
     uint extraTokens;
 
-    if (time < startTime || time > endTime) {
-      return (0, 0);
+    if (_time < startTime || _time > endTime) {
+      return (0, 0, 0);
     } else {
       if (isAmountBonus) {
-        bonus = bonus.add(calculateAmountBonus(weiAmount));
+        bonus = bonus.add(calculateAmountBonus(_weiAmount));
       }
 
       if (isEarlyBonus) {
-        bonus = bonus.add(calculateTimeBonus(now - startTime));
+        bonus = bonus.add(calculateTimeBonus(_time - startTime));
       }
     }
 
     priceWithBonus = price.mul(10000 - bonus).div(10000);
-    beneficiaryTokens = weiAmount.mul(10 ** tokenDecimals).div(priceWithBonus);
+    beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(priceWithBonus);
 
     if (isExtraDistribution) {
       extraTokens = beneficiaryTokens.mul(1000 - extraDistributionPart).mul(extraDistributionPart);
@@ -411,7 +415,11 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _tokenAmount,
     uint _extraAmount,
     uint _totalAmount) 
-  public constant returns(bool) {
+  public constant returns(bool) 
+  {
+    _extraAmount;
+    _weiAmount;
+
     if (isKnownOnly && !userRegistry.knownAddress(_beneficiary)) {
       return false;
     }
@@ -421,9 +429,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
     if (isWhitelisted) {
       WhitelistRecord record = whitelist[_beneficiary];
-      if (!record.allow || 
-          record.min > finalBeneficiaryBalance ||
-          record.max < finalBeneficiaryBalance) {
+      if (!record.allow() || 
+          record.min() > finalBeneficiaryBalance ||
+          record.max() < finalBeneficiaryBalance) {
         return false;
       }
     }
@@ -451,7 +459,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
-    require(sellTokens(_beneficiary, msg.value));
+    uint shipAmount = sellTokens(_beneficiary, msg.value);
+    require(shipAmount > 0);
     forwardEther();
   }
 
@@ -459,7 +468,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Active) onlyOwner public 
   {
     uint value = _amount.mul(price).div(10 ** tokenDecimals);
-    require(sellTokens(_beneficiary, value));
+    uint shipAmount = sellTokens(_beneficiary, value);
+    require(shipAmount > 0);
     BitcoinSale(_beneficiary, value, _amount, _hash);
   }
 
@@ -467,11 +477,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                            uint256 _value, 
                            address _token, 
                            bytes _extraData) public {
+    _extraData;
     require(address(allowedTokens[_token]) != address(0));
-    uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals);
-    uint shipAmount = sellTokens(_from, weiAmount);
+    uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
+    uint shipAmount = sellTokens(_from, weiValue);
     require(shipAmount > 0);
-    TokenSell(_beneficiary, _token, _value, weiValue, shipAmount);
+    TokenSell(_from, _token, _value, weiValue, shipAmount);
   }
 
   function refund(address _beneficiary) onlyOwner public {
@@ -506,7 +517,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint beneficiaryTokens;
     uint extraTokens;
     uint totalTokens;
-    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(weiAmount, token.totalSupply());
+    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(weiAmount, block.timestamp, token.totalSupply());
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
                           weiAmount, 
@@ -515,7 +526,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                           totalTokens));
 
     weiRaised = weiRaised.add(weiAmount); // update state (wei amount)
-    shipTokens(_beneficiary, tokens);     // ship tokens to beneficiary
+    shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
     TokenPurchase(msg.sender,             // Fire purchase event
                   _beneficiary, 
                   weiAmount, 
@@ -524,11 +535,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
     if (isExtraDistribution) {            // calculate and
       shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)
-                 tokens);
-
-      ExtraTokens(msg.sender,             // Fire extra distribution event
-                  extraTokensHolder, 
-                  extraTokens);
+                 extraTokens);
       ShipTokens(extraTokensHolder, extraTokens);
     }
 
@@ -558,13 +565,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal {
-    TokenInterface token = allowedTokens[_tokenAddress];
+    TokenInterface allowedToken = allowedTokens[_tokenAddress];
 
     if (isRefundable) {
-      token.transferFrom(_beneficiary, address(this), _amount);
-      altDeposit[_token][_beneficiary] = _amount;
+      allowedToken.transferFrom(_beneficiary, address(this), _amount);
+      altDeposit[_tokenAddress][_beneficiary] = _amount;
     } else {
-      token.transferFrom(_beneficiary, wallet, _amount);
+      allowedToken.transferFrom(_beneficiary, wallet, _amount);
     }
   }
 }

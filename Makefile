@@ -1,4 +1,5 @@
 compile: node_modules
+	@rm -rf $(shell pwd)/build/contracts
 	@truffle compile
 	@sol-merger contracts/base/Crowdsale.sol merged/
 	@sol-merger contracts/AltToken.sol merged/
