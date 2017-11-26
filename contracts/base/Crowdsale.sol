@@ -255,11 +255,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     userRegistry = UserRegistryInterface(_registry);
   }
 
-  function setExtraTokensHolder(address _holder) 
+  function setExtraDistribution(address _holder, uint _extraPart) 
     inState(State.Setup) onlyOwner public
   {
     require(_holder != address(0));
     extraTokensHolder = _holder;
+    extraDistributionPart = _extraPart;
   }
 
   function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 

@@ -1,6 +1,8 @@
-compile: node_modules
+clean:
 	@rm -rf $(shell pwd)/merged
 	@rm -rf $(shell pwd)/build/contracts
+	
+compile: node_modules
 	@truffle compile
 	@sol-merger contracts/AltCrowdsale.sol merged/
 	@sol-merger contracts/AltToken.sol merged/

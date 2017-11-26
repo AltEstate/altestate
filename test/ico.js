@@ -4,7 +4,7 @@ import expectThrow from 'zeppelin-solidity/test/helpers/expectThrow';
 import ether from 'zeppelin-solidity/test/helpers/ether';
 import moment from 'moment';
 
-const AltCrowdsale = artifacts.require("./AltCrowdsale.sol")
+const AltCrowdsalePhaseOne = artifacts.require("./AltCrowdsalePhaseOne.sol")
 const AltToken = artifacts.require("./AltToken.sol")
 const UserRegistry = artifacts.require("./UserRegistry.sol")
 
@@ -23,9 +23,21 @@ contract('ICO', accounts => {
 
     registry = await UserRegistry.new()
     token = await AltToken.new(registry.address)
-    crowdsale = await AltCrowdsale.new(
+    crowdsale = await AltCrowdsalePhaseOne.new(
       registry.address,
-      token.address
+      token.address,
+      [
+        duration.days(3),
+        duration.days(5),
+        duration.days(10),
+        duration.days(25)
+      ],
+      [
+        2000, // 20%
+        1500,
+        1000,
+        0
+      ]
     )
 
     await token.transferOwnership(crowdsale.address)

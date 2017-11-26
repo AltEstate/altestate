@@ -55,9 +55,11 @@ contract AltCrowdsalePhaseOne is Crowdsale {
       false
     );
 
+    setTime(block.timestamp, block.timestamp + 30 days);
+
     setRegistry(_registry);
     setWallet(msg.sender);
-    setExtraTokensHolder(_extraTokensHolder);
+    setExtraDistribution(_extraTokensHolder, _extraTokensPart);
 
     // 200 ALT per 1 ETH
     setPrice(uint(1 ether).div(200));
