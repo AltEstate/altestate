@@ -394,7 +394,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function calculateTimeBonus(uint _at) public constant returns(uint) {
     uint bonus = 0;
     for (uint index = 0; index < timeSlices.length; index++) {
-      if(timeBonuses[index] > _changeAmount) {
+      if(timeBonuses[index] > _at) {
         break;
       }
       bonus = timeBonuses[timeSlices[index]];
