@@ -105,9 +105,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   MintableTokenInterface public token;  // The token being sold
   uint public tokenDecimals;            // Token decimals
 
-  mapping (address => TokenInterface) allowedTokens;
+  mapping (address => TokenInterface) public allowedTokens;
                                         // allowed tokens list
-  mapping (address => uint) tokensValues;
+  mapping (address => uint) public tokensValues;
                                         // TOKEN to ETH conversion rate (oraclized)
 
   uint public startTime;                // start and end timestamps where 
@@ -132,10 +132,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   State public state;
   // Temporal balances to pull tokens after token sale
   // requires to ship required balance to smart contract
-  mapping (address => uint) temporalBalances;
-
-  mapping (address => uint) weiDeposit;
-  mapping (address => uint) tokenDeposit;
+  mapping (address => uint) public temporalBalances;
+  uint public temporalTotalSupply;
+  mapping (address => uint) public weiDeposit;
+  mapping (address => uint) public tokenDeposit;
 
 
 
