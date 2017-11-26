@@ -426,7 +426,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       }
     }
 
-    if (isCapped && hardCap > finalTotalSupply) {
+    if (hardCap < finalTotalSupply) {
         return false;
     }
 
