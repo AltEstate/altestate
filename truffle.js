@@ -8,7 +8,7 @@ require('babel-register')({
 
 module.exports = {
   networks: {
-    development: {
+    testrpc: {
       gas: 4.5 * 1e6,
       gasPrice: 1e9,
       network_id: '*',
@@ -17,10 +17,10 @@ module.exports = {
       from: '0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1'     // Use the address we derived
     }
   },
-  // solc: {
-  //   optimizer: {
-  //     enabled: true,
-  //     runs: 200
-  //   }
-  // }
+  solc: {
+    optimizer: {
+      enabled: true,
+      runs: 200
+    }
+  }
 };

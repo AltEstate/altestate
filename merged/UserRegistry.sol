@@ -19,7 +19,6 @@ contract MultiOwners {
     mapping(address => bool) owners;
     address public publisher;
 
-
     function MultiOwners() {
         owners[msg.sender] = true;
         publisher = msg.sender;
@@ -37,7 +36,6 @@ contract MultiOwners {
     function checkOwner(address maybe_owner) constant returns (bool) {
         return owners[maybe_owner] ? true : false;
     }
-
 
     function grant(address _owner) onlyOwner {
         owners[_owner] = true;

@@ -20,6 +20,7 @@ contract('ICO', accounts => {
 
   beforeEach(async () => {
     const now = latestTime()
+
     registry = await UserRegistry.new()
     token = await AltToken.new(registry.address)
     crowdsale = await Crowdsale.new(
@@ -31,13 +32,7 @@ contract('ICO', accounts => {
       registry.address
     )
 
-    // await crowdsale.setTime(60 * 60 * 24 * 30) // 1 month
-    // await crowdsale.setPrice(1e16)
-    // await crowdsale.setWallet(accounts[1])
-    // await crowdsale.setRegistry(registry.address)
-    // await crowdsale.setToken(token.address)
-    // await token.transferOwnership(crowdsale.address)
-    // await crowdsale.saneIt()
+    await token.transferOwnership(crowdsale.address)
 
     for (let index = 0; index < 3; index++) {
       await registry.addAddress(accounts[index])
@@ -75,12 +70,12 @@ contract('ICO', accounts => {
   })
 
   it('prevent to mint more than hard cap', async () => {
-    crowdsale.buyTokens(accounts[1], { from: accounts[1], value: ether(1) })
+    await crowdsale.buyTokens(accounts[1], { from: accounts[1], value: ether(1) })
     expectThrow(crowdsale.buyTokens(accounts[2], { from: accounts[2], value: ether(0.1) }))
   })
 
   it('should be half of cap', async () => {
-    crowdsale.buyTokens(accounts[1], { from: accounts[1], value: ether(0.5) })
+    await crowdsale.buyTokens(accounts[1], { from: accounts[1], value: ether(0.5) })
 
     const total = await token.totalSupply()
     const cap = await token.cap()

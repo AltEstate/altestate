@@ -1,0 +1,69 @@
+{
+  "contractName": "SqmCrowdsale",
+  "abi": [],
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a7230582049e5c3fc0a9d2bd55e8789e09ce0f80b654a9e4ea1f65ff1a76d5af481555a070029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a7230582049e5c3fc0a9d2bd55e8789e09ce0f80b654a9e4ea1f65ff1a76d5af481555a070029",
+  "sourceMap": "26:28:2:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "26:28:2:-;;;;;",
+  "source": "pragma solidity ^0.4.15;\n\ncontract SqmCrowdsale {\n  \n}",
+  "sourcePath": "/Users/aler/crypto/altestate-3/contracts/SqmCrowdsale.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/aler/crypto/altestate-3/contracts/SqmCrowdsale.sol",
+      "exportedSymbols": {
+        "SqmCrowdsale": [
+          95
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".15"
+          ]
+        },
+        "id": 94,
+        "name": "PragmaDirective",
+        "src": "0:24:2"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            95
+          ],
+          "name": "SqmCrowdsale",
+          "nodes": [
+            null
+          ],
+          "scope": 96
+        },
+        "id": 95,
+        "name": "ContractDefinition",
+        "src": "26:28:2"
+      }
+    ],
+    "id": 96,
+    "name": "SourceUnit",
+    "src": "0:54:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2017-11-26T09:45:03.100Z"
+}

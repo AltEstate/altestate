@@ -1,0 +1,525 @@
+{
+  "contractName": "UserRegistryInterface",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_who",
+          "type": "address"
+        }
+      ],
+      "name": "hasIdentity",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "addresses",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_who",
+          "type": "address"
+        }
+      ],
+      "name": "knownAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "identities",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "name": "AddAddress",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "name": "AddIdentity",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.15;\ncontract UserRegistryInterface {\n  mapping (address => bool) public addresses;\n  mapping (address => bool) public identities;\n\n  event AddAddress(address indexed who);\n  event AddIdentity(address indexed who);\n\n  function knownAddress(address _who) public constant returns(bool);\n  function hasIdentity(address _who) public constant returns(bool);\n}",
+  "sourcePath": "/Users/aler/crypto/altestate-3/contracts/base/UserRegistryInterface.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/UserRegistryInterface.sol",
+      "exportedSymbols": {
+        "UserRegistryInterface": [
+          968
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".15"
+          ]
+        },
+        "id": 937,
+        "name": "PragmaDirective",
+        "src": "0:24:11"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            968
+          ],
+          "name": "UserRegistryInterface",
+          "scope": 969
+        },
+        "children": [
+          {
+            "attributes": {
+              "constant": false,
+              "name": "addresses",
+              "scope": 968,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(address => bool)",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(address => bool)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 938,
+                    "name": "ElementaryTypeName",
+                    "src": "69:7:11"
+                  },
+                  {
+                    "attributes": {
+                      "name": "bool",
+                      "type": "bool"
+                    },
+                    "id": 939,
+                    "name": "ElementaryTypeName",
+                    "src": "80:4:11"
+                  }
+                ],
+                "id": 940,
+                "name": "Mapping",
+                "src": "60:25:11"
+              }
+            ],
+            "id": 941,
+            "name": "VariableDeclaration",
+            "src": "60:42:11"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "name": "identities",
+              "scope": 968,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "mapping(address => bool)",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "type": "mapping(address => bool)"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 942,
+                    "name": "ElementaryTypeName",
+                    "src": "115:7:11"
+                  },
+                  {
+                    "attributes": {
+                      "name": "bool",
+                      "type": "bool"
+                    },
+                    "id": 943,
+                    "name": "ElementaryTypeName",
+                    "src": "126:4:11"
+                  }
+                ],
+                "id": 944,
+                "name": "Mapping",
+                "src": "106:25:11"
+              }
+            ],
+            "id": 945,
+            "name": "VariableDeclaration",
+            "src": "106:43:11"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "AddAddress"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "who",
+                      "scope": 949,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 946,
+                        "name": "ElementaryTypeName",
+                        "src": "171:7:11"
+                      }
+                    ],
+                    "id": 947,
+                    "name": "VariableDeclaration",
+                    "src": "171:19:11"
+                  }
+                ],
+                "id": 948,
+                "name": "ParameterList",
+                "src": "170:21:11"
+              }
+            ],
+            "id": 949,
+            "name": "EventDefinition",
+            "src": "154:38:11"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "AddIdentity"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "who",
+                      "scope": 953,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 950,
+                        "name": "ElementaryTypeName",
+                        "src": "213:7:11"
+                      }
+                    ],
+                    "id": 951,
+                    "name": "VariableDeclaration",
+                    "src": "213:19:11"
+                  }
+                ],
+                "id": 952,
+                "name": "ParameterList",
+                "src": "212:21:11"
+              }
+            ],
+            "id": 953,
+            "name": "EventDefinition",
+            "src": "195:39:11"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "knownAddress",
+              "payable": false,
+              "scope": 968,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_who",
+                      "scope": 960,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 954,
+                        "name": "ElementaryTypeName",
+                        "src": "260:7:11"
+                      }
+                    ],
+                    "id": 955,
+                    "name": "VariableDeclaration",
+                    "src": "260:12:11"
+                  }
+                ],
+                "id": 956,
+                "name": "ParameterList",
+                "src": "259:14:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 960,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 957,
+                        "name": "ElementaryTypeName",
+                        "src": "298:4:11"
+                      }
+                    ],
+                    "id": 958,
+                    "name": "VariableDeclaration",
+                    "src": "298:4:11"
+                  }
+                ],
+                "id": 959,
+                "name": "ParameterList",
+                "src": "297:6:11"
+              }
+            ],
+            "id": 960,
+            "name": "FunctionDefinition",
+            "src": "238:66:11"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "hasIdentity",
+              "payable": false,
+              "scope": 968,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_who",
+                      "scope": 967,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 961,
+                        "name": "ElementaryTypeName",
+                        "src": "328:7:11"
+                      }
+                    ],
+                    "id": 962,
+                    "name": "VariableDeclaration",
+                    "src": "328:12:11"
+                  }
+                ],
+                "id": 963,
+                "name": "ParameterList",
+                "src": "327:14:11"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 967,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 964,
+                        "name": "ElementaryTypeName",
+                        "src": "366:4:11"
+                      }
+                    ],
+                    "id": 965,
+                    "name": "VariableDeclaration",
+                    "src": "366:4:11"
+                  }
+                ],
+                "id": 966,
+                "name": "ParameterList",
+                "src": "365:6:11"
+              }
+            ],
+            "id": 967,
+            "name": "FunctionDefinition",
+            "src": "307:65:11"
+          }
+        ],
+        "id": 968,
+        "name": "ContractDefinition",
+        "src": "25:349:11"
+      }
+    ],
+    "id": 969,
+    "name": "SourceUnit",
+    "src": "0:374:11"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2017-11-26T09:45:03.104Z"
+}
