@@ -202,7 +202,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     hardCap = _hardCap;
 
     token = MintableTokenInterface(_token);
-    decimals = token.decimals();
+    tokenDecimals = token.decimals();
     price = _price;
   }
 
