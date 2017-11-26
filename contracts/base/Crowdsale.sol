@@ -223,7 +223,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     require(wallet == address(0));
     wallet = _wallet;
-    vault = new RefundVault(wallet);
   }
   
   function setRegistry(address _registry) 
