@@ -134,9 +134,11 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // requires to ship required balance to smart contract
   mapping (address => uint) public temporalBalances;
   uint public temporalTotalSupply;
-  mapping (address => uint) public weiDeposit;
-  mapping (address => uint) public tokenDeposit;
 
+  mapping (address => uint) public weiDeposit;
+  mapping (address => mapping(address => uint)) public altDeposit;
+
+  mapping (address => bool) public claimRefundAllowance;
 
 
   // ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
@@ -487,7 +489,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
     // refund all deposited alt tokens
     if (isTokenExcange) {
-      token.transfer(_beneficiary, altDeposit[_beneficiary]);
+      // token.transfer(_beneficiary, altDeposit[_beneficiary]);
     }
   }
 
@@ -555,10 +557,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
   }
 
-  function forwardTokens(address _beneficiary, uint _amount) internal {
+  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal {
+    TokenInterface token = allowedTokens[_tokenAddress];
+
     if (isRefundable) {
       token.transferFrom(_beneficiary, address(this), _amount);
-      altDeposit[_beneficiary] = _amount;
+      altDeposit[_token][_beneficiary] = _amount;
     } else {
       token.transferFrom(_beneficiary, wallet, _amount);
     }
