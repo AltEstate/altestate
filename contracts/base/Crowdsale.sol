@@ -433,6 +433,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return true;
   }
 
+  function updateTokenValue(address _token, uint _value) onlyOwner public {
+    tokensValues[_token] = _value;
+  }
+
   //  ██████╗ ██╗   ██╗████████╗███████╗██╗██████╗ ███████╗
   // ██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██║██╔══██╗██╔════╝
   // ██║   ██║██║   ██║   ██║   ███████╗██║██║  ██║█████╗  
