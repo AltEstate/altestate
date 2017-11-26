@@ -9,7 +9,7 @@ contract AltToken is NamedToken, KnownHolderToken, ApproveAndCallToken, CappedTo
   function AltToken(address _registry) 
     NamedToken("Alt Estate", "ALT", 10)
     ApproveAndCallToken()
-    CappedToken(10 ** 12) // 100 tokens!
+    CappedToken(10 ** 17) // 10M tokens!
     KnownHolderToken(_registry) public {
   }
 }

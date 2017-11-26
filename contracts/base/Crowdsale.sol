@@ -17,6 +17,18 @@ contract MintableTokenInterface is TokenInterface {
   function mint(address beneficiary, uint amount) public returns(bool);
 }
 
+contract PersonalBonusRecord {
+  address public referalAddress;
+  uint public bonus;
+  uint public referalBonus;
+
+  function PersonalBonusRecord(uint _bonus, address _referal, uint _referalBonus) public {
+    referalAddress = _referal;
+    referalBonus = _referalBonus;
+    bonus = _bonus;
+  }
+}
+
 contract WhitelistRecord {
   bool public allow;
   uint public min;
@@ -33,11 +45,13 @@ contract WhitelistRecord {
  * Complex crowdsale with huge posibilities
  * Core features:
  * - Whitelisting
- * - Min\max invest amounts
+ *  - Min\max invest amounts
+ * - Only known users
  * - Buy with allowed tokens
- * - Oraclize based pairs (ETH to TOKEN)
+ *  - Oraclize based pairs (ETH to TOKEN)
  * - Pulling tokens (temporal balance inside sale)
  * - Revert\refund
+ * - Personal bonuses
  * - Amount bonuses
  * - Total supply bonuses
  * - Early birds bonuses
@@ -90,19 +104,17 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // Known users registry (required to known rules)
   UserRegistryInterface public userRegistry;
 
-  mapping (uint => uint) public amountBonuses; 
-                                        // Amount bonuses
+  mapping (uint => uint) public amountBonuses; // Amount bonuses
   uint[] public amountSlices;           // Key is min amount of buy
   uint public amountSlicesCount;        // 10000 - totaly free
                                         //  5000 - 50% sale
                                         //     0 - 100% (no bonus)
-
-  
-  mapping (uint => uint) public timeBonuses;   
-                                        // Time bonuses
+  mapping (uint => uint) public timeBonuses; // Time bonuses
   uint[] public timeSlices;             // Same as amount but key is seconds after start
   uint public timeSlicesCount;
 
+  mapping (address => PersonalBonusRecord) public personalBonuses; 
+                                        // personal bonuses
   MintableTokenInterface public token;  // The token being sold
   uint public tokenDecimals;            // Token decimals
 
@@ -110,13 +122,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                                         // allowed tokens list
   mapping (address => uint) public tokensValues;
                                         // TOKEN to ETH conversion rate (oraclized)
-
   uint public startTime;                // start and end timestamps where 
   uint public endTime;                  // investments are allowed (both inclusive)
-
   address public wallet;                // address where funds are collected
   uint public price;                    // how many token (1 * 10 ** decimals) a buyer gets per wei
   uint public hardCap;
+  uint public softCap;
 
   address public extraTokensHolder;     // address to mint/transfer extra tokens (0 – 0%, 1000 - 100.0%)
   uint public extraDistributionPart;    // % of extra distribution
@@ -141,6 +152,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
   mapping (address => bool) public claimRefundAllowance;
 
+  modifier inState(State _target) {
+    require(state == _target);
+    _;
+  }
 
   // ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
   // ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
@@ -148,19 +163,20 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
   // ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
   // ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-                                                      
-  /**
-   * event for token purchase logging
-   * @param purchaser who paid for the tokens
-   * @param beneficiary who got the tokens
-   * @param value weis paid for purchase
-   * @param amount amount of tokens purchased
-   */
+  
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
-  event BitcoinSale(address indexed beneficiary, uint value, uint amount, bytes32 indexed bitcoinHash);
+  event HashSale(address indexed beneficiary, uint value, uint amount, uint timestamp, bytes32 indexed bitcoinHash);
   event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
   event ShipTokens(address indexed owner, uint indexed amount);
-  function Crowdsale(
+
+  // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
+  // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
+  // ███████╗█████╗     ██║   ██║   ██║██████╔╝    ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
+  // ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝     ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
+  // ███████║███████╗   ██║   ╚██████╔╝██║         ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
+  // ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝         ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+
+  function setFlags(
     // Should be whitelisted to buy tokens
     bool _isWhitelisted,
     // Should be known user to buy tokens
@@ -180,15 +196,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Will ship token via minting? 
     bool _isMintingShipment,
     // Should beneficiaries pull their tokens? 
-    bool _isPullingTokens,
-
-    // primary values:
-    uint _price,
-    uint _start, uint _end,
-    uint _hardCap,
-    address _token
-  ) public {
-    state = State.Setup;
+    bool _isPullingTokens)
+    inState(State.Setup) onlyOwner public 
+  {
     isWhitelisted = _isWhitelisted;
     isKnownOnly = _isKnownOnly;
     isAmountBonus = _isAmountBonus;
@@ -199,29 +209,38 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isExtraDistribution = _isExtraDistribution;
     isMintingShipment = _isMintingShipment;
     isPullingTokens = isRefundable || _isPullingTokens;
+  }
 
-    require(endTime > now);
-    startTime = _start;
-    endTime = _end;
-    hardCap = _hardCap;
-
-    token = MintableTokenInterface(_token);
-    tokenDecimals = token.decimals();
+  function setPrice(uint _price)
+    inState(State.Setup) onlyOwner public
+  {
     price = _price;
   }
 
-  modifier inState(State _target) {
-    require(state == _target);
-    _;
+  function setSoftHardCaps(uint _softCap, uint _hardCap)
+    inState(State.Setup) onlyOwner public
+  {
+    hardCap = _hardCap;
+    softCap = _softCap;
   }
 
-  // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
-  // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
-  // ███████╗█████╗     ██║   ██║   ██║██████╔╝    ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
-  // ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝     ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
-  // ███████║███████╗   ██║   ╚██████╔╝██║         ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
-  // ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝         ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-  
+  function setTime(uint _start, uint _end)
+    inState(State.Setup) onlyOwner public 
+  {
+    require(_start < _end);
+    require(_end > block.timestamp);
+    startTime = _start;
+    endTime = _end;
+  }
+
+  function setToken(address _tokenAddress) 
+    inState(State.Setup) onlyOwner public
+  {
+    require(_tokenAddress != address(0));
+    token = MintableTokenInterface(_tokenAddress);
+    tokenDecimals = token.decimals();
+  }
+
   function setWallet(address _wallet) 
     inState(State.Setup) onlyOwner public 
   {
@@ -241,24 +260,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     require(_holder != address(0));
     extraTokensHolder = _holder;
-  }
-
-  function setWhitelistThem(address[] _beneficiaries, uint[] _min, uint[] _max)
-    inState(State.Setup) onlyOwner public
-  {
-    require(_beneficiaries.length > 0);
-    require(_beneficiaries.length == _min.length);
-    require(_max.length == _min.length);
-
-    for (uint index = 0; index < _beneficiaries.length; index++) {
-      whitelist[_beneficiaries[index]] = new WhitelistRecord(
-        _min[index],
-        _max[index]
-      );
-
-      whitelisted.push(_beneficiaries[index]);
-      whitelistedCount++;
-    }
   }
 
   function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 
@@ -464,13 +465,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     forwardEther();
   }
 
-  function buyWithBitcoin(address _beneficiary, uint _amount, bytes32 _hash) 
+  function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash) 
     inState(State.Active) onlyOwner public 
   {
-    uint value = _amount.mul(price).div(10 ** tokenDecimals);
-    uint shipAmount = sellTokens(_beneficiary, value);
+    uint shipAmount = sellTokens(_beneficiary, _value);
     require(shipAmount > 0);
-    BitcoinSale(_beneficiary, value, _amount, _hash);
+    HashSale(_beneficiary, _value, shipAmount, _timestamp, _hash);
   }
 
   function receiveApproval(address _from, 
@@ -502,6 +502,33 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     if (isTokenExcange) {
       // token.transfer(_beneficiary, altDeposit[_beneficiary]);
     }
+  }
+
+  function addToWhitelist(address _beneficiary, uint _min, uint _max)
+    inState(State.Setup) onlyOwner public
+  {
+    require(_beneficiary != address(0));
+    require(_min <= _max);
+
+    if (_max == 0) {
+      _max = 10 ** 40; // should be huge enough? :0
+    }
+
+    whitelist[_beneficiary] = new WhitelistRecord(_min, _max);
+    whitelisted.push(_beneficiary);
+    whitelistedCount++;
+  }
+  
+  function setPersonalBonus(
+    address _beneficiary, 
+    uint _bonus, 
+    address _referalAddress, 
+    uint _referalBonus) onlyOwner public {
+    personalBonuses[_beneficiary] = new PersonalBonusRecord(
+      _bonus,
+      _referalAddress,
+      _referalBonus
+    ); 
   }
 
   // ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗

@@ -3,8 +3,8 @@
   "abi": [],
   "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a7230582049e5c3fc0a9d2bd55e8789e09ce0f80b654a9e4ea1f65ff1a76d5af481555a070029",
   "deployedBytecode": "0x6060604052600080fd00a165627a7a7230582049e5c3fc0a9d2bd55e8789e09ce0f80b654a9e4ea1f65ff1a76d5af481555a070029",
-  "sourceMap": "26:28:2:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "26:28:2:-;;;;;",
+  "sourceMap": "26:28:3:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "26:28:3:-;;;;;",
   "source": "pragma solidity ^0.4.15;\n\ncontract SqmCrowdsale {\n  \n}",
   "sourcePath": "/Users/aler/crypto/altestate-3/contracts/SqmCrowdsale.sol",
   "ast": {
@@ -12,7 +12,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/SqmCrowdsale.sol",
       "exportedSymbols": {
         "SqmCrowdsale": [
-          95
+          143
         ]
       }
     },
@@ -26,9 +26,9 @@
             ".15"
           ]
         },
-        "id": 94,
+        "id": 142,
         "name": "PragmaDirective",
-        "src": "0:24:2"
+        "src": "0:24:3"
       },
       {
         "attributes": {
@@ -42,22 +42,22 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            95
+            143
           ],
           "name": "SqmCrowdsale",
           "nodes": [
             null
           ],
-          "scope": 96
+          "scope": 144
         },
-        "id": 95,
+        "id": 143,
         "name": "ContractDefinition",
-        "src": "26:28:2"
+        "src": "26:28:3"
       }
     ],
-    "id": 96,
+    "id": 144,
     "name": "SourceUnit",
-    "src": "0:54:2"
+    "src": "0:54:3"
   },
   "compiler": {
     "name": "solc",
@@ -65,5 +65,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T15:15:19.203Z"
+  "updatedAt": "2017-11-26T15:54:35.391Z"
 }

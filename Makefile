@@ -1,7 +1,8 @@
 compile: node_modules
+	@rm -rf $(shell pwd)/merged
 	@rm -rf $(shell pwd)/build/contracts
 	@truffle compile
-	@sol-merger contracts/base/Crowdsale.sol merged/
+	@sol-merger contracts/AltCrowdsale.sol merged/
 	@sol-merger contracts/AltToken.sol merged/
 	@sol-merger contracts/UserRegistry.sol merged/
 
@@ -11,7 +12,7 @@ node_modules:
 test: node_modules
 	@truffle --network testrpc test
 
-link: node_modules
+link: compile
 	@remixd -S $(shell pwd)/merged
 
 
