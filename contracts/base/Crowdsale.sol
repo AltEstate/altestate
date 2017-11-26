@@ -170,7 +170,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Allow to buy tokens for another tokens?
     bool _isTokenExcange,
     // Allow to issue tokens with tx hash (ex bitcoin)
-    bool _allowToIssue,
+    bool _isAllowToIssue,
     // Should mint extra tokens for future distribution?
     bool _isExtraDistribution,
     // Will ship token via minting? 
@@ -191,7 +191,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isEarlyBonus = _isEarlyBonus;
     isRefundable = _isRefundable;
     isTokenExcange = _isTokenExcange;
-    allowToIssue = _allowToIssue;
+    isAllowToIssue = _isAllowToIssue;
     isExtraDistribution = _isExtraDistribution;
     isMintingShipment = _isMintingShipment;
     isPullingTokens = isRefundable || _isPullingTokens;
