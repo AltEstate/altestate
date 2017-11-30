@@ -315,10 +315,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(wallet != address(0));
     require(token != address(0));
 
-    if (isWhitelisted) {
-      require(whitelistedCount > 0);
-    }
-
     if (isKnownOnly) {
       require(userRegistry != address(0));
     }
@@ -380,7 +376,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(priceWithBonus);
 
     if (isExtraDistribution) {
-      extraTokens = beneficiaryTokens.mul(1000 - extraDistributionPart).mul(extraDistributionPart);
+      extraTokens = beneficiaryTokens.mul(10000 - extraDistributionPart).mul(extraDistributionPart);
     }
 
     return (beneficiaryTokens.add(extraTokens), beneficiaryTokens, extraTokens);

@@ -2,16 +2,6 @@ pragma solidity ^0.4.15;
 
 import './base/Crowdsale.sol';
 
-contract AltCrowdsalePhaseTwo is Crowdsale {
-  function AltCrowdsalePhaseTwo(
-    address _registry, 
-    address _token)
-    public
-  {
-    
-  }  
-}
-
 contract AltCrowdsalePhaseOne is Crowdsale {
   function AltCrowdsalePhaseOne(
     address _registry,
@@ -54,6 +44,8 @@ contract AltCrowdsalePhaseOne is Crowdsale {
       // _isPullingTokens
       false
     );
+
+    setToken(_token);
 
     setTime(block.timestamp, block.timestamp + 30 days);
 
