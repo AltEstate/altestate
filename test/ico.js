@@ -26,6 +26,8 @@ contract('ICO', accounts => {
     crowdsale = await AltCrowdsalePhaseOne.new(
       registry.address,
       token.address,
+      accounts[4],
+      3000,
       [
         duration.days(3),
         duration.days(5),
@@ -45,11 +47,13 @@ contract('ICO', accounts => {
     for (let index = 0; index < 3; index++) {
       await registry.addAddress(accounts[index])
     }
+
+    await crowdsale.saneIt()
   })
 
   it('sane?', async () => {
-    let sane = await crowdsale.isSane()
-    assert(sane, 'not ready yet?')
+    let sane = await crowdsale.state()
+    assert(sane.eq(1), `not ready yet? state is ${sane}`)
   })
 
   it('owner?', async () => {
