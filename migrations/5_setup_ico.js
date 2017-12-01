@@ -1,4 +1,4 @@
-const AltCrowdsale = artifacts.require("./AltCrowdsale.sol");
+// const AltCrowdsale = artifacts.require("./AltCrowdsale.sol");
 const AltToken = artifacts.require("./AltToken.sol");
 const UserRegistry = artifacts.require("./UserRegistry.sol");
 

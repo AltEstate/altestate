@@ -94,6 +94,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
   bool public isMintingShipment;        // Will ship token via minting?
+  bool public isCappedInEther;          // Should be capped in Ether 
   bool public isPullingTokens;          // Should beneficiaries pull their tokens?
 
   // List of allowed beneficiaries
@@ -195,6 +196,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     bool _isExtraDistribution,
     // Will ship token via minting? 
     bool _isMintingShipment,
+    // Should be capped in ether
+    bool _isCappedInEther,
     // Should beneficiaries pull their tokens? 
     bool _isPullingTokens)
     inState(State.Setup) onlyOwner public 
@@ -208,6 +211,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isAllowToIssue = _isAllowToIssue;
     isExtraDistribution = _isExtraDistribution;
     isMintingShipment = _isMintingShipment;
+    isCappedInEther = _isCappedInEther;
     isPullingTokens = isRefundable || _isPullingTokens;
   }
 
@@ -348,16 +352,17 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝
 
   function calculateEthAmount(
+    address _beneficiary,
     uint _weiAmount,
     uint _time,
     uint _totalSupply
-  ) public constant returns(uint, uint, uint) 
+  ) public returns(uint, uint, uint) 
   {
     _totalSupply;
 
     uint beneficiaryTokens;
     uint priceWithBonus;
-    uint bonus;
+    uint bonus = 0;
     uint extraTokens;
 
     if (_time < startTime || _time > endTime) {
@@ -365,18 +370,22 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     } else {
       if (isAmountBonus) {
         bonus = bonus.add(calculateAmountBonus(_weiAmount));
+        Debug(msg.sender, appendUintToString("Calculated amount dependent bonus: ", bonus));
       }
 
       if (isEarlyBonus) {
+        Debug(msg.sender, appendUintToString("Calculate time bonus at: ", _time.sub(startTime)));
         bonus = bonus.add(calculateTimeBonus(_time - startTime));
+        Debug(msg.sender, appendUintToString("Calculated time dependent bonus: ", bonus));
       }
     }
 
-    priceWithBonus = price.mul(10000 - bonus).div(10000);
-    beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(priceWithBonus);
+    // tokenBonus = price.mul(bonus).div(10000);
+    beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(price);
+    beneficiaryTokens = beneficiaryTokens.add(beneficiaryTokens.mul(bonus).div(10000));
 
     if (isExtraDistribution) {
-      extraTokens = beneficiaryTokens.mul(10000 - extraDistributionPart).mul(extraDistributionPart);
+      extraTokens = beneficiaryTokens.mul(extraDistributionPart).div(10000);
     }
 
     return (beneficiaryTokens.add(extraTokens), beneficiaryTokens, extraTokens);
@@ -391,17 +400,16 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
       bonus = amountBonuses[amountSlices[index]];
     }
-
     return bonus;
   }
 
   function calculateTimeBonus(uint _at) public constant returns(uint) {
     uint bonus = 0;
     for (uint index = 0; index < timeSlices.length; index++) {
-      if(timeBonuses[index] > _at) {
+      bonus = timeBonuses[timeSlices[index]];
+      if(timeSlices[index] > _at) {
         break;
       }
-      bonus = timeBonuses[timeSlices[index]];
     }
 
     return bonus;
@@ -434,13 +442,20 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       }
     }
 
-    if (hardCap < finalTotalSupply) {
+    if (isCappedInEther) {
+      if (weiRaised.add(_weiAmount) > hardCap) {
         return false;
+      }
+    } else {
+      if (finalTotalSupply > hardCap) {
+        return false;
+      }
     }
 
     return true;
   }
 
+                                                                                        
   function updateTokenValue(address _token, uint _value) onlyOwner public {
     tokensValues[_token] = _value;
   }
@@ -457,6 +472,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
+    Debug(msg.sender, "Start buy tokens");
+
     uint shipAmount = sellTokens(_beneficiary, msg.value);
     require(shipAmount > 0);
     forwardEther();
@@ -501,8 +518,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
   }
 
-  function addToWhitelist(address _beneficiary, uint _min, uint _max)
-    inState(State.Setup) onlyOwner public
+  function addToWhitelist(address _beneficiary, uint _min, uint _max) public
   {
     require(_beneficiary != address(0));
     require(_min <= _max);
@@ -538,10 +554,18 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function sellTokens(address _beneficiary, uint weiAmount) 
     inState(State.Active) internal returns(uint)
   {
+    Debug(msg.sender, "Start sell tokens");
     uint beneficiaryTokens;
     uint extraTokens;
     uint totalTokens;
-    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(weiAmount, block.timestamp, token.totalSupply());
+    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(
+      _beneficiary, 
+      weiAmount, 
+      block.timestamp, 
+      token.totalSupply());
+    Debug(msg.sender, "Calculate amount");
+    Debug(msg.sender, appendUintToString("Total: ", totalTokens));
+    Debug(msg.sender, appendUintToString("Beneficiary: ", beneficiaryTokens));
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
                           weiAmount, 
@@ -597,5 +621,51 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     } else {
       allowedToken.transferFrom(_beneficiary, wallet, _amount);
     }
+  }
+
+
+  // ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
+  // ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
+  // ██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗
+  // ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
+  // ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
+  // ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ 
+  event Debug(address indexed sender, string message);
+  
+  function uintToString(uint v) public pure returns (string str) {
+    uint maxlength = 100;
+    bytes memory reversed = new bytes(maxlength);
+    uint i = 0;
+    while (v != 0) {
+      uint remainder = v % 10;
+      v = v / 10;
+      reversed[i++] = byte(48 + remainder);
+    }
+    bytes memory s = new bytes(i);
+    for (uint j = 0; j < i; j++) {
+      s[j] = reversed[i - 1 - j];
+    }
+    str = string(s);
+  }
+
+  function appendUintToString(string inStr, uint v) public pure returns (string str) {
+    uint maxlength = 100;
+    bytes memory reversed = new bytes(maxlength);
+    uint i = 0;
+    while (v != 0) {
+      uint remainder = v % 10;
+      v = v / 10;
+      reversed[i++] = byte(48 + remainder);
+    }
+    bytes memory inStrb = bytes(inStr);
+    bytes memory s = new bytes(inStrb.length + i);
+    uint j;
+    for (j = 0; j < inStrb.length; j++) {
+      s[j] = inStrb[j];
+    }
+    for (j = 0; j < i; j++) {
+      s[j + inStrb.length] = reversed[i - 1 - j];
+    }
+    str = string(s);
   }
 }

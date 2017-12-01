@@ -19,7 +19,7 @@ contract AltCrowdsalePhaseOne is Crowdsale {
       // Should be known user to buy tokens
       // _isKnownOnly,
       true,
-      // Enable amount bonuses in crowdsale?
+      // Enable amount bonuses in crowdsale? 
       // _isAmountBonus,
       false,
       // Enable early bird bonus in crowdsale?
@@ -36,26 +36,34 @@ contract AltCrowdsalePhaseOne is Crowdsale {
       true,
       // Should mint extra tokens for future distribution?
       // _isExtraDistribution,
-      true,
+      false,
       // Will ship token via minting? 
       // _isMintingShipment,
+      true,
+      // Should be capped in ether
+      // bool _isCappedInEther,
       true,
       // Should beneficiaries pull their tokens? 
       // _isPullingTokens
       false
     );
 
-    setToken(_token);
-
-    setTime(block.timestamp, block.timestamp + 30 days);
+    setToken(_token); 
+ 
+    setTime(block.timestamp - 1 seconds, block.timestamp + 30 days);
 
     setRegistry(_registry);
     setWallet(msg.sender);
     setExtraDistribution(_extraTokensHolder, _extraTokensPart);
 
+    setSoftHardCaps(
+      5 ether, // soft
+      10 ether  // hard
+    );
+
     // 200 ALT per 1 ETH
-    setPrice(uint(1 ether).div(200));
+    setPrice(uint(1 ether).div(100));
 
     setTimeBonuses(_timeSlices, _timePrices);
   }  
-}
+} 

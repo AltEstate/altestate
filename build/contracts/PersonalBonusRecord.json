@@ -1,107 +1,24 @@
 {
-  "contractName": "TokenInterface",
+  "contractName": "PersonalBonusRecord",
   "abi": [
     {
       "constant": true,
       "inputs": [],
-      "name": "name",
+      "name": "referalAddress",
       "outputs": [
         {
           "name": "",
-          "type": "string"
+          "type": "address"
         }
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "spender",
-          "type": "address"
-        },
-        {
-          "name": "value",
-          "type": "uint256"
-        }
-      ],
-      "name": "approve",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "constant": true,
       "inputs": [],
-      "name": "totalSupply",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "name": "value",
-          "type": "uint256"
-        }
-      ],
-      "name": "transferFrom",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "decimals",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "who",
-          "type": "address"
-        }
-      ],
-      "name": "balanceOf",
+      "name": "referalBonus",
       "outputs": [
         {
           "name": "",
@@ -115,11 +32,11 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "symbol",
+      "name": "bonus",
       "outputs": [
         {
           "name": "",
-          "type": "string"
+          "type": "uint256"
         }
       ],
       "payable": false,
@@ -127,100 +44,29 @@
       "type": "function"
     },
     {
-      "constant": false,
       "inputs": [
         {
-          "name": "to",
+          "name": "_bonus",
+          "type": "uint256"
+        },
+        {
+          "name": "_referal",
           "type": "address"
         },
         {
-          "name": "value",
+          "name": "_referalBonus",
           "type": "uint256"
-        }
-      ],
-      "name": "transfer",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
         }
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "name": "spender",
-          "type": "address"
-        }
-      ],
-      "name": "allowance",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "name": "spender",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "value",
-          "type": "uint256"
-        }
-      ],
-      "name": "Approval",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "name": "value",
-          "type": "uint256"
-        }
-      ],
-      "name": "Transfer",
-      "type": "event"
+      "type": "constructor"
     }
   ],
-  "bytecode": "0x",
-  "deployedBytecode": "0x",
-  "sourceMap": "",
-  "deployedSourceMap": "",
+  "bytecode": "0x6060604052341561000f57600080fd5b60405160608061017f83398101604052808051919060200180519190602001805160008054600160a060020a03909516600160a060020a0319909516949094179093555050600255600155610116806100696000396000f30060606040526004361060525763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166329176e638114605757806363e0f8c714609057806375b4d78c1460b2575b600080fd5b3415606157600080fd5b606760c2565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b3415609a57600080fd5b60a060de565b60405190815260200160405180910390f35b341560bc57600080fd5b60a060e4565b60005473ffffffffffffffffffffffffffffffffffffffff1681565b60025481565b600154815600a165627a7a7230582091d82b4da3da688d748f74da85de03789263f4fc5e8511f0def93b0375bf47620029",
+  "deployedBytecode": "0x60606040526004361060525763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166329176e638114605757806363e0f8c714609057806375b4d78c1460b2575b600080fd5b3415606157600080fd5b606760c2565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b3415609a57600080fd5b60a060de565b60405190815260200160405180910390f35b341560bc57600080fd5b60a060e4565b60005473ffffffffffffffffffffffffffffffffffffffff1681565b60025481565b600154815600a165627a7a7230582091d82b4da3da688d748f74da85de03789263f4fc5e8511f0def93b0375bf47620029",
+  "sourceMap": "493:295:1:-;;;609:177;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;702:14;:25;;-1:-1:-1;;;;;702:25:1;;;-1:-1:-1;;;;;;702:25:1;;;;;;;;;;-1:-1:-1;;733:12:1;:28;702:25;767:14;493:295;;;;;;",
+  "deployedSourceMap": "493:295:1:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;526:29;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;580:24;;;;;;;;;;;;;;;;;;;;;;;;;;;559:17;;;;;;;;;;;;526:29;;;;;;:::o;580:24::-;;;;:::o;559:17::-;;;;:::o",
   "source": "pragma solidity ^0.4.15;\n\nimport 'zeppelin-solidity/contracts/math/SafeMath.sol';\nimport 'zeppelin-solidity/contracts/token/ERC20.sol';\nimport './UserRegistryInterface.sol';\nimport './MultiOwners.sol';\nimport './TokenRecipient.sol';\n\ncontract TokenInterface is ERC20 {\n  string public name;\n  string public symbol;\n  uint public decimals;\n}\n\ncontract MintableTokenInterface is TokenInterface {\n  address public owner;\n  function mint(address beneficiary, uint amount) public returns(bool);\n}\n\ncontract PersonalBonusRecord {\n  address public referalAddress;\n  uint public bonus;\n  uint public referalBonus;\n\n  function PersonalBonusRecord(uint _bonus, address _referal, uint _referalBonus) public {\n    referalAddress = _referal;\n    referalBonus = _referalBonus;\n    bonus = _bonus;\n  }\n}\n\ncontract WhitelistRecord {\n  bool public allow;\n  uint public min;\n  uint public max;\n\n  function WhitelistRecord(uint _minAmount, uint _maxAmount) public {\n    allow = true;\n    min = _minAmount;\n    max = _maxAmount;\n  }\n}\n\n/**\n * Complex crowdsale with huge posibilities\n * Core features:\n * - Whitelisting\n *  - Min\\max invest amounts\n * - Only known users\n * - Buy with allowed tokens\n *  - Oraclize based pairs (ETH to TOKEN)\n * - Pulling tokens (temporal balance inside sale)\n * - Revert\\refund\n * - Personal bonuses\n * - Amount bonuses\n * - Total supply bonuses\n * - Early birds bonuses\n * - Extra distribution (team, foundation and also)\n * - Soft and hard caps\n * - Finalization logics\n**/\ncontract Crowdsale is MultiOwners, TokenRecipient {\n  using SafeMath for uint;\n\n  //  ██████╗ ██████╗ ███╗   ██╗███████╗████████╗███████╗\n  // ██╔════╝██╔═══██╗████╗  ██║██╔════╝╚══██╔══╝██╔════╝\n  // ██║     ██║   ██║██╔██╗ ██║███████╗   ██║   ███████╗\n  // ██║     ██║   ██║██║╚██╗██║╚════██║   ██║   ╚════██║\n  // ╚██████╗╚██████╔╝██║ ╚████║███████║   ██║   ███████║\n  //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚══════╝\n  uint public constant VERSION = 0x1;\n  enum State {\n    Setup,          // Non active yet (require to be setuped)\n    Active,         // Crowdsale in a live\n    Success,        // Finalization state (forward funds, transfer tokens (if not yet), refunding via owner if it requires (KYC))\n    Refund,         // Unsucceseful crowdsale (refund ether)\n    History         // Close and store only historical fact of existence\n  }\n\n\n  //  ██████╗ ██████╗ ███╗   ██╗███████╗██╗███╗   ██╗ ██████╗ \n  // ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║████╗  ██║██╔════╝ \n  // ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██╔██╗ ██║██║  ███╗\n  // ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║╚██╗██║██║   ██║\n  // ╚██████╗╚██████╔╝██║ ╚████║██║     ██║██║ ╚████║╚██████╔╝\n  //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝ \n                                                           \n  bool public isWhitelisted;            // Should be whitelisted to buy tokens\n  bool public isKnownOnly;              // Should be known user to buy tokens\n  bool public isAmountBonus;            // Enable amount bonuses in crowdsale?\n  bool public isEarlyBonus;             // Enable early bird bonus in crowdsale?\n  bool public isRefundable;             // Allow to refund money?\n  bool public isTokenExcange;           // Allow to buy tokens for another tokens?\n  bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)\n  bool public isExtraDistribution;      // Should distribute extra tokens to special contract?\n  bool public isMintingShipment;        // Will ship token via minting?\n  bool public isCappedInEther;          // Should be capped in Ether \n  bool public isPullingTokens;          // Should beneficiaries pull their tokens?\n\n  // List of allowed beneficiaries\n  mapping (address => WhitelistRecord) public whitelist;\n  address[] public whitelisted;\n  uint public whitelistedCount;\n\n  // Known users registry (required to known rules)\n  UserRegistryInterface public userRegistry;\n\n  mapping (uint => uint) public amountBonuses; // Amount bonuses\n  uint[] public amountSlices;           // Key is min amount of buy\n  uint public amountSlicesCount;        // 10000 - totaly free\n                                        //  5000 - 50% sale\n                                        //     0 - 100% (no bonus)\n  mapping (uint => uint) public timeBonuses; // Time bonuses\n  uint[] public timeSlices;             // Same as amount but key is seconds after start\n  uint public timeSlicesCount;\n\n  mapping (address => PersonalBonusRecord) public personalBonuses; \n                                        // personal bonuses\n  MintableTokenInterface public token;  // The token being sold\n  uint public tokenDecimals;            // Token decimals\n\n  mapping (address => TokenInterface) public allowedTokens;\n                                        // allowed tokens list\n  mapping (address => uint) public tokensValues;\n                                        // TOKEN to ETH conversion rate (oraclized)\n  uint public startTime;                // start and end timestamps where \n  uint public endTime;                  // investments are allowed (both inclusive)\n  address public wallet;                // address where funds are collected\n  uint public price;                    // how many token (1 * 10 ** decimals) a buyer gets per wei\n  uint public hardCap;\n  uint public softCap;\n\n  address public extraTokensHolder;     // address to mint/transfer extra tokens (0 – 0%, 1000 - 100.0%)\n  uint public extraDistributionPart;    // % of extra distribution\n\n  // ███████╗████████╗ █████╗ ████████╗███████╗\n  // ██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝██╔════╝\n  // ███████╗   ██║   ███████║   ██║   █████╗  \n  // ╚════██║   ██║   ██╔══██║   ██║   ██╔══╝  \n  // ███████║   ██║   ██║  ██║   ██║   ███████╗\n  // ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚══════╝\n  // amount of raised money in wei\n  uint public weiRaised;\n  // Current crowdsale state\n  State public state;\n  // Temporal balances to pull tokens after token sale\n  // requires to ship required balance to smart contract\n  mapping (address => uint) public temporalBalances;\n  uint public temporalTotalSupply;\n\n  mapping (address => uint) public weiDeposit;\n  mapping (address => mapping(address => uint)) public altDeposit;\n\n  mapping (address => bool) public claimRefundAllowance;\n\n  modifier inState(State _target) {\n    require(state == _target);\n    _;\n  }\n\n  // ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗\n  // ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝\n  // █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗\n  // ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║\n  // ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║\n  // ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝\n  \n  event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);\n  event HashSale(address indexed beneficiary, uint value, uint amount, uint timestamp, bytes32 indexed bitcoinHash);\n  event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);\n  event ShipTokens(address indexed owner, uint indexed amount);\n\n  // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗\n  // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝\n  // ███████╗█████╗     ██║   ██║   ██║██████╔╝    ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗\n  // ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝     ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║\n  // ███████║███████╗   ██║   ╚██████╔╝██║         ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║\n  // ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝         ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝\n\n  function setFlags(\n    // Should be whitelisted to buy tokens\n    bool _isWhitelisted,\n    // Should be known user to buy tokens\n    bool _isKnownOnly,\n    // Enable amount bonuses in crowdsale?\n    bool _isAmountBonus,\n    // Enable early bird bonus in crowdsale?\n    bool _isEarlyBonus,\n    // Allow to refund money?\n    bool _isRefundable,\n    // Allow to buy tokens for another tokens?\n    bool _isTokenExcange,\n    // Allow to issue tokens with tx hash (ex bitcoin)\n    bool _isAllowToIssue,\n    // Should mint extra tokens for future distribution?\n    bool _isExtraDistribution,\n    // Will ship token via minting? \n    bool _isMintingShipment,\n    // Should be capped in ether\n    bool _isCappedInEther,\n    // Should beneficiaries pull their tokens? \n    bool _isPullingTokens)\n    inState(State.Setup) onlyOwner public \n  {\n    isWhitelisted = _isWhitelisted;\n    isKnownOnly = _isKnownOnly;\n    isAmountBonus = _isAmountBonus;\n    isEarlyBonus = _isEarlyBonus;\n    isRefundable = _isRefundable;\n    isTokenExcange = _isTokenExcange;\n    isAllowToIssue = _isAllowToIssue;\n    isExtraDistribution = _isExtraDistribution;\n    isMintingShipment = _isMintingShipment;\n    isCappedInEther = _isCappedInEther;\n    isPullingTokens = isRefundable || _isPullingTokens;\n  }\n\n  function setPrice(uint _price)\n    inState(State.Setup) onlyOwner public\n  {\n    price = _price;\n  }\n\n  function setSoftHardCaps(uint _softCap, uint _hardCap)\n    inState(State.Setup) onlyOwner public\n  {\n    hardCap = _hardCap;\n    softCap = _softCap;\n  }\n\n  function setTime(uint _start, uint _end)\n    inState(State.Setup) onlyOwner public \n  {\n    require(_start < _end);\n    require(_end > block.timestamp);\n    startTime = _start;\n    endTime = _end;\n  }\n\n  function setToken(address _tokenAddress) \n    inState(State.Setup) onlyOwner public\n  {\n    require(_tokenAddress != address(0));\n    token = MintableTokenInterface(_tokenAddress);\n    tokenDecimals = token.decimals();\n  }\n\n  function setWallet(address _wallet) \n    inState(State.Setup) onlyOwner public \n  {\n    require(wallet == address(0));\n    wallet = _wallet;\n  }\n  \n  function setRegistry(address _registry) \n    inState(State.Setup) onlyOwner public \n  {\n    require(address(userRegistry) == 0);\n    userRegistry = UserRegistryInterface(_registry);\n  }\n\n  function setExtraDistribution(address _holder, uint _extraPart) \n    inState(State.Setup) onlyOwner public\n  {\n    require(_holder != address(0));\n    extraTokensHolder = _holder;\n    extraDistributionPart = _extraPart;\n  }\n\n  function setAmountBonuses(uint[] _amountSlices, uint[] _prices) \n    inState(State.Setup) onlyOwner public \n  {\n    // Only once in life time\n    require(amountSlicesCount == 0);\n    require(_amountSlices.length > 1);\n    require(_prices.length == _amountSlices.length);\n    uint lastSlice = 0;\n    for (uint index = 0; index < _amountSlices.length; index++) {\n      require(_amountSlices[index] >= lastSlice);\n      lastSlice = _amountSlices[index];\n      amountSlices.push(lastSlice);\n      amountBonuses[lastSlice] = _prices[index];\n    }\n    amountSlicesCount = amountSlices.length;\n  }\n\n  function setTimeBonuses(uint[] _timeSlices, uint[] _prices) \n    inState(State.Setup) onlyOwner public \n  {\n    // Only once in life time\n    require(timeSlicesCount == 0);\n    require(_timeSlices.length > 1);\n    require(_prices.length == _timeSlices.length);\n    uint lastSlice = 0;\n    for (uint index = 0; index < _timeSlices.length; index++) {\n      require(_timeSlices[index] >= lastSlice);\n      lastSlice = _timeSlices[index];\n      timeSlices.push(lastSlice);\n      timeBonuses[lastSlice] = _prices[index];\n    }\n    timeSlicesCount = timeSlices.length;\n  }\n  \n  function setTokenExcange(address _token, uint _value)\n    inState(State.Setup) onlyOwner public\n  {\n    allowedTokens[_token] = TokenInterface(_token);\n    updateTokenValue(_token, _value); \n  }\n\n  function saneIt() \n    inState(State.Setup) onlyOwner public \n  {\n    require(startTime <= now);\n    require(endTime > now);\n\n    require(price > 0);\n\n    require(wallet != address(0));\n    require(token != address(0));\n\n    if (isKnownOnly) {\n      require(userRegistry != address(0));\n    }\n\n    if (isAmountBonus) {\n      require(amountSlicesCount > 0);\n    }\n\n    if (isEarlyBonus) {\n      require(timeSlicesCount > 0);\n    }\n\n    if (isExtraDistribution) {\n      require(extraTokensHolder != address(0));\n    }\n\n    if (isMintingShipment) {\n      require(token.owner() == address(this));\n    } else {\n      require(token.balanceOf(address(this)) >= hardCap);\n    }\n\n    state = State.Active;\n  }\n\n  // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗\n  // ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔════╝\n  // █████╗   ╚███╔╝ █████╗  ██║     ██║   ██║   ██║   █████╗  \n  // ██╔══╝   ██╔██╗ ██╔══╝  ██║     ██║   ██║   ██║   ██╔══╝  \n  // ███████╗██╔╝ ██╗███████╗╚██████╗╚██████╔╝   ██║   ███████╗\n  // ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝\n\n  function calculateEthAmount(\n    address _beneficiary,\n    uint _weiAmount,\n    uint _time,\n    uint _totalSupply\n  ) public returns(uint, uint, uint) \n  {\n    _totalSupply;\n\n    uint beneficiaryTokens;\n    uint priceWithBonus;\n    uint bonus = 0;\n    uint extraTokens;\n\n    if (_time < startTime || _time > endTime) {\n      return (0, 0, 0);\n    } else {\n      if (isAmountBonus) {\n        bonus = bonus.add(calculateAmountBonus(_weiAmount));\n        Debug(msg.sender, appendUintToString(\"Calculated amount dependent bonus: \", bonus));\n      }\n\n      if (isEarlyBonus) {\n        Debug(msg.sender, appendUintToString(\"Calculate time bonus at: \", _time.sub(startTime)));\n        bonus = bonus.add(calculateTimeBonus(_time - startTime));\n        Debug(msg.sender, appendUintToString(\"Calculated time dependent bonus: \", bonus));\n      }\n    }\n\n    // tokenBonus = price.mul(bonus).div(10000);\n    beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(price);\n    beneficiaryTokens = beneficiaryTokens.add(beneficiaryTokens.mul(bonus).div(10000));\n\n    if (isExtraDistribution) {\n      extraTokens = beneficiaryTokens.mul(extraDistributionPart).div(10000);\n    }\n\n    return (beneficiaryTokens.add(extraTokens), beneficiaryTokens, extraTokens);\n  }\n\n  function calculateAmountBonus(uint _changeAmount) public constant returns(uint) {\n    uint bonus = 0;\n    for (uint index = 0; index < amountSlices.length; index++) {\n      if(amountSlices[index] > _changeAmount) {\n        break;\n      }\n\n      bonus = amountBonuses[amountSlices[index]];\n    }\n    return bonus;\n  }\n\n  function calculateTimeBonus(uint _at) public constant returns(uint) {\n    uint bonus = 0;\n    for (uint index = 0; index < timeSlices.length; index++) {\n      bonus = timeBonuses[timeSlices[index]];\n      if(timeSlices[index] > _at) {\n        break;\n      }\n    }\n\n    return bonus;\n  }\n\n  function validPurchase(\n    address _beneficiary, \n    uint _weiAmount, \n    uint _tokenAmount,\n    uint _extraAmount,\n    uint _totalAmount) \n  public constant returns(bool) \n  {\n    _extraAmount;\n    _weiAmount;\n\n    if (isKnownOnly && !userRegistry.knownAddress(_beneficiary)) {\n      return false;\n    }\n\n    uint finalBeneficiaryBalance = temporalBalances[_beneficiary].add(_tokenAmount);\n    uint finalTotalSupply = temporalTotalSupply.add(_totalAmount);\n\n    if (isWhitelisted) {\n      WhitelistRecord record = whitelist[_beneficiary];\n      if (!record.allow() || \n          record.min() > finalBeneficiaryBalance ||\n          record.max() < finalBeneficiaryBalance) {\n        return false;\n      }\n    }\n\n    if (isCappedInEther) {\n      if (weiRaised.add(_weiAmount) > hardCap) {\n        return false;\n      }\n    } else {\n      if (finalTotalSupply > hardCap) {\n        return false;\n      }\n    }\n\n    return true;\n  }\n\n                                                                                        \n  function updateTokenValue(address _token, uint _value) onlyOwner public {\n    tokensValues[_token] = _value;\n  }\n\n  //  ██████╗ ██╗   ██╗████████╗███████╗██╗██████╗ ███████╗\n  // ██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██║██╔══██╗██╔════╝\n  // ██║   ██║██║   ██║   ██║   ███████╗██║██║  ██║█████╗  \n  // ██║   ██║██║   ██║   ██║   ╚════██║██║██║  ██║██╔══╝  \n  // ╚██████╔╝╚██████╔╝   ██║   ███████║██║██████╔╝███████╗\n  //  ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚═╝╚═════╝ ╚══════╝\n  // fallback function can be used to buy tokens\n  function () external payable {\n    buyTokens(msg.sender);\n  }\n\n  function buyTokens(address _beneficiary) inState(State.Active) public payable {\n    Debug(msg.sender, \"Start buy tokens\");\n\n    uint shipAmount = sellTokens(_beneficiary, msg.value);\n    require(shipAmount > 0);\n    forwardEther();\n  }\n\n  function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash) \n    inState(State.Active) onlyOwner public \n  {\n    uint shipAmount = sellTokens(_beneficiary, _value);\n    require(shipAmount > 0);\n    HashSale(_beneficiary, _value, shipAmount, _timestamp, _hash);\n  }\n\n  function receiveApproval(address _from, \n                           uint256 _value, \n                           address _token, \n                           bytes _extraData) public {\n    _extraData;\n    require(address(allowedTokens[_token]) != address(0));\n    uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());\n    uint shipAmount = sellTokens(_from, weiValue);\n    require(shipAmount > 0);\n    TokenSell(_from, _token, _value, weiValue, shipAmount);\n  }\n\n  function refund(address _beneficiary) onlyOwner public {\n    require(isRefundable);\n    claimRefundAllowance[_beneficiary] = true;\n  }\n\n  // if crowdsale is unsuccessful, investors can claim refunds here\n  function claimRefund(address _beneficiary) public returns(bool) {\n    require(isRefundable);\n    require(claimRefundAllowance[_beneficiary] || state == State.Refund);\n\n    // refund all deposited wei\n    _beneficiary.transfer(weiDeposit[_beneficiary]);\n\n    // refund all deposited alt tokens\n    if (isTokenExcange) {\n      // token.transfer(_beneficiary, altDeposit[_beneficiary]);\n    }\n  }\n\n  function addToWhitelist(address _beneficiary, uint _min, uint _max) public\n  {\n    require(_beneficiary != address(0));\n    require(_min <= _max);\n\n    if (_max == 0) {\n      _max = 10 ** 40; // should be huge enough? :0\n    }\n\n    whitelist[_beneficiary] = new WhitelistRecord(_min, _max);\n    whitelisted.push(_beneficiary);\n    whitelistedCount++;\n  }\n  \n  function setPersonalBonus(\n    address _beneficiary, \n    uint _bonus, \n    address _referalAddress, \n    uint _referalBonus) onlyOwner public {\n    personalBonuses[_beneficiary] = new PersonalBonusRecord(\n      _bonus,\n      _referalAddress,\n      _referalBonus\n    ); \n  }\n\n  // ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗\n  // ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔════╝\n  // ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████╗\n  // ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ╚════██║\n  // ██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗███████║\n  // ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝\n  // low level token purchase function\n  function sellTokens(address _beneficiary, uint weiAmount) \n    inState(State.Active) internal returns(uint)\n  {\n    Debug(msg.sender, \"Start sell tokens\");\n    uint beneficiaryTokens;\n    uint extraTokens;\n    uint totalTokens;\n    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(\n      _beneficiary, \n      weiAmount, \n      block.timestamp, \n      token.totalSupply());\n    Debug(msg.sender, \"Calculate amount\");\n    Debug(msg.sender, appendUintToString(\"Total: \", totalTokens));\n    Debug(msg.sender, appendUintToString(\"Beneficiary: \", beneficiaryTokens));\n\n    require(validPurchase(_beneficiary,   // Check if current purchase is valid\n                          weiAmount, \n                          beneficiaryTokens,\n                          extraTokens,\n                          totalTokens));\n\n    weiRaised = weiRaised.add(weiAmount); // update state (wei amount)\n    shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary\n    TokenPurchase(msg.sender,             // Fire purchase event\n                  _beneficiary, \n                  weiAmount, \n                  beneficiaryTokens);\n    ShipTokens(_beneficiary, beneficiaryTokens);\n\n    if (isExtraDistribution) {            // calculate and\n      shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)\n                 extraTokens);\n      ShipTokens(extraTokensHolder, extraTokens);\n    }\n\n    return beneficiaryTokens;\n  }\n\n  function shipTokens(address _beneficiary, uint _amount) \n    inState(State.Active) internal \n  {\n    if (!isPullingTokens) {\n      if (isMintingShipment) {\n        token.mint(_beneficiary, _amount);\n      } else {\n        token.transferFrom(address(this), _beneficiary, _amount);\n      }\n    } \n\n    temporalBalances[_beneficiary] = temporalBalances[_beneficiary].add(_amount);\n  }\n\n  function forwardEther() internal {\n    if (isRefundable) {\n      weiDeposit[msg.sender] = msg.value;\n    } else {\n      wallet.transfer(msg.value);\n    }\n  }\n\n  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal {\n    TokenInterface allowedToken = allowedTokens[_tokenAddress];\n\n    if (isRefundable) {\n      allowedToken.transferFrom(_beneficiary, address(this), _amount);\n      altDeposit[_tokenAddress][_beneficiary] = _amount;\n    } else {\n      allowedToken.transferFrom(_beneficiary, wallet, _amount);\n    }\n  }\n\n\n  // ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ \n  // ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ \n  // ██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗\n  // ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║\n  // ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝\n  // ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ \n  event Debug(address indexed sender, string message);\n  \n  function uintToString(uint v) public pure returns (string str) {\n    uint maxlength = 100;\n    bytes memory reversed = new bytes(maxlength);\n    uint i = 0;\n    while (v != 0) {\n      uint remainder = v % 10;\n      v = v / 10;\n      reversed[i++] = byte(48 + remainder);\n    }\n    bytes memory s = new bytes(i);\n    for (uint j = 0; j < i; j++) {\n      s[j] = reversed[i - 1 - j];\n    }\n    str = string(s);\n  }\n\n  function appendUintToString(string inStr, uint v) public pure returns (string str) {\n    uint maxlength = 100;\n    bytes memory reversed = new bytes(maxlength);\n    uint i = 0;\n    while (v != 0) {\n      uint remainder = v % 10;\n      v = v / 10;\n      reversed[i++] = byte(48 + remainder);\n    }\n    bytes memory inStrb = bytes(inStr);\n    bytes memory s = new bytes(inStrb.length + i);\n    uint j;\n    for (j = 0; j < inStrb.length; j++) {\n      s[j] = inStrb[j];\n    }\n    for (j = 0; j < i; j++) {\n      s[j + inStrb.length] = reversed[i - 1 - j];\n    }\n    str = string(s);\n  }\n}",
   "sourcePath": "/Users/aler/crypto/altestate-3/contracts/base/Crowdsale.sol",
   "ast": {
@@ -27116,5 +26962,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-01T13:39:55.272Z"
+  "updatedAt": "2017-12-01T13:39:55.294Z"
 }

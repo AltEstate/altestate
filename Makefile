@@ -11,7 +11,7 @@ compile: node_modules
 node_modules:
 	npm install
 
-test: node_modules
+test: compile
 	@truffle --network testrpc test
 
 link: compile

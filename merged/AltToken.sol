@@ -318,39 +318,11 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-/**
- * @title Capped token
- * @dev Mintable token with a token cap.
- */
-
-contract CappedToken is MintableToken {
-
-  uint256 public cap;
-
-  function CappedToken(uint256 _cap) public {
-    require(_cap > 0);
-    cap = _cap;
-  }
-
-  /**
-   * @dev Function to mint tokens
-   * @param _to The address that will receive the minted tokens.
-   * @param _amount The amount of tokens to mint.
-   * @return A boolean that indicates if the operation was successful.
-   */
-  function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-    require(totalSupply.add(_amount) <= cap);
-
-    return super.mint(_to, _amount);
-  }
-
-}
-
-contract AltToken is NamedToken, KnownHolderToken, ApproveAndCallToken, CappedToken {
+contract AltToken is NamedToken, KnownHolderToken, ApproveAndCallToken, MintableToken {
   function AltToken(address _registry) 
     NamedToken("Alt Estate", "ALT", 10)
     ApproveAndCallToken()
-    CappedToken(10 ** 17) // 10M tokens!
+    MintableToken()
     KnownHolderToken(_registry) public {
   }
 }

@@ -475,7 +475,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/SqmToken.sol",
       "exportedSymbols": {
         "SqmToken": [
-          183
+          218
         ]
       }
     },
@@ -489,102 +489,102 @@
             ".15"
           ]
         },
-        "id": 145,
+        "id": 180,
         "name": "PragmaDirective",
         "src": "0:24:4"
       },
       {
         "attributes": {
-          "SourceUnit": 1957,
+          "SourceUnit": 2386,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/KnownHolderToken.sol",
           "file": "./base/KnownHolderToken.sol",
-          "scope": 184,
+          "scope": 219,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 146,
+        "id": 181,
         "name": "ImportDirective",
         "src": "26:37:4"
       },
       {
         "attributes": {
-          "SourceUnit": 340,
+          "SourceUnit": 375,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/ApproveAndCallToken.sol",
           "file": "./base/ApproveAndCallToken.sol",
-          "scope": 184,
+          "scope": 219,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 147,
+        "id": 182,
         "name": "ImportDirective",
         "src": "64:40:4"
       },
       {
         "attributes": {
-          "SourceUnit": 2115,
+          "SourceUnit": 2544,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/NamedToken.sol",
           "file": "./base/NamedToken.sol",
-          "scope": 184,
+          "scope": 219,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 148,
+        "id": 183,
         "name": "ImportDirective",
         "src": "105:31:4"
       },
       {
         "attributes": {
-          "SourceUnit": 2455,
+          "SourceUnit": 2884,
           "absolutePath": "zeppelin-solidity/contracts/token/CappedToken.sol",
           "file": "zeppelin-solidity/contracts/token/CappedToken.sol",
-          "scope": 184,
+          "scope": 219,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 149,
+        "id": 184,
         "name": "ImportDirective",
         "src": "137:59:4"
       },
       {
         "attributes": {
           "contractDependencies": [
-            339,
-            1956,
-            2114,
-            2315,
-            2401,
-            2454,
-            2497,
-            2526,
-            2621,
-            2867
+            374,
+            2385,
+            2543,
+            2744,
+            2830,
+            2883,
+            2926,
+            2955,
+            3050,
+            3296
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            183,
-            2454,
-            2621,
-            2315,
-            339,
-            1956,
-            2114,
-            2867,
-            2401,
-            2497,
-            2526
+            218,
+            2883,
+            3050,
+            2744,
+            374,
+            2385,
+            2543,
+            3296,
+            2830,
+            2926,
+            2955
           ],
           "name": "SqmToken",
-          "scope": 184
+          "scope": 219
         },
         "children": [
           {
@@ -598,15 +598,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "NamedToken",
-                  "referencedDeclaration": 2114,
+                  "referencedDeclaration": 2543,
                   "type": "contract NamedToken"
                 },
-                "id": 150,
+                "id": 185,
                 "name": "UserDefinedTypeName",
                 "src": "219:10:4"
               }
             ],
-            "id": 151,
+            "id": 186,
             "name": "InheritanceSpecifier",
             "src": "219:10:4"
           },
@@ -621,15 +621,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "KnownHolderToken",
-                  "referencedDeclaration": 1956,
+                  "referencedDeclaration": 2385,
                   "type": "contract KnownHolderToken"
                 },
-                "id": 152,
+                "id": 187,
                 "name": "UserDefinedTypeName",
                 "src": "231:16:4"
               }
             ],
-            "id": 153,
+            "id": 188,
             "name": "InheritanceSpecifier",
             "src": "231:16:4"
           },
@@ -644,15 +644,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "ApproveAndCallToken",
-                  "referencedDeclaration": 339,
+                  "referencedDeclaration": 374,
                   "type": "contract ApproveAndCallToken"
                 },
-                "id": 154,
+                "id": 189,
                 "name": "UserDefinedTypeName",
                 "src": "249:19:4"
               }
             ],
-            "id": 155,
+            "id": 190,
             "name": "InheritanceSpecifier",
             "src": "249:19:4"
           },
@@ -667,15 +667,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "CappedToken",
-                  "referencedDeclaration": 2454,
+                  "referencedDeclaration": 2883,
                   "type": "contract CappedToken"
                 },
-                "id": 156,
+                "id": 191,
                 "name": "UserDefinedTypeName",
                 "src": "270:11:4"
               }
             ],
-            "id": 157,
+            "id": 192,
             "name": "InheritanceSpecifier",
             "src": "270:11:4"
           },
@@ -686,7 +686,7 @@
               "isConstructor": true,
               "name": "SqmToken",
               "payable": false,
-              "scope": 183,
+              "scope": 218,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -698,7 +698,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_name",
-                      "scope": 182,
+                      "scope": 217,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -711,12 +711,12 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 158,
+                        "id": 193,
                         "name": "ElementaryTypeName",
                         "src": "304:6:4"
                       }
                     ],
-                    "id": 159,
+                    "id": 194,
                     "name": "VariableDeclaration",
                     "src": "304:12:4"
                   },
@@ -724,7 +724,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_ticker",
-                      "scope": 182,
+                      "scope": 217,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -737,12 +737,12 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 160,
+                        "id": 195,
                         "name": "ElementaryTypeName",
                         "src": "318:6:4"
                       }
                     ],
-                    "id": 161,
+                    "id": 196,
                     "name": "VariableDeclaration",
                     "src": "318:14:4"
                   },
@@ -750,7 +750,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_decimals",
-                      "scope": 182,
+                      "scope": 217,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -763,12 +763,12 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 162,
+                        "id": 197,
                         "name": "ElementaryTypeName",
                         "src": "334:4:4"
                       }
                     ],
-                    "id": 163,
+                    "id": 198,
                     "name": "VariableDeclaration",
                     "src": "334:14:4"
                   },
@@ -776,7 +776,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_cap",
-                      "scope": 182,
+                      "scope": 217,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -789,12 +789,12 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 164,
+                        "id": 199,
                         "name": "ElementaryTypeName",
                         "src": "350:4:4"
                       }
                     ],
-                    "id": 165,
+                    "id": 200,
                     "name": "VariableDeclaration",
                     "src": "350:9:4"
                   },
@@ -802,7 +802,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_registry",
-                      "scope": 182,
+                      "scope": 217,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -815,17 +815,17 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 166,
+                        "id": 201,
                         "name": "ElementaryTypeName",
                         "src": "361:7:4"
                       }
                     ],
-                    "id": 167,
+                    "id": 202,
                     "name": "VariableDeclaration",
                     "src": "361:17:4"
                   }
                 ],
-                "id": 168,
+                "id": 203,
                 "name": "ParameterList",
                 "src": "303:76:4"
               },
@@ -836,7 +836,7 @@
                   ]
                 },
                 "children": [],
-                "id": 180,
+                "id": 215,
                 "name": "ParameterList",
                 "src": "491:0:4"
               },
@@ -848,11 +848,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 1956,
+                      "referencedDeclaration": 2385,
                       "type": "type(contract KnownHolderToken)",
                       "value": "KnownHolderToken"
                     },
-                    "id": 169,
+                    "id": 204,
                     "name": "Identifier",
                     "src": "385:16:4"
                   },
@@ -862,16 +862,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 167,
+                      "referencedDeclaration": 202,
                       "type": "address",
                       "value": "_registry"
                     },
-                    "id": 170,
+                    "id": 205,
                     "name": "Identifier",
                     "src": "402:9:4"
                   }
                 ],
-                "id": 171,
+                "id": 206,
                 "name": "ModifierInvocation",
                 "src": "385:27:4"
               },
@@ -883,11 +883,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2114,
+                      "referencedDeclaration": 2543,
                       "type": "type(contract NamedToken)",
                       "value": "NamedToken"
                     },
-                    "id": 172,
+                    "id": 207,
                     "name": "Identifier",
                     "src": "417:10:4"
                   },
@@ -897,11 +897,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 159,
+                      "referencedDeclaration": 194,
                       "type": "string memory",
                       "value": "_name"
                     },
-                    "id": 173,
+                    "id": 208,
                     "name": "Identifier",
                     "src": "428:5:4"
                   },
@@ -911,11 +911,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 161,
+                      "referencedDeclaration": 196,
                       "type": "string memory",
                       "value": "_ticker"
                     },
-                    "id": 174,
+                    "id": 209,
                     "name": "Identifier",
                     "src": "435:7:4"
                   },
@@ -925,16 +925,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 163,
+                      "referencedDeclaration": 198,
                       "type": "uint256",
                       "value": "_decimals"
                     },
-                    "id": 175,
+                    "id": 210,
                     "name": "Identifier",
                     "src": "444:9:4"
                   }
                 ],
-                "id": 176,
+                "id": 211,
                 "name": "ModifierInvocation",
                 "src": "417:37:4"
               },
@@ -946,11 +946,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2454,
+                      "referencedDeclaration": 2883,
                       "type": "type(contract CappedToken)",
                       "value": "CappedToken"
                     },
-                    "id": 177,
+                    "id": 212,
                     "name": "Identifier",
                     "src": "459:11:4"
                   },
@@ -960,16 +960,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 165,
+                      "referencedDeclaration": 200,
                       "type": "uint256",
                       "value": "_cap"
                     },
-                    "id": 178,
+                    "id": 213,
                     "name": "Identifier",
                     "src": "471:4:4"
                   }
                 ],
-                "id": 179,
+                "id": 214,
                 "name": "ModifierInvocation",
                 "src": "459:17:4"
               },
@@ -980,22 +980,22 @@
                   ]
                 },
                 "children": [],
-                "id": 181,
+                "id": 216,
                 "name": "Block",
                 "src": "491:5:4"
               }
             ],
-            "id": 182,
+            "id": 217,
             "name": "FunctionDefinition",
             "src": "286:210:4"
           }
         ],
-        "id": 183,
+        "id": 218,
         "name": "ContractDefinition",
         "src": "198:300:4"
       }
     ],
-    "id": 184,
+    "id": 219,
     "name": "SourceUnit",
     "src": "0:498:4"
   },
@@ -1005,5 +1005,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T15:54:35.391Z"
+  "updatedAt": "2017-12-01T12:06:46.891Z"
 }
