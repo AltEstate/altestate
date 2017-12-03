@@ -9,7 +9,7 @@ require('babel-register')({
 module.exports = {
   networks: {
     testrpc: {
-      gas: 4.5 * 1e6,
+      // gas: 4.5 * 1e6,
       gasPrice: 1e9,
       network_id: '*',
       host: 'localhost',

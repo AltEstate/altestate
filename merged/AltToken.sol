@@ -318,11 +318,16 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-contract AltToken is NamedToken, KnownHolderToken, ApproveAndCallToken, MintableToken {
-  function AltToken(address _registry) 
-    NamedToken("Alt Estate", "ALT", 10)
+contract DefaultToken is NamedToken, KnownHolderToken, ApproveAndCallToken, MintableToken {
+  function DefaultToken(string name, string ticker, uint decimals, address _registry) 
+    NamedToken(name, ticker, decimals)
     ApproveAndCallToken()
     MintableToken()
     KnownHolderToken(_registry) public {
+  }
+}
+
+contract AltToken is DefaultToken {
+  function AltToken(address _registry) DefaultToken("Alt Estate", "ALT", 10, _registry) public {
   }
 }

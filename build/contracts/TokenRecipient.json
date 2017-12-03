@@ -39,7 +39,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/TokenRecipient.sol",
       "exportedSymbols": {
         "TokenRecipient": [
-          2146
+          2343
         ]
       }
     },
@@ -53,9 +53,9 @@
             ".16"
           ]
         },
-        "id": 2134,
+        "id": 2331,
         "name": "PragmaDirective",
-        "src": "0:24:3"
+        "src": "0:24:2"
       },
       {
         "attributes": {
@@ -69,10 +69,10 @@
           "documentation": null,
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            2146
+            2343
           ],
           "name": "TokenRecipient",
-          "scope": 2147
+          "scope": 2344
         },
         "children": [
           {
@@ -86,7 +86,7 @@
               ],
               "name": "receiveApproval",
               "payable": false,
-              "scope": 2146,
+              "scope": 2343,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -98,7 +98,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_from",
-                      "scope": 2145,
+                      "scope": 2342,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -111,20 +111,20 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 2135,
+                        "id": 2332,
                         "name": "ElementaryTypeName",
-                        "src": "79:7:3"
+                        "src": "79:7:2"
                       }
                     ],
-                    "id": 2136,
+                    "id": 2333,
                     "name": "VariableDeclaration",
-                    "src": "79:13:3"
+                    "src": "79:13:2"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "_value",
-                      "scope": 2145,
+                      "scope": 2342,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -137,20 +137,20 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2137,
+                        "id": 2334,
                         "name": "ElementaryTypeName",
-                        "src": "94:7:3"
+                        "src": "94:7:2"
                       }
                     ],
-                    "id": 2138,
+                    "id": 2335,
                     "name": "VariableDeclaration",
-                    "src": "94:14:3"
+                    "src": "94:14:2"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "_token",
-                      "scope": 2145,
+                      "scope": 2342,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -163,20 +163,20 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 2139,
+                        "id": 2336,
                         "name": "ElementaryTypeName",
-                        "src": "110:7:3"
+                        "src": "110:7:2"
                       }
                     ],
-                    "id": 2140,
+                    "id": 2337,
                     "name": "VariableDeclaration",
-                    "src": "110:14:3"
+                    "src": "110:14:2"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "_extraData",
-                      "scope": 2145,
+                      "scope": 2342,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes memory",
@@ -189,19 +189,19 @@
                           "name": "bytes",
                           "type": "bytes storage pointer"
                         },
-                        "id": 2141,
+                        "id": 2338,
                         "name": "ElementaryTypeName",
-                        "src": "126:5:3"
+                        "src": "126:5:2"
                       }
                     ],
-                    "id": 2142,
+                    "id": 2339,
                     "name": "VariableDeclaration",
-                    "src": "126:16:3"
+                    "src": "126:16:2"
                   }
                 ],
-                "id": 2143,
+                "id": 2340,
                 "name": "ParameterList",
-                "src": "78:65:3"
+                "src": "78:65:2"
               },
               {
                 "attributes": {
@@ -210,24 +210,24 @@
                   ]
                 },
                 "children": [],
-                "id": 2144,
+                "id": 2341,
                 "name": "ParameterList",
-                "src": "150:0:3"
+                "src": "150:0:2"
               }
             ],
-            "id": 2145,
+            "id": 2342,
             "name": "FunctionDefinition",
-            "src": "54:97:3"
+            "src": "54:97:2"
           }
         ],
-        "id": 2146,
+        "id": 2343,
         "name": "ContractDefinition",
-        "src": "26:128:3"
+        "src": "26:128:2"
       }
     ],
-    "id": 2147,
+    "id": 2344,
     "name": "SourceUnit",
-    "src": "0:154:3"
+    "src": "0:154:2"
   },
   "compiler": {
     "name": "solc",
@@ -235,5 +235,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-01T13:39:55.300Z"
+  "updatedAt": "2017-12-03T15:19:49.195Z"
 }

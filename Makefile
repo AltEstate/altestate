@@ -12,7 +12,7 @@ node_modules:
 	npm install
 
 test: compile
-	@truffle --network testrpc test
+	@truffle --network testrpc test test/crowdsale.js
 
 link: compile
 	@remixd -S $(shell pwd)/merged

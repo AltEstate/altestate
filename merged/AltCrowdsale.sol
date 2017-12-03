@@ -198,7 +198,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isTokenExcange;           // Allow to buy tokens for another tokens?
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
-  bool public isMintingShipment;        // Will ship token via minting?
+  bool public isTransferShipment;        // Will ship token via minting?
   bool public isCappedInEther;          // Should be capped in Ether 
   bool public isPullingTokens;          // Should beneficiaries pull their tokens?
 
@@ -273,7 +273,21 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
   event HashSale(address indexed beneficiary, uint value, uint amount, uint timestamp, bytes32 indexed bitcoinHash);
   event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
-  event ShipTokens(address indexed owner, uint indexed amount);
+  event ShipTokens(address indexed owner, uint amount);
+
+  // event SetToken(address indexed owner, address previousToken, address indexed nextToken);
+  // event SetStartTime(address indexed owner, uint previousStartTime, uint nextStartTime);
+  // event SetEndTime(address indexed owner, uint previousEndTime, uint nextEndTime);
+  // event SetExtraTokensHolder(address indexed owner, address previousExtraTokensHolder, address nextExtraTokensHolder);
+  // event SetExtraTokensPart(address indexed owner, uint previousExtraTokensPart, uint nextExtraTokensPart);
+  // event SetHardCap(address indexed owner, uint previousHardCap, uint nextHardCap);
+  // event SetSoftCap(address indexed owner, uint previousSoftCap, uint nextSoftCap);
+  // event SetPrice(address indexed owner, uint previousPrice, uint nextPrice);
+  // event SetWallet(address indexed owner, address previousWallet, address nextWallet);
+  // event SetRegistry(address indexed owner, address previousRegistry, address nextRegistry);
+  // event AddAmountSlice(address indexed owner, uint slice, uint bonus);
+  // event AddTimeSlice(address indexed owner, uint slice, uint bonus);
+
 
   // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
   // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
@@ -315,7 +329,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isTokenExcange = _isTokenExcange;
     isAllowToIssue = _isAllowToIssue;
     isExtraDistribution = _isExtraDistribution;
-    isMintingShipment = _isMintingShipment;
+    isTransferShipment = _isMintingShipment;
     isCappedInEther = _isCappedInEther;
     isPullingTokens = isRefundable || _isPullingTokens;
   }
@@ -323,14 +337,21 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function setPrice(uint _price)
     inState(State.Setup) onlyOwner public
   {
+    require(_price > 0);
+    // SetPrice(msg.sender, price, _price);
     price = _price;
+    Debug(msg.sender, appendUintToString("New Price: ", _price));
   }
 
   function setSoftHardCaps(uint _softCap, uint _hardCap)
     inState(State.Setup) onlyOwner public
   {
+    // SetSoftCap(msg.sender, softCap, _softCap);
+    // SetHardCap(msg.sender, hardCap, _hardCap);
     hardCap = _hardCap;
     softCap = _softCap;
+    Debug(msg.sender, appendUintToString("Soft Cap: ", _softCap));
+    Debug(msg.sender, appendUintToString("Hard Cap: ", _hardCap));
   }
 
   function setTime(uint _start, uint _end)
@@ -338,45 +359,61 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     require(_start < _end);
     require(_end > block.timestamp);
+
+    // SetStartTime(msg.sender, startTime, _start);
+    // SetEndTime(msg.sender, endTime, _end);
     startTime = _start;
     endTime = _end;
+    Debug(msg.sender, appendUintToString("Start Time: ", _start));
+    Debug(msg.sender, appendUintToString("End Time: ", _end));
   }
 
   function setToken(address _tokenAddress) 
     inState(State.Setup) onlyOwner public
   {
-    require(_tokenAddress != address(0));
+    // SetToken(msg.sender, token, _tokenAddress);
     token = MintableTokenInterface(_tokenAddress);
     tokenDecimals = token.decimals();
+    Debug(msg.sender, "New Token");
+    Debug(msg.sender, addressToString(_tokenAddress));
   }
 
   function setWallet(address _wallet) 
     inState(State.Setup) onlyOwner public 
   {
-    require(wallet == address(0));
+    require(_wallet != address(0));
+    // SetWallet(msg.sender, wallet, _wallet);
     wallet = _wallet;
+    Debug(msg.sender, "New Wallet");
+    Debug(msg.sender, addressToString(_wallet));
   }
   
   function setRegistry(address _registry) 
     inState(State.Setup) onlyOwner public 
   {
-    require(address(userRegistry) == 0);
+    require(_registry != address(0));
+    // SetRegistry(msg.sender, userRegistry, _registry);
     userRegistry = UserRegistryInterface(_registry);
+    Debug(msg.sender, "New Registry");
+    Debug(msg.sender, addressToString(_registry));
   }
 
   function setExtraDistribution(address _holder, uint _extraPart) 
     inState(State.Setup) onlyOwner public
   {
     require(_holder != address(0));
+    // SetExtraTokensHolder(msg.sender, extraTokensHolder, _holder);
+    // SetExtraTokensPart(msg.sender, extraDistributionPart, _extraPart);
     extraTokensHolder = _holder;
     extraDistributionPart = _extraPart;
+    Debug(msg.sender, "New Extra Tokens Holder");
+    Debug(msg.sender, addressToString(_holder));
+    Debug(msg.sender, appendUintToString("New Extra Tokens Part: ", _extraPart));
   }
 
   function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 
     inState(State.Setup) onlyOwner public 
   {
-    // Only once in life time
-    require(amountSlicesCount == 0);
     require(_amountSlices.length > 1);
     require(_prices.length == _amountSlices.length);
     uint lastSlice = 0;
@@ -385,7 +422,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       lastSlice = _amountSlices[index];
       amountSlices.push(lastSlice);
       amountBonuses[lastSlice] = _prices[index];
+
+      // AddAmountSlice(msg.sender, _amountSlices[index], _prices[index]);
+      Debug(msg.sender, appendUintToString("Add amount bonus: ", _prices[index]));
+      Debug(msg.sender, appendUintToString("At slice: ", _amountSlices[index]));
     }
+
     amountSlicesCount = amountSlices.length;
   }
 
@@ -402,6 +444,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       lastSlice = _timeSlices[index];
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _prices[index];
+      // AddTimeSlice(msg.sender, _timeSlices[index], _prices[index]);
+      Debug(msg.sender, appendUintToString("Add time bonus: ", _prices[index]));
+      Debug(msg.sender, appendUintToString("At slice: ", _timeSlices[index]));
     }
     timeSlicesCount = timeSlices.length;
   }
@@ -416,7 +461,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function saneIt() 
     inState(State.Setup) onlyOwner public 
   {
-    require(startTime <= now);
+    require(startTime < endTime);
     require(endTime > now);
 
     require(price > 0);
@@ -440,13 +485,15 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       require(extraTokensHolder != address(0));
     }
 
-    if (isMintingShipment) {
-      require(token.owner() == address(this));
-    } else {
+    if (isTransferShipment) {
       require(token.balanceOf(address(this)) >= hardCap);
+    } else {
+      require(token.owner() == address(this));
     }
 
     state = State.Active;
+
+    Debug(msg.sender, "Sane it");
   }
 
   // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗
@@ -487,7 +534,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
     // tokenBonus = price.mul(bonus).div(10000);
     beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(price);
-    beneficiaryTokens = beneficiaryTokens.add(beneficiaryTokens.mul(bonus).div(10000));
+    if (bonus > 0) {
+      beneficiaryTokens = beneficiaryTokens.add(beneficiaryTokens.mul(bonus).div(10000));
+    }
 
     if (isExtraDistribution) {
       extraTokens = beneficiaryTokens.mul(extraDistributionPart).div(10000);
@@ -668,6 +717,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       weiAmount, 
       block.timestamp, 
       token.totalSupply());
+      
     Debug(msg.sender, "Calculate amount");
     Debug(msg.sender, appendUintToString("Total: ", totalTokens));
     Debug(msg.sender, appendUintToString("Beneficiary: ", beneficiaryTokens));
@@ -699,10 +749,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Active) internal 
   {
     if (!isPullingTokens) {
-      if (isMintingShipment) {
-        token.mint(_beneficiary, _amount);
-      } else {
+      if (isTransferShipment) {
         token.transferFrom(address(this), _beneficiary, _amount);
+      } else {
+        token.mint(_beneficiary, _amount);
       }
     } 
 
@@ -751,6 +801,23 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       s[j] = reversed[i - 1 - j];
     }
     str = string(s);
+  }
+
+  function addressToString(address x) returns (string) {
+    bytes memory s = new bytes(40);
+    for (uint i = 0; i < 20; i++) {
+      byte b = byte(uint8(uint(x) / (2**(8*(19 - i)))));
+      byte hi = byte(uint8(b) / 16);
+      byte lo = byte(uint8(b) - 16 * uint8(hi));
+      s[2*i] = char(hi);
+      s[2*i+1] = char(lo);            
+    }
+    return string(s);
+  }
+
+  function char(byte b) returns (byte c) {
+    if (b < 10) return byte(uint8(b) + 0x30);
+    else return byte(uint8(b) + 0x57);
   }
 
   function appendUintToString(string inStr, uint v) public pure returns (string str) {
