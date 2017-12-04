@@ -279,6 +279,7 @@ contract('crowdsale', _accs => {
       it('allow owner to setup buy with token', async () => {
         await crowdsale.setTokenExcange(tokenA.address, ether(0.1), ownerSig)
         await crowdsale.saneIt(ownerSig)
+        const rate = await crowdsale.tokensValues(tokenA.address)
         assert(rate.eq(ether(0.1)), 'incorrect rate')
       })
       it('reject setup allowed token after sanitaze', async () => {
@@ -286,15 +287,20 @@ contract('crowdsale', _accs => {
       })
       it('reject change conversion rate from anyone', async () => {
         await expectThrow(crowdsale.updateTokenValue(tokenA.address, ether(0.01), buyerSig))
+        const rate = await crowdsale.tokensValues(tokenA.address)
         assert(rate.eq(ether(0.1)), 'incorrect rate')
       })
       it('change conversion rate', async () => {
-        await crowdsale.updateTokenValue(tokenA.address, ether(0.01), buyerSig)
+        await crowdsale.updateTokenValue(tokenA.address, ether(0.01), ownerSig)
         const rate = await crowdsale.tokensValues(tokenA.address)
         assert(rate.eq(ether(0.01)), 'incorrect rate')
       })
       it('raise wei with tokens', async () => {
-        
+        const raisedBefore = await crowdsale.weiRaised()
+        await tokenA.approveAndCall(crowdsale.address, 100 * 1e10, null, buyerSig)
+        const raisedAfrer = await crowdsale.weiRaised()
+
+        assert(raisedAfrer.sub(raisedBefore).div(1e18).eq(1), 'should raise wei amount on 1 ETH')
       })
     })
 
