@@ -145,7 +145,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   State public state;
   // Temporal balances to pull tokens after token sale
   // requires to ship required balance to smart contract
-  mapping (address => uint) public temporalBalances;
+  mapping (address => uint) public beneficiaryInvest;
   uint public temporalTotalSupply;
 
   mapping (address => uint) public weiDeposit;
@@ -479,14 +479,14 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       return false;
     }
 
-    uint finalBeneficiaryBalance = temporalBalances[_beneficiary].add(_tokenAmount);
+    uint finalBeneficiaryInvest = beneficiaryInvest[_beneficiary].add(_weiAmount);
     uint finalTotalSupply = temporalTotalSupply.add(_totalAmount);
 
     if (isWhitelisted) {
       WhitelistRecord record = whitelist[_beneficiary];
       if (!record.allow() || 
-          record.min() > finalBeneficiaryBalance ||
-          record.max() < finalBeneficiaryBalance) {
+          record.min() > finalBeneficiaryInvest ||
+          record.max() < finalBeneficiaryInvest) {
         return false;
       }
     }
@@ -567,7 +567,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
   }
 
-  function addToWhitelist(address _beneficiary, uint _min, uint _max) public
+  function addToWhitelist(address _beneficiary, uint _min, uint _max) onlyOwner public
   {
     require(_beneficiary != address(0));
     require(_min <= _max);
@@ -600,7 +600,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗███████║
   // ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝
   // low level token purchase function
-  function sellTokens(address _beneficiary, uint weiAmount) 
+  function sellTokens(address _beneficiary, uint _weiAmount) 
     inState(State.Active) internal returns(uint)
   {
     Debug(msg.sender, "Start sell tokens");
@@ -609,7 +609,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint totalTokens;
     (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(
       _beneficiary, 
-      weiAmount, 
+      _weiAmount, 
       block.timestamp, 
       token.totalSupply());
       
@@ -618,16 +618,17 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     Debug(msg.sender, appendUintToString("Beneficiary: ", beneficiaryTokens));
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
-                          weiAmount, 
+                          _weiAmount, 
                           beneficiaryTokens,
                           extraTokens,
                           totalTokens));
 
-    weiRaised = weiRaised.add(weiAmount); // update state (wei amount)
+    weiRaised = weiRaised.add(_weiAmount); // update state (wei amount)
+    beneficiaryInvest[_beneficiary] = beneficiaryInvest[_beneficiary].add(_weiAmount);
     shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
     TokenPurchase(msg.sender,             // Fire purchase event
                   _beneficiary, 
-                  weiAmount, 
+                  _weiAmount, 
                   beneficiaryTokens);
     ShipTokens(_beneficiary, beneficiaryTokens);
 
@@ -649,9 +650,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       } else {
         token.mint(_beneficiary, _amount);
       }
-    } 
+    }
 
-    temporalBalances[_beneficiary] = temporalBalances[_beneficiary].add(_amount);
+    temporalTotalSupply = temporalTotalSupply.add(_amount);
   }
 
   function forwardEther() internal {

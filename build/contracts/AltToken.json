@@ -465,7 +465,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2608,
+          "SourceUnit": 2617,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/DefaultToken.sol",
           "file": "./base/DefaultToken.sol",
           "scope": 107,
@@ -495,7 +495,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2854,
+          "SourceUnit": 2863,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/NamedToken.sol",
           "file": "./base/NamedToken.sol",
           "scope": 107,
@@ -510,7 +510,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 3361,
+          "SourceUnit": 3370,
           "absolutePath": "zeppelin-solidity/contracts/token/MintableToken.sol",
           "file": "zeppelin-solidity/contracts/token/MintableToken.sol",
           "scope": 107,
@@ -527,31 +527,31 @@
         "attributes": {
           "contractDependencies": [
             362,
-            2607,
-            2695,
-            2853,
-            3054,
-            3140,
-            3236,
-            3265,
-            3360,
-            3606
+            2616,
+            2704,
+            2862,
+            3063,
+            3149,
+            3245,
+            3274,
+            3369,
+            3615
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             106,
-            2607,
-            3360,
-            3054,
+            2616,
+            3369,
+            3063,
             362,
-            2695,
-            2853,
-            3606,
-            3140,
-            3236,
-            3265
+            2704,
+            2862,
+            3615,
+            3149,
+            3245,
+            3274
           ],
           "name": "AltToken",
           "scope": 107
@@ -568,7 +568,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "DefaultToken",
-                  "referencedDeclaration": 2607,
+                  "referencedDeclaration": 2616,
                   "type": "contract DefaultToken"
                 },
                 "id": 92,
@@ -645,7 +645,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2607,
+                      "referencedDeclaration": 2616,
                       "type": "type(contract DefaultToken)",
                       "value": "DefaultToken"
                     },
@@ -755,5 +755,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-04T00:54:20.422Z"
+  "updatedAt": "2017-12-04T06:05:03.355Z"
 }

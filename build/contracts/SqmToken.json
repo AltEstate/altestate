@@ -495,7 +495,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2696,
+          "SourceUnit": 2705,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/KnownHolderToken.sol",
           "file": "./base/KnownHolderToken.sol",
           "scope": 207,
@@ -525,7 +525,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2854,
+          "SourceUnit": 2863,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/NamedToken.sol",
           "file": "./base/NamedToken.sol",
           "scope": 207,
@@ -540,7 +540,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 3194,
+          "SourceUnit": 3203,
           "absolutePath": "zeppelin-solidity/contracts/token/CappedToken.sol",
           "file": "zeppelin-solidity/contracts/token/CappedToken.sol",
           "scope": 207,
@@ -557,31 +557,31 @@
         "attributes": {
           "contractDependencies": [
             362,
-            2695,
-            2853,
-            3054,
-            3140,
-            3193,
-            3236,
-            3265,
-            3360,
-            3606
+            2704,
+            2862,
+            3063,
+            3149,
+            3202,
+            3245,
+            3274,
+            3369,
+            3615
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             206,
-            3193,
-            3360,
-            3054,
+            3202,
+            3369,
+            3063,
             362,
-            2695,
-            2853,
-            3606,
-            3140,
-            3236,
-            3265
+            2704,
+            2862,
+            3615,
+            3149,
+            3245,
+            3274
           ],
           "name": "SqmToken",
           "scope": 207
@@ -598,7 +598,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "NamedToken",
-                  "referencedDeclaration": 2853,
+                  "referencedDeclaration": 2862,
                   "type": "contract NamedToken"
                 },
                 "id": 173,
@@ -621,7 +621,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "KnownHolderToken",
-                  "referencedDeclaration": 2695,
+                  "referencedDeclaration": 2704,
                   "type": "contract KnownHolderToken"
                 },
                 "id": 175,
@@ -667,7 +667,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "CappedToken",
-                  "referencedDeclaration": 3193,
+                  "referencedDeclaration": 3202,
                   "type": "contract CappedToken"
                 },
                 "id": 179,
@@ -848,7 +848,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2695,
+                      "referencedDeclaration": 2704,
                       "type": "type(contract KnownHolderToken)",
                       "value": "KnownHolderToken"
                     },
@@ -883,7 +883,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2853,
+                      "referencedDeclaration": 2862,
                       "type": "type(contract NamedToken)",
                       "value": "NamedToken"
                     },
@@ -946,7 +946,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 3193,
+                      "referencedDeclaration": 3202,
                       "type": "type(contract CappedToken)",
                       "value": "CappedToken"
                     },
@@ -1005,5 +1005,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-04T00:54:20.422Z"
+  "updatedAt": "2017-12-04T06:05:03.355Z"
 }

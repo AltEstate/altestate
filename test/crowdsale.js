@@ -15,6 +15,10 @@ function bn (from) {
   return new web3.BigNumber(from)
 }
 
+function tokens(n) {
+  return ether(n)
+}
+
 function setFlags (crowdsale, flags, sig) {
   const flagsMap = {
     whitelisted: 0,
@@ -58,11 +62,11 @@ async function makeContext() {
 
   const time = latestTime()
   await crowdsale.setTime(time - duration.days(1), time + duration.days(30), ownerSig)
-  await crowdsale.setPrice(ether(1).div(100), ownerSig)
+  await crowdsale.setPrice(ether(1).div(10), ownerSig) // 1 eth -> 10 tokens
   await crowdsale.setWallet(accounts[5], ownerSig)
   await crowdsale.setSoftHardCaps(
-    ether(1e5), // soft cap is 100k
-    ether(1e6)  // hard cap is 1kk
+    tokens(1e5), // soft cap is 100k
+    tokens(1e6)  // hard cap is 1kk
   )  
   await token.transferOwnership(crowdsale.address, ownerSig)
 }
@@ -182,46 +186,112 @@ contract('crowdsale', _accs => {
     describe('whitelisting', async () => {
       before(async () => await makeContext())
       after(async () => await cleanContext())
-
       it('disallow anyone to set whitelisting', async () => {
         await expectThrow(setFlags(crowdsale, { whitelisted: true }, buyerSig))
       })
-
       it('allow owner to set whitelisting', async () => {
         await setFlags(crowdsale, {
           whitelisted: true
         }, ownerSig)
-
         assert(await crowdsale.isWhitelisted(), 'should be whitelisted')
+        await crowdsale.saneIt()
       })
-
-
       it('disallow non whitelisted user', async () => {
-        
-      })
-      it('allow after whitelisting', async () => {
-        
+        await expectThrow(crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] }))
       })
       it('reject adding without rights', async () => {
-        
+        await expectThrow(crowdsale.addToWhitelist(accounts[1], ether(1), ether(3), buyerSig))
       })
       it('disallow less than min amount', async () => {
-        
+        await crowdsale.addToWhitelist(
+          accounts[1],
+          ether(1),
+          ether(3),
+          ownerSig
+        )
+
+        await expectThrow(
+          crowdsale.buyTokens(
+            accounts[1],
+            { value: ether(0.1), from: accounts[1] }
+          )
+        )
       })
-      it('disallow more than ma amount', async () => {
-        
+      it('disallow more than max amount', async () => {
+        await expectThrow(
+          crowdsale.buyTokens(
+            accounts[1],
+            { value: ether(5), from: accounts[1] }
+          )
+        )
+      })
+      it('allow after whitelisting', async () => {
+        await crowdsale.buyTokens(
+          accounts[1], 
+          { value: ether(2), from: accounts[1] }
+        )
       })
       it('replace min/max amounts', async () => {
-        
+        await crowdsale.addToWhitelist(
+          accounts[1],
+          ether(3),
+          ether(4),
+          ownerSig
+        )        
+      })
+      it('reject less then min after replace', async () => {
+        await expectThrow(
+          crowdsale.buyTokens(
+            accounts[1],
+            { value: ether(0.5), from: accounts[1] }
+          )
+        )
+      })
+      it('allow if sum enough', async () => {
+        await crowdsale.buyTokens(
+          accounts[1],
+          { value: ether(1.1), from: accounts[1] }
+        )
+      })
+      it('reject if sum more than max limit', async () => {
+        await expectThrow(
+          crowdsale.buyTokens(
+            accounts[1],
+            { value: ether(3), from: accounts[1] }
+          )
+        )
       })
     })
 
     describe('buy with tokens', async () => {
-      it('allow to buy with token', async () => {
-        
+      let tokenA, tokenB
+      before(async () => {
+        tokenA = await DefaultToken.new('Extra Token A', 'EXC', 10, registry.address, ownerSig)
+        await tokenA.mint(accounts[1], 10000 * 1e10)
+        tokenB = await DefaultToken.new('Extra Token B', 'EXB', 15, registry.address, ownerSig)
+        await tokenB.mint(accounts[1], 10000 * 1e15)
+        await makeContext()
+      })
+      after(async () => await cleanContext())
+      it('disallow anyone to setup buy with tokens', async () => {
+        await expectThrow(crowdsale.setTokenExcange(tokenA.address, ether(0.1), buyerSig))
+      })
+      it('allow owner to setup buy with token', async () => {
+        await crowdsale.setTokenExcange(tokenA.address, ether(0.1), ownerSig)
+        await crowdsale.saneIt(ownerSig)
+        assert(rate.eq(ether(0.1)), 'incorrect rate')
+      })
+      it('reject setup allowed token after sanitaze', async () => {
+        await expectThrow(crowdsale.setTokenExcange(tokenB.address, ether(0.01), ownerSig))
+      })
+      it('reject change conversion rate from anyone', async () => {
+        await expectThrow(crowdsale.updateTokenValue(tokenA.address, ether(0.01), buyerSig))
+        assert(rate.eq(ether(0.1)), 'incorrect rate')
       })
       it('change conversion rate', async () => {
-        
+        await crowdsale.updateTokenValue(tokenA.address, ether(0.01), buyerSig)
+        const rate = await crowdsale.tokensValues(tokenA.address)
+        assert(rate.eq(ether(0.01)), 'incorrect rate')
       })
       it('raise wei with tokens', async () => {
         
