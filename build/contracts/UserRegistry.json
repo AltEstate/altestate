@@ -270,7 +270,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2896,
+          "SourceUnit": 2901,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/UserRegistryInterface.sol",
           "file": "./base/UserRegistryInterface.sol",
           "scope": 318,
@@ -285,7 +285,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2815,
+          "SourceUnit": 2820,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/MultiOwners.sol",
           "file": "./base/MultiOwners.sol",
           "scope": 318,
@@ -301,16 +301,16 @@
       {
         "attributes": {
           "contractDependencies": [
-            2814,
-            2895
+            2819,
+            2900
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             317,
-            2895,
-            2814
+            2900,
+            2819
           ],
           "name": "UserRegistry",
           "scope": 318
@@ -327,7 +327,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "MultiOwners",
-                  "referencedDeclaration": 2814,
+                  "referencedDeclaration": 2819,
                   "type": "contract MultiOwners"
                 },
                 "id": 211,
@@ -350,7 +350,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "UserRegistryInterface",
-                  "referencedDeclaration": 2895,
+                  "referencedDeclaration": 2900,
                   "type": "contract UserRegistryInterface"
                 },
                 "id": 213,
@@ -454,7 +454,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2735,
+                      "referencedDeclaration": 2740,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -497,7 +497,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3616,
+                              "referencedDeclaration": 3621,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -614,7 +614,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2868,
+                                  "referencedDeclaration": 2873,
                                   "type": "mapping(address => bool)",
                                   "value": "addresses"
                                 },
@@ -696,7 +696,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2876,
+                              "referencedDeclaration": 2881,
                               "type": "function (address)",
                               "value": "AddAddress"
                             },
@@ -857,7 +857,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2735,
+                      "referencedDeclaration": 2740,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -900,7 +900,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3616,
+                              "referencedDeclaration": 3621,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -1021,7 +1021,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2868,
+                                  "referencedDeclaration": 2873,
                                   "type": "mapping(address => bool)",
                                   "value": "addresses"
                                 },
@@ -1084,7 +1084,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2868,
+                                          "referencedDeclaration": 2873,
                                           "type": "mapping(address => bool)",
                                           "value": "addresses"
                                         },
@@ -1166,7 +1166,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2876,
+                                      "referencedDeclaration": 2881,
                                       "type": "function (address)",
                                       "value": "AddAddress"
                                     },
@@ -1237,7 +1237,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2872,
+                                  "referencedDeclaration": 2877,
                                   "type": "mapping(address => bool)",
                                   "value": "identities"
                                 },
@@ -1319,7 +1319,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2880,
+                              "referencedDeclaration": 2885,
                               "type": "function (address)",
                               "value": "AddIdentity"
                             },
@@ -1400,7 +1400,7 @@
               "payable": false,
               "scope": 317,
               "stateMutability": "view",
-              "superFunction": 2887,
+              "superFunction": 2892,
               "visibility": "public"
             },
             "children": [
@@ -1493,7 +1493,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2868,
+                              "referencedDeclaration": 2873,
                               "type": "mapping(address => bool)",
                               "value": "addresses"
                             },
@@ -1547,7 +1547,7 @@
               "payable": false,
               "scope": 317,
               "stateMutability": "view",
-              "superFunction": 2894,
+              "superFunction": 2899,
               "visibility": "public"
             },
             "children": [
@@ -1708,7 +1708,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2872,
+                                  "referencedDeclaration": 2877,
                                   "type": "mapping(address => bool)",
                                   "value": "identities"
                                 },
@@ -1771,5 +1771,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-03T15:14:34.308Z"
+  "updatedAt": "2017-12-04T00:54:20.422Z"
 }

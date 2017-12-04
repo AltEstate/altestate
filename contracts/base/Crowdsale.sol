@@ -90,7 +90,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isAmountBonus;            // Enable amount bonuses in crowdsale?
   bool public isEarlyBonus;             // Enable early bird bonus in crowdsale?
   bool public isRefundable;             // Allow to refund money?
-  bool public isTokenExcange;           // Allow to buy tokens for another tokens?
+  bool public isTokenExchange;           // Allow to buy tokens for another tokens?
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
   bool public isTransferShipment;        // Will ship token via minting?
@@ -203,7 +203,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Allow to refund money?
     bool _isRefundable,
     // Allow to buy tokens for another tokens?
-    bool _isTokenExcange,
+    bool _isTokenExchange,
     // Allow to issue tokens with tx hash (ex bitcoin)
     bool _isAllowToIssue,
     // Should mint extra tokens for future distribution?
@@ -221,7 +221,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isAmountBonus = _isAmountBonus;
     isEarlyBonus = _isEarlyBonus;
     isRefundable = _isRefundable;
-    isTokenExcange = _isTokenExcange;
+    isTokenExchange = _isTokenExchange;
     isAllowToIssue = _isAllowToIssue;
     isExtraDistribution = _isExtraDistribution;
     isTransferShipment = _isMintingShipment;
@@ -562,7 +562,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     _beneficiary.transfer(weiDeposit[_beneficiary]);
 
     // refund all deposited alt tokens
-    if (isTokenExcange) {
+    if (isTokenExchange) {
       // token.transfer(_beneficiary, altDeposit[_beneficiary]);
     }
   }

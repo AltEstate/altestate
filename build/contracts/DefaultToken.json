@@ -457,7 +457,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/DefaultToken.sol",
       "exportedSymbols": {
         "DefaultToken": [
-          2602
+          2607
         ]
       }
     },
@@ -471,22 +471,22 @@
             ".15"
           ]
         },
-        "id": 2565,
+        "id": 2570,
         "name": "PragmaDirective",
         "src": "0:24:8"
       },
       {
         "attributes": {
-          "SourceUnit": 2691,
+          "SourceUnit": 2696,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/KnownHolderToken.sol",
           "file": "./KnownHolderToken.sol",
-          "scope": 2603,
+          "scope": 2608,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2566,
+        "id": 2571,
         "name": "ImportDirective",
         "src": "26:32:8"
       },
@@ -495,43 +495,43 @@
           "SourceUnit": 363,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/ApproveAndCallToken.sol",
           "file": "./ApproveAndCallToken.sol",
-          "scope": 2603,
+          "scope": 2608,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2567,
+        "id": 2572,
         "name": "ImportDirective",
         "src": "59:35:8"
       },
       {
         "attributes": {
-          "SourceUnit": 2849,
+          "SourceUnit": 2854,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/NamedToken.sol",
           "file": "./NamedToken.sol",
-          "scope": 2603,
+          "scope": 2608,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2568,
+        "id": 2573,
         "name": "ImportDirective",
         "src": "95:26:8"
       },
       {
         "attributes": {
-          "SourceUnit": 3356,
+          "SourceUnit": 3361,
           "absolutePath": "zeppelin-solidity/contracts/token/MintableToken.sol",
           "file": "zeppelin-solidity/contracts/token/MintableToken.sol",
-          "scope": 2603,
+          "scope": 2608,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2569,
+        "id": 2574,
         "name": "ImportDirective",
         "src": "122:61:8"
       },
@@ -539,32 +539,32 @@
         "attributes": {
           "contractDependencies": [
             362,
-            2690,
-            2848,
-            3049,
-            3135,
-            3231,
-            3260,
-            3355,
-            3601
+            2695,
+            2853,
+            3054,
+            3140,
+            3236,
+            3265,
+            3360,
+            3606
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            2602,
-            3355,
-            3049,
+            2607,
+            3360,
+            3054,
             362,
-            2690,
-            2848,
-            3601,
-            3135,
-            3231,
-            3260
+            2695,
+            2853,
+            3606,
+            3140,
+            3236,
+            3265
           ],
           "name": "DefaultToken",
-          "scope": 2603
+          "scope": 2608
         },
         "children": [
           {
@@ -578,15 +578,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "NamedToken",
-                  "referencedDeclaration": 2848,
+                  "referencedDeclaration": 2853,
                   "type": "contract NamedToken"
                 },
-                "id": 2570,
+                "id": 2575,
                 "name": "UserDefinedTypeName",
                 "src": "210:10:8"
               }
             ],
-            "id": 2571,
+            "id": 2576,
             "name": "InheritanceSpecifier",
             "src": "210:10:8"
           },
@@ -601,15 +601,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "KnownHolderToken",
-                  "referencedDeclaration": 2690,
+                  "referencedDeclaration": 2695,
                   "type": "contract KnownHolderToken"
                 },
-                "id": 2572,
+                "id": 2577,
                 "name": "UserDefinedTypeName",
                 "src": "222:16:8"
               }
             ],
-            "id": 2573,
+            "id": 2578,
             "name": "InheritanceSpecifier",
             "src": "222:16:8"
           },
@@ -627,12 +627,12 @@
                   "referencedDeclaration": 362,
                   "type": "contract ApproveAndCallToken"
                 },
-                "id": 2574,
+                "id": 2579,
                 "name": "UserDefinedTypeName",
                 "src": "240:19:8"
               }
             ],
-            "id": 2575,
+            "id": 2580,
             "name": "InheritanceSpecifier",
             "src": "240:19:8"
           },
@@ -647,15 +647,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "MintableToken",
-                  "referencedDeclaration": 3355,
+                  "referencedDeclaration": 3360,
                   "type": "contract MintableToken"
                 },
-                "id": 2576,
+                "id": 2581,
                 "name": "UserDefinedTypeName",
                 "src": "261:13:8"
               }
             ],
-            "id": 2577,
+            "id": 2582,
             "name": "InheritanceSpecifier",
             "src": "261:13:8"
           },
@@ -666,7 +666,7 @@
               "isConstructor": true,
               "name": "DefaultToken",
               "payable": false,
-              "scope": 2602,
+              "scope": 2607,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -678,7 +678,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "name",
-                      "scope": 2601,
+                      "scope": 2606,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -691,12 +691,12 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 2578,
+                        "id": 2583,
                         "name": "ElementaryTypeName",
                         "src": "301:6:8"
                       }
                     ],
-                    "id": 2579,
+                    "id": 2584,
                     "name": "VariableDeclaration",
                     "src": "301:11:8"
                   },
@@ -704,7 +704,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "ticker",
-                      "scope": 2601,
+                      "scope": 2606,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -717,12 +717,12 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 2580,
+                        "id": 2585,
                         "name": "ElementaryTypeName",
                         "src": "314:6:8"
                       }
                     ],
-                    "id": 2581,
+                    "id": 2586,
                     "name": "VariableDeclaration",
                     "src": "314:13:8"
                   },
@@ -730,7 +730,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "decimals",
-                      "scope": 2601,
+                      "scope": 2606,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -743,12 +743,12 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 2582,
+                        "id": 2587,
                         "name": "ElementaryTypeName",
                         "src": "329:4:8"
                       }
                     ],
-                    "id": 2583,
+                    "id": 2588,
                     "name": "VariableDeclaration",
                     "src": "329:13:8"
                   },
@@ -756,7 +756,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_registry",
-                      "scope": 2601,
+                      "scope": 2606,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -769,17 +769,17 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 2584,
+                        "id": 2589,
                         "name": "ElementaryTypeName",
                         "src": "344:7:8"
                       }
                     ],
-                    "id": 2585,
+                    "id": 2590,
                     "name": "VariableDeclaration",
                     "src": "344:17:8"
                   }
                 ],
-                "id": 2586,
+                "id": 2591,
                 "name": "ParameterList",
                 "src": "300:62:8"
               },
@@ -790,7 +790,7 @@
                   ]
                 },
                 "children": [],
-                "id": 2599,
+                "id": 2604,
                 "name": "ParameterList",
                 "src": "488:0:8"
               },
@@ -802,11 +802,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2848,
+                      "referencedDeclaration": 2853,
                       "type": "type(contract NamedToken)",
                       "value": "NamedToken"
                     },
-                    "id": 2587,
+                    "id": 2592,
                     "name": "Identifier",
                     "src": "368:10:8"
                   },
@@ -816,11 +816,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2579,
+                      "referencedDeclaration": 2584,
                       "type": "string memory",
                       "value": "name"
                     },
-                    "id": 2588,
+                    "id": 2593,
                     "name": "Identifier",
                     "src": "379:4:8"
                   },
@@ -830,11 +830,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2581,
+                      "referencedDeclaration": 2586,
                       "type": "string memory",
                       "value": "ticker"
                     },
-                    "id": 2589,
+                    "id": 2594,
                     "name": "Identifier",
                     "src": "385:6:8"
                   },
@@ -844,16 +844,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2583,
+                      "referencedDeclaration": 2588,
                       "type": "uint256",
                       "value": "decimals"
                     },
-                    "id": 2590,
+                    "id": 2595,
                     "name": "Identifier",
                     "src": "393:8:8"
                   }
                 ],
-                "id": 2591,
+                "id": 2596,
                 "name": "ModifierInvocation",
                 "src": "368:34:8"
               },
@@ -874,12 +874,12 @@
                       "type": "type(contract ApproveAndCallToken)",
                       "value": "ApproveAndCallToken"
                     },
-                    "id": 2592,
+                    "id": 2597,
                     "name": "Identifier",
                     "src": "407:19:8"
                   }
                 ],
-                "id": 2593,
+                "id": 2598,
                 "name": "ModifierInvocation",
                 "src": "407:21:8"
               },
@@ -896,16 +896,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 3355,
+                      "referencedDeclaration": 3360,
                       "type": "type(contract MintableToken)",
                       "value": "MintableToken"
                     },
-                    "id": 2594,
+                    "id": 2599,
                     "name": "Identifier",
                     "src": "433:13:8"
                   }
                 ],
-                "id": 2595,
+                "id": 2600,
                 "name": "ModifierInvocation",
                 "src": "433:15:8"
               },
@@ -917,11 +917,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2690,
+                      "referencedDeclaration": 2695,
                       "type": "type(contract KnownHolderToken)",
                       "value": "KnownHolderToken"
                     },
-                    "id": 2596,
+                    "id": 2601,
                     "name": "Identifier",
                     "src": "453:16:8"
                   },
@@ -931,16 +931,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2585,
+                      "referencedDeclaration": 2590,
                       "type": "address",
                       "value": "_registry"
                     },
-                    "id": 2597,
+                    "id": 2602,
                     "name": "Identifier",
                     "src": "470:9:8"
                   }
                 ],
-                "id": 2598,
+                "id": 2603,
                 "name": "ModifierInvocation",
                 "src": "453:27:8"
               },
@@ -951,22 +951,22 @@
                   ]
                 },
                 "children": [],
-                "id": 2600,
+                "id": 2605,
                 "name": "Block",
                 "src": "488:5:8"
               }
             ],
-            "id": 2601,
+            "id": 2606,
             "name": "FunctionDefinition",
             "src": "279:214:8"
           }
         ],
-        "id": 2602,
+        "id": 2607,
         "name": "ContractDefinition",
         "src": "185:310:8"
       }
     ],
-    "id": 2603,
+    "id": 2608,
     "name": "SourceUnit",
     "src": "0:495:8"
   },
@@ -976,5 +976,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-03T15:14:34.344Z"
+  "updatedAt": "2017-12-04T00:54:20.452Z"
 }
