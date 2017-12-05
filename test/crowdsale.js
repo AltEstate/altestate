@@ -4,9 +4,10 @@ import expectThrow from 'zeppelin-solidity/test/helpers/expectThrow';
 import ether from 'zeppelin-solidity/test/helpers/ether';
 import moment from 'moment';
 
-const Crowdsale = artifacts.require("./Crowdsale.sol")
+const Crowdsale = artifacts.require('./Crowdsale.sol')
 const DefaultToken = artifacts.require('./DefaultToken.sol')
-const UserRegistry = artifacts.require("./UserRegistry.sol")
+const UserRegistry = artifacts.require('./UserRegistry.sol')
+const PersonalBonusRecord = artifacts.require('./PersonalBonusRecord.sol')
 
 let crowdsale, registry, token, debugHandler, accounts,
     ownerSig, buyerSig
@@ -31,7 +32,8 @@ function setFlags (crowdsale, flags, sig) {
     extraDistribution: 7,
     transferShipment: 8,
     cappedInEther: 9,
-    pullingTokens: 10
+    pullingTokens: 10,
+    personalBonuses: 11,
   }
 
   let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)
@@ -97,7 +99,8 @@ contract('crowdsale', _accs => {
         extraDistribution: true,
         transferShipment:  true,
         cappedInEther:    true,
-        pullingTokens:    true
+        pullingTokens:    true,
+        personalBonuses:  true
       }, ownerSig)
 
       assert(await crowdsale.isWhitelisted(), 'should be whitelisted')
@@ -110,6 +113,7 @@ contract('crowdsale', _accs => {
       assert(await crowdsale.isTransferShipment(), 'should be transfer shipment')
       assert(await crowdsale.isCappedInEther(), 'should be capped in ether')
       assert(await crowdsale.isPullingTokens(), 'should be pulling tokens')
+      assert(await crowdsale.isPersonalBonuses(), 'should be personal bonuses')
     })
 
     it('allow owner to resetup flags', async () => {
@@ -125,6 +129,7 @@ contract('crowdsale', _accs => {
       assert(!(await crowdsale.isTransferShipment()), 'shouldn\'t be transfer shipment')
       assert(!(await crowdsale.isCappedInEther()), 'shouldn\'t be capped in ether')
       assert(!(await crowdsale.isPullingTokens()), 'shouldn\'t be pulling tokens')
+      assert(!(await crowdsale.isPersonalBonuses()), 'shouldn\'t be a personal bonuses')
     })
     
     it('reject anyone to setup flags', async () => {
@@ -336,20 +341,66 @@ contract('crowdsale', _accs => {
 
     describe('bonuses', async () => {
       describe('personal bonuses', () => {
-        it('allow owner to add personal bonus', async () => {
-          
-        })
-        it('personal bonus should be less than 50%', async () => {
-          
-        })
+        before(async () => await makeContext())
+        after(async () => await cleanContext())
         it('disallow anyone to add personal bonus', async () => {
-          
+          await expectThrow(setFlags(crowdsale, { personalBonuses: true }, buyerSig))
+          await expectThrow(crowdsale.setPersonalBonus(accounts[1], 2000, 0, 0, buyerSig))
+        })
+        it('allow owner to add personal bonus', async () => {
+          await setFlags(crowdsale, { personalBonuses: true }, ownerSig)
+          await crowdsale.saneIt()
+          await crowdsale.setPersonalBonus(accounts[1], 2000, 0, 0, ownerSig)
+          const bonusRecord = PersonalBonusRecord.at(await crowdsale.personalBonuses(accounts[1]))
+          const bonus = await bonusRecord.bonus()
+          assert(bonus.eq(2000))
         })
         it('personal bonus calculation', async () => {
-          
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime(),
+            0
+          )
+
+          assert(
+            calculation[1].eq(tokens(12)), 
+            `unxpected calculation result: ${calculation[1].div(1e18).toString(10)}`
+          )
+
+          // get before balances
+          const beneficiaryBalanceBefore = await token.balanceOf(accounts[1])
+          // buy tokens with acc 1
+          await crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+          // get changed balances
+          const beneficiaryBalanceAfter = await token.balanceOf(accounts[1])
+          assert(
+            beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).eq(tokens(12)), 
+            `unxpected change beneficiary balance: ${beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).div(1e18).toString(10)}`
+          )
         })
         it('referal shipment', async () => {
-          
+          // Replace bonus to add referal with 5% bonus
+          await crowdsale.setPersonalBonus(accounts[1], 3500, accounts[2], 500, ownerSig)
+
+          // get before balances
+          const beneficiaryBalanceBefore = await token.balanceOf(accounts[1])
+          const referalBalanceBefore = await token.balanceOf(accounts[2])
+          // buy tokens with acc 1
+          await crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+
+          // get changed balances
+          const beneficiaryBalanceAfter = await token.balanceOf(accounts[1])
+          const referalBalanceAfter = await token.balanceOf(accounts[2])
+
+          assert(
+            beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).eq(tokens(13.5)), 
+            `unxpected change beneficiary balance: ${beneficiaryBalanceAfter.sub(beneficiaryBalanceBefore).div(1e18).toString(10)}`
+          )
+          assert(
+            referalBalanceAfter.sub(referalBalanceBefore).eq(tokens(13.5 * 0.05)), 
+            `unxpected change referal balance: ${referalBalanceAfter.sub(referalBalanceBefore).div(1e18).toString(10)}`
+          )
         })
       })
 

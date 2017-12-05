@@ -90,12 +90,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isAmountBonus;            // Enable amount bonuses in crowdsale?
   bool public isEarlyBonus;             // Enable early bird bonus in crowdsale?
   bool public isRefundable;             // Allow to refund money?
-  bool public isTokenExchange;           // Allow to buy tokens for another tokens?
+  bool public isTokenExchange;          // Allow to buy tokens for another tokens?
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
-  bool public isTransferShipment;        // Will ship token via minting?
+  bool public isTransferShipment;       // Will ship token via minting?
   bool public isCappedInEther;          // Should be capped in Ether 
   bool public isPullingTokens;          // Should beneficiaries pull their tokens?
+  bool public isPersonalBonuses;        // Should check personal beneficiary bonus?
 
   // List of allowed beneficiaries
   mapping (address => WhitelistRecord) public whitelist;
@@ -213,7 +214,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Should be capped in ether
     bool _isCappedInEther,
     // Should beneficiaries pull their tokens? 
-    bool _isPullingTokens)
+    bool _isPullingTokens,
+    // Should check personal bonus?
+    bool _isPersonalBonuses)
     inState(State.Setup) onlyOwner public 
   {
     isWhitelisted = _isWhitelisted;
@@ -227,6 +230,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isTransferShipment = _isMintingShipment;
     isCappedInEther = _isCappedInEther;
     isPullingTokens = isRefundable || _isPullingTokens;
+    isPersonalBonuses = _isPersonalBonuses;
   }
 
   function setPrice(uint _price)
@@ -403,41 +407,50 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _weiAmount,
     uint _time,
     uint _totalSupply
-  ) public returns(uint, uint, uint) 
+  ) public constant returns(
+    uint calculatedTotal, 
+    uint calculatedBeneficiary, 
+    uint calculatedExtra, 
+    uint calculatedReferal, 
+    address referalAddress) 
   {
     _totalSupply;
-
-    uint beneficiaryTokens;
-    uint priceWithBonus;
     uint bonus = 0;
-    uint extraTokens;
 
     if (_time < startTime || _time > endTime) {
-      return (0, 0, 0);
+      return (0, 0, 0, 0, address(0));
     } else {
       if (isAmountBonus) {
         bonus = bonus.add(calculateAmountBonus(_weiAmount));
-        Debug(msg.sender, appendUintToString("Calculated amount dependent bonus: ", bonus));
       }
 
       if (isEarlyBonus) {
-        Debug(msg.sender, appendUintToString("Calculate time bonus at: ", _time.sub(startTime)));
         bonus = bonus.add(calculateTimeBonus(_time - startTime));
-        Debug(msg.sender, appendUintToString("Calculated time dependent bonus: ", bonus));
+      }
+
+      if (isPersonalBonuses && personalBonuses[_beneficiary].bonus() > 0) {
+        bonus = bonus.add(personalBonuses[_beneficiary].bonus());
       }
     }
 
-    // tokenBonus = price.mul(bonus).div(10000);
-    beneficiaryTokens = _weiAmount.mul(10 ** tokenDecimals).div(price);
+    calculatedBeneficiary = _weiAmount.mul(10 ** tokenDecimals).div(price);
     if (bonus > 0) {
-      beneficiaryTokens = beneficiaryTokens.add(beneficiaryTokens.mul(bonus).div(10000));
+      calculatedBeneficiary = calculatedBeneficiary.add(calculatedBeneficiary.mul(bonus).div(10000));
     }
 
     if (isExtraDistribution) {
-      extraTokens = beneficiaryTokens.mul(extraDistributionPart).div(10000);
+      calculatedExtra = calculatedBeneficiary.mul(extraDistributionPart).div(10000);
     }
 
-    return (beneficiaryTokens.add(extraTokens), beneficiaryTokens, extraTokens);
+    if (isPersonalBonuses && 
+        personalBonuses[_beneficiary].referalAddress() != address(0) && 
+        personalBonuses[_beneficiary].referalBonus() > 0) 
+    {
+      calculatedReferal = calculatedBeneficiary.mul(personalBonuses[_beneficiary].referalBonus()).div(10000);
+      referalAddress = personalBonuses[_beneficiary].referalAddress();
+    }
+
+    calculatedTotal = calculatedBeneficiary.add(calculatedExtra).add(calculatedReferal);
   }
 
   function calculateAmountBonus(uint _changeAmount) public constant returns(uint) {
@@ -607,7 +620,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint beneficiaryTokens;
     uint extraTokens;
     uint totalTokens;
-    (totalTokens, beneficiaryTokens, extraTokens) = calculateEthAmount(
+    uint referalTokens;
+    address referalAddress;
+    (totalTokens, beneficiaryTokens, extraTokens, referalTokens, referalAddress) = calculateEthAmount(
       _beneficiary, 
       _weiAmount, 
       block.timestamp, 
@@ -636,6 +651,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)
                  extraTokens);
       ShipTokens(extraTokensHolder, extraTokens);
+    }
+
+    if (isPersonalBonuses) {
+      PersonalBonusRecord record = personalBonuses[_beneficiary];
+      if (record.referalAddress() != address(0) && record.referalBonus() > 0) {
+        shipTokens(record.referalAddress(), referalTokens);
+      }
     }
 
     return beneficiaryTokens;

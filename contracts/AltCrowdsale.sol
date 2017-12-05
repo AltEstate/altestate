@@ -45,7 +45,10 @@ contract AltCrowdsalePhaseOne is Crowdsale {
       true,
       // Should beneficiaries pull their tokens? 
       // _isPullingTokens
-      false
+      false,
+      // Should check personal bonuses?
+      // _isPersonalBonuses
+      true
     );
 
     setToken(_token); 

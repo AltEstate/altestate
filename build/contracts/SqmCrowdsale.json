@@ -12,7 +12,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/SqmCrowdsale.sol",
       "exportedSymbols": {
         "SqmCrowdsale": [
-          166
+          167
         ]
       }
     },
@@ -26,7 +26,7 @@
             ".15"
           ]
         },
-        "id": 165,
+        "id": 166,
         "name": "PragmaDirective",
         "src": "0:24:3"
       },
@@ -42,20 +42,20 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            166
+            167
           ],
           "name": "SqmCrowdsale",
           "nodes": [
             null
           ],
-          "scope": 167
+          "scope": 168
         },
-        "id": 166,
+        "id": 167,
         "name": "ContractDefinition",
         "src": "26:28:3"
       }
     ],
-    "id": 167,
+    "id": 168,
     "name": "SourceUnit",
     "src": "0:54:3"
   },
@@ -65,5 +65,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-04T06:05:03.355Z"
+  "updatedAt": "2017-12-04T13:47:15.867Z"
 }
