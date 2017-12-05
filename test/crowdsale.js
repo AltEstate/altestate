@@ -20,6 +20,10 @@ function tokens(n) {
   return ether(n)
 }
 
+function tokensWithBonus(n, b) {
+  return tokens(n).mul(b).div(10000).add(tokens(n))
+}
+
 function setFlags (crowdsale, flags, sig) {
   const flagsMap = {
     whitelisted: 0,
@@ -405,17 +409,82 @@ contract('crowdsale', _accs => {
       })
 
       describe('amount bonuses', () => {
-        it('allow owner to add amount bonuses', async () => {
-          
-        })
+        before(async () => await makeContext())
+        after(async () => await cleanContext())
         it('disallow anyone to add amount bonuses', async () => {
-          
+          await expectThrow(setFlags(crowdsale, { amountBonus: true }, buyerSig))
+          await expectThrow(crowdsale.setAmountBonuses(
+            [ ether(10), ether(30), ether(50) ],
+            [      1000,      1500,      2000 ],
+            buyerSig
+          ))
+        })
+        it('allow owner to add amount bonuses', async () => {
+          await setFlags(crowdsale, { amountBonus: true }, ownerSig)
+          await crowdsale.setAmountBonuses(
+            [ ether(10), ether(30), ether(50) ],
+            [      1000,      1500,      2000 ],
+            ownerSig
+          )
+          await crowdsale.saneIt(ownerSig)
         })
         it('disallow to add amount bonuses after sanetize', async () => {
-          
+          /* Amount bonuses table:
+           * | from   | to      | bonus %   |
+           * | 10     | 30      | 10%       | 
+           * | 30     | 50      | 15%       |
+           * | 50     | --      | 20%       |
+           */
+          await expectThrow(crowdsale.setAmountBonuses(
+            [ ether(10), ether(30), ether(50) ],
+            [      1000,      1500,      2000 ],
+            ownerSig
+          ))
         })
-        it('amount bonuses calculation test', async () => {
-          
+        it('amount bonuses calculation test', async () => {          
+          let calculation1 = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime(),
+            0
+          )
+          let calculation2 = await crowdsale.calculateEthAmount(
+            accounts[2],
+            ether(15),
+            latestTime(),
+            0
+          )
+          let calculation3 = await crowdsale.calculateEthAmount(
+            accounts[3],
+            ether(35),
+            latestTime(),
+            0
+          )
+
+          // inclusive test
+          let calculation4 = await crowdsale.calculateEthAmount(
+            accounts[4],
+            ether(50),
+            latestTime(),
+            0
+          )
+
+          assert(
+            calculation1[1].eq(tokensWithBonus(10, 0)), 
+            `unxpected calculation result \ngot: ${calculation1[1].div(1e18).toString(10)} expect: ${tokens(10).toString(10)}`
+          )
+          assert(
+            calculation2[1].eq(tokensWithBonus(150, 1000)),
+            `unxpected calculation result: \ngot: ${calculation2[1].div(1e18).toString(10)} expect: ${tokensWithBonus(150, 1000).toString(10)}`
+          )
+          assert(
+            calculation3[1].eq(tokensWithBonus(350, 1500)),
+            `unxpected calculation result: \ngot: ${calculation3[1].div(1e18).toString(10)} expect: ${tokensWithBonus(350, 1500).toString(10)}`
+          )
+          assert(
+            calculation4[1].eq(tokensWithBonus(500, 2000)),
+            `unxpected calculation result: \ngot: ${calculation4[1].div(1e18).toString(10)} expect: ${tokensWithBonus(500, 2000).toString(10)}`
+          )
         })
       })
 
