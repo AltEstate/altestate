@@ -421,6 +421,12 @@ contract('crowdsale', _accs => {
         })
         it('allow owner to add amount bonuses', async () => {
           await setFlags(crowdsale, { amountBonus: true }, ownerSig)
+          /* Amount bonuses table:
+           * | from   | to      | bonus %   |
+           * | 10     | 30      | 10%       | 
+           * | 30     | 50      | 15%       |
+           * | 50     | --      | 20%       |
+           */
           await crowdsale.setAmountBonuses(
             [ ether(10), ether(30), ether(50) ],
             [      1000,      1500,      2000 ],
@@ -429,12 +435,6 @@ contract('crowdsale', _accs => {
           await crowdsale.saneIt(ownerSig)
         })
         it('disallow to add amount bonuses after sanetize', async () => {
-          /* Amount bonuses table:
-           * | from   | to      | bonus %   |
-           * | 10     | 30      | 10%       | 
-           * | 30     | 50      | 15%       |
-           * | 50     | --      | 20%       |
-           */
           await expectThrow(crowdsale.setAmountBonuses(
             [ ether(10), ether(30), ether(50) ],
             [      1000,      1500,      2000 ],
@@ -489,17 +489,81 @@ contract('crowdsale', _accs => {
       })
 
       describe('time bonuses', () => {
-        it('allow owner to add time bonuses', async () => {
-          
-        })
+        before(async () => await makeContext())
+        after(async () => await cleanContext())
         it('disallow anyone to add time bonuses', async () => {
-          
+          await expectThrow(setFlags(crowdsale, { earlyBonus: true}, buyerSig))
+          await expectThrow(crowdsale.setTimeBonuses(
+            [ duration.days(20), duration.days(10), duration.days(5) ],
+            [               300,               500,             1000 ],
+            buyerSig
+          ))
+        })
+        it('allow owner to add time bonuses', async () => {
+          await setFlags(crowdsale, { earlyBonus: true }, ownerSig)
+          /* Time bonuses table:
+           * | first N      | bonus %   |
+           * | 5 days       | 15%       | 
+           * | 10 days      | 5%        |
+           * | 20 days      | 3%        |
+           */
+          await crowdsale.setTimeBonuses(
+            [ duration.days(5), duration.days(10), duration.days(20) ],
+            [             1500,               500,                 0 ],
+            ownerSig
+          )
+
+          await crowdsale.saneIt()
         })
         it('disallow to add time bonuses after sanetize', async () => {
-          
+          await expectThrow(
+            crowdsale.setTimeBonuses(
+              [ duration.days(5), duration.days(10), duration.days(20) ],
+              [             1500,               500,                 0 ],
+              ownerSig
+            )
+          )
         })
-        it('time bonuses calculation test', async () => {
-          
+        it('time bonuses calculation max sale', async () => {
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime(),
+            0
+          )
+
+          assert(
+            calculation[1].eq(tokensWithBonus(10, 1500)), 
+            `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokensWithBonus(10, 1500)}`
+          )
+        })
+        it('time bonuses calculation 10 days', async () => {
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime() + duration.days(10),
+            0
+          )
+
+          console.log(calculation)
+
+          assert(
+            calculation[1].eq(tokensWithBonus(10, 500)), 
+            `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokensWithBonus(10, 500)}`
+          )
+        })
+        it('time bonuses calculation without bonus', async () => {
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime() + duration.days(20),
+            0
+          )
+
+          assert(
+            calculation[1].eq(tokens(10)), 
+            `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokens(10)}`
+          )
         })
       })
     })

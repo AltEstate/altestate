@@ -339,7 +339,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_prices.length == _timeSlices.length);
     uint lastSlice = 0;
     for (uint index = 0; index < _timeSlices.length; index++) {
-      require(_timeSlices[index] >= lastSlice);
+      require(_timeSlices[index] > lastSlice);
       lastSlice = _timeSlices[index];
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _prices[index];
@@ -407,7 +407,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _weiAmount,
     uint _time,
     uint _totalSupply
+  // TODO: Debug
   ) public constant returns(
+  // ) public returns(
     uint calculatedTotal, 
     uint calculatedBeneficiary, 
     uint calculatedExtra, 
@@ -465,13 +467,18 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return bonus;
   }
 
+  // TODO: Debug
   function calculateTimeBonus(uint _at) public constant returns(uint) {
+  // function calculateTimeBonus(uint _at) public returns(uint) {
     uint bonus = 0;
+    // Debug(msg.sender, appendUintToString("Calculate bonus at: ", _at));
     for (uint index = 0; index < timeSlices.length; index++) {
-      bonus = timeBonuses[timeSlices[index]];
-      if(timeSlices[index] > _at) {
+      // Debug(msg.sender, appendUintToString("Time Slice: ", timeSlices[index]));
+      if(timeSlices[index] < _at) {
         break;
       }
+      bonus = timeBonuses[timeSlices[index]];
+      // Debug(msg.sender, appendUintToString("Fit to bonus: ", bonus));
     }
 
     return bonus;

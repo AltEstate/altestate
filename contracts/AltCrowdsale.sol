@@ -1,21 +1,23 @@
 pragma solidity ^0.4.15;
 
 import './base/Crowdsale.sol';
-
-contract AltCrowdsalePhaseOne is Crowdsale {
-  function AltCrowdsalePhaseOne(
+contract BaseAltCrowdsale is Crowdsale {
+  function BaseAltCrowdsale(
     address _registry,
     address _token,
     address _extraTokensHolder,
-    uint _extraTokensPart,
-    uint[] _timeSlices,
-    uint[] _timePrices
-  ) public
-  {
+    address _wallet,
+    bool _isWhitelisted,
+    uint _price,
+    uint _start,
+    uint _end,
+    uint _softCap,
+    uint _hardCap
+  ) public {
     setFlags(
       // Should be whitelisted to buy tokens
       // _isWhitelisted,
-      true,
+      _isWhitelisted,
       // Should be known user to buy tokens
       // _isKnownOnly,
       true,
@@ -52,21 +54,88 @@ contract AltCrowdsalePhaseOne is Crowdsale {
     );
 
     setToken(_token); 
- 
-    setTime(block.timestamp - 1 seconds, block.timestamp + 30 days);
-
+    setTime(_start, _end);
     setRegistry(_registry);
-    setWallet(msg.sender);
-    setExtraDistribution(_extraTokensHolder, _extraTokensPart);
+    setWallet(_wallet);
+    setExtraDistribution(
+      _extraTokensHolder,
+      3000 // 30%
+    );
 
     setSoftHardCaps(
-      5 ether, // soft
-      10 ether  // hard
+      _softCap, // soft
+      _hardCap  // hard
     );
 
     // 200 ALT per 1 ETH
-    setPrice(uint(1 ether).div(100));
+    setPrice(_price);
+  }
+}
 
-    setTimeBonuses(_timeSlices, _timePrices);
-  }  
+contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
+  function AltCrowdsalePhaseTwo(
+    address _registry,
+    address _token,
+    address _extraTokensHolder,
+    address _wallet
+  )
+  BaseAltCrowdsale(
+    _registry,
+    _token,
+    _extraTokensHolder,
+    _wallet,
+
+    // Whitelisted
+    false,
+
+    // price 1 ETH -> 100 ALT
+    uint(1 ether).div(100), 
+
+    // start
+    block.timestamp + 60 days,
+    // end 
+    block.timestamp + 90 days,
+
+    // _softCap,
+    0,
+    // _hardCap
+    15000 ether
+  ) 
+  public {
+
+  } 
+}
+
+contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
+  function AltCrowdsalePhaseOne (
+    address _registry,
+    address _token,
+    address _extraTokensHolder,
+    address _wallet
+  )
+  BaseAltCrowdsale(
+    _registry,
+    _token,
+    _extraTokensHolder,
+    _wallet,
+
+    // Whitelisted
+    false,
+
+    // price 1 ETH -> 200 ALT
+    uint(1 ether).div(200), 
+
+    // start
+    block.timestamp,
+    // end 
+    block.timestamp + 10 days,
+
+    // _softCap,
+    0,
+    // _hardCap
+    1500 ether
+  ) 
+  public {
+
+  } 
 } 

@@ -1,12 +1,23 @@
 clean:
+	@echo "Cleaning Project Builds"
 	@rm -rf $(shell pwd)/merged
 	@rm -rf $(shell pwd)/build/contracts
 	
 compile: node_modules
+	@echo "Begining of compilation"
 	@truffle compile
+	@sol-merger contracts/base/Crowdsale.sol merged/
 	@sol-merger contracts/AltCrowdsale.sol merged/
 	@sol-merger contracts/AltToken.sol merged/
 	@sol-merger contracts/UserRegistry.sol merged/
+
+migrate: compile
+	@echo "Begin migrate to $(value NETWORK)"
+	@truffle migrate --network=$(value NETWORK)
+
+migrateHard: clean compile
+	@echo "Begin migrate --reset to $(value NETWORK)"
+	@truffle migrate --reset --network=$(value NETWORK)
 
 node_modules:
 	npm install
@@ -32,4 +43,5 @@ testrpc: node_modules
 		--account="0x829e924fdf021ba3dbbc4225edfece9aca04b929d6e75613329ca6f1d31c0bb4,100000000000000000000" \
 		--account="0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773,100000000000000000000" \
 		--account="0x4eca7090ae56d1aeebcca9600f3c363b98440281b7a9dd31823fb2456abe4083,100000000000000000000" \
-		--account="0xe22691555326a123f3f404a5a487f1698fdae74304dc362ce2740e2dba4f6773,100000000000000000000"	
+		--account="0xe22691555326a123f3f404a5a487f1698fdae74304dc362ce2740e2dba4f6773,100000000000000000000" \
+		--networkId="0xC0FFEE1"

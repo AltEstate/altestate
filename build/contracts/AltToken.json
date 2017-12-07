@@ -445,7 +445,7 @@
       "absolutePath": "/Users/aler/crypto/altestate-3/contracts/AltToken.sol",
       "exportedSymbols": {
         "AltToken": [
-          107
+          170
         ]
       }
     },
@@ -459,102 +459,102 @@
             ".15"
           ]
         },
-        "id": 88,
+        "id": 151,
         "name": "PragmaDirective",
         "src": "0:24:1"
       },
       {
         "attributes": {
-          "SourceUnit": 2618,
+          "SourceUnit": 2793,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/DefaultToken.sol",
           "file": "./base/DefaultToken.sol",
-          "scope": 108,
+          "scope": 171,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 89,
+        "id": 152,
         "name": "ImportDirective",
         "src": "26:33:1"
       },
       {
         "attributes": {
-          "SourceUnit": 364,
+          "SourceUnit": 427,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/ApproveAndCallToken.sol",
           "file": "./base/ApproveAndCallToken.sol",
-          "scope": 108,
+          "scope": 171,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 90,
+        "id": 153,
         "name": "ImportDirective",
         "src": "60:40:1"
       },
       {
         "attributes": {
-          "SourceUnit": 2864,
+          "SourceUnit": 3039,
           "absolutePath": "/Users/aler/crypto/altestate-3/contracts/base/NamedToken.sol",
           "file": "./base/NamedToken.sol",
-          "scope": 108,
+          "scope": 171,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 91,
+        "id": 154,
         "name": "ImportDirective",
         "src": "101:31:1"
       },
       {
         "attributes": {
-          "SourceUnit": 3371,
+          "SourceUnit": 3546,
           "absolutePath": "zeppelin-solidity/contracts/token/MintableToken.sol",
           "file": "zeppelin-solidity/contracts/token/MintableToken.sol",
-          "scope": 108,
+          "scope": 171,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 92,
+        "id": 155,
         "name": "ImportDirective",
         "src": "133:61:1"
       },
       {
         "attributes": {
           "contractDependencies": [
-            363,
-            2617,
-            2705,
-            2863,
-            3064,
-            3150,
-            3246,
-            3275,
-            3370,
-            3616
+            426,
+            2792,
+            2880,
+            3038,
+            3239,
+            3325,
+            3421,
+            3450,
+            3545,
+            3791
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            107,
-            2617,
-            3370,
-            3064,
-            363,
-            2705,
-            2863,
-            3616,
-            3150,
-            3246,
-            3275
+            170,
+            2792,
+            3545,
+            3239,
+            426,
+            2880,
+            3038,
+            3791,
+            3325,
+            3421,
+            3450
           ],
           "name": "AltToken",
-          "scope": 108
+          "scope": 171
         },
         "children": [
           {
@@ -568,15 +568,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "DefaultToken",
-                  "referencedDeclaration": 2617,
+                  "referencedDeclaration": 2792,
                   "type": "contract DefaultToken"
                 },
-                "id": 93,
+                "id": 156,
                 "name": "UserDefinedTypeName",
                 "src": "217:12:1"
               }
             ],
-            "id": 94,
+            "id": 157,
             "name": "InheritanceSpecifier",
             "src": "217:12:1"
           },
@@ -587,7 +587,7 @@
               "isConstructor": true,
               "name": "AltToken",
               "payable": false,
-              "scope": 107,
+              "scope": 170,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -599,7 +599,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_registry",
-                      "scope": 106,
+                      "scope": 169,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -612,17 +612,17 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 95,
+                        "id": 158,
                         "name": "ElementaryTypeName",
                         "src": "252:7:1"
                       }
                     ],
-                    "id": 96,
+                    "id": 159,
                     "name": "VariableDeclaration",
                     "src": "252:17:1"
                   }
                 ],
-                "id": 97,
+                "id": 160,
                 "name": "ParameterList",
                 "src": "251:19:1"
               },
@@ -633,7 +633,7 @@
                   ]
                 },
                 "children": [],
-                "id": 104,
+                "id": 167,
                 "name": "ParameterList",
                 "src": "327:0:1"
               },
@@ -645,11 +645,11 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2617,
+                      "referencedDeclaration": 2792,
                       "type": "type(contract DefaultToken)",
                       "value": "DefaultToken"
                     },
-                    "id": 98,
+                    "id": 161,
                     "name": "Identifier",
                     "src": "271:12:1"
                   },
@@ -666,7 +666,7 @@
                       "type": "literal_string \"Alt Estate\"",
                       "value": "Alt Estate"
                     },
-                    "id": 99,
+                    "id": 162,
                     "name": "Literal",
                     "src": "284:12:1"
                   },
@@ -683,7 +683,7 @@
                       "type": "literal_string \"ALT\"",
                       "value": "ALT"
                     },
-                    "id": 100,
+                    "id": 163,
                     "name": "Literal",
                     "src": "298:5:1"
                   },
@@ -700,7 +700,7 @@
                       "type": "int_const 10",
                       "value": "10"
                     },
-                    "id": 101,
+                    "id": 164,
                     "name": "Literal",
                     "src": "305:2:1"
                   },
@@ -710,16 +710,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 96,
+                      "referencedDeclaration": 159,
                       "type": "address",
                       "value": "_registry"
                     },
-                    "id": 102,
+                    "id": 165,
                     "name": "Identifier",
                     "src": "309:9:1"
                   }
                 ],
-                "id": 103,
+                "id": 166,
                 "name": "ModifierInvocation",
                 "src": "271:48:1"
               },
@@ -730,22 +730,22 @@
                   ]
                 },
                 "children": [],
-                "id": 105,
+                "id": 168,
                 "name": "Block",
                 "src": "327:5:1"
               }
             ],
-            "id": 106,
+            "id": 169,
             "name": "FunctionDefinition",
             "src": "234:98:1"
           }
         ],
-        "id": 107,
+        "id": 170,
         "name": "ContractDefinition",
         "src": "196:138:1"
       }
     ],
-    "id": 108,
+    "id": 171,
     "name": "SourceUnit",
     "src": "0:334:1"
   },
@@ -753,7 +753,13 @@
     "name": "solc",
     "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "202374881": {
+      "events": {},
+      "links": {},
+      "address": "0xc89ce4735882c9f0f0fe26686c53074e09b0d550"
+    }
+  },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-04T13:47:15.867Z"
+  "updatedAt": "2017-12-07T00:15:07.474Z"
 }
