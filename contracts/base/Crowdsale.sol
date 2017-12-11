@@ -171,6 +171,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
   event ShipTokens(address indexed owner, uint amount);
 
+  event Whitelisted(address indexed beneficiary, uint min, uint max);
+  event PersonalBonus(address indexed beneficiary, address indexed referer, uint bonus, uint refererBonus);
+
   // event SetToken(address indexed owner, address previousToken, address indexed nextToken);
   // event SetStartTime(address indexed owner, uint previousStartTime, uint nextStartTime);
   // event SetEndTime(address indexed owner, uint previousEndTime, uint nextEndTime);
@@ -239,7 +242,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_price > 0);
     // SetPrice(msg.sender, price, _price);
     price = _price;
-    Debug(msg.sender, appendUintToString("New Price: ", _price));
   }
 
   function setSoftHardCaps(uint _softCap, uint _hardCap)
@@ -249,8 +251,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetHardCap(msg.sender, hardCap, _hardCap);
     hardCap = _hardCap;
     softCap = _softCap;
-    Debug(msg.sender, appendUintToString("Soft Cap: ", _softCap));
-    Debug(msg.sender, appendUintToString("Hard Cap: ", _hardCap));
   }
 
   function setTime(uint _start, uint _end)
@@ -263,8 +263,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetEndTime(msg.sender, endTime, _end);
     startTime = _start;
     endTime = _end;
-    Debug(msg.sender, appendUintToString("Start Time: ", _start));
-    Debug(msg.sender, appendUintToString("End Time: ", _end));
   }
 
   function setToken(address _tokenAddress) 
@@ -273,8 +271,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetToken(msg.sender, token, _tokenAddress);
     token = MintableTokenInterface(_tokenAddress);
     tokenDecimals = token.decimals();
-    Debug(msg.sender, "New Token");
-    Debug(msg.sender, addressToString(_tokenAddress));
   }
 
   function setWallet(address _wallet) 
@@ -283,8 +279,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_wallet != address(0));
     // SetWallet(msg.sender, wallet, _wallet);
     wallet = _wallet;
-    Debug(msg.sender, "New Wallet");
-    Debug(msg.sender, addressToString(_wallet));
   }
   
   function setRegistry(address _registry) 
@@ -293,8 +287,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_registry != address(0));
     // SetRegistry(msg.sender, userRegistry, _registry);
     userRegistry = UserRegistryInterface(_registry);
-    Debug(msg.sender, "New Registry");
-    Debug(msg.sender, addressToString(_registry));
   }
 
   function setExtraDistribution(address _holder, uint _extraPart) 
@@ -305,9 +297,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetExtraTokensPart(msg.sender, extraDistributionPart, _extraPart);
     extraTokensHolder = _holder;
     extraDistributionPart = _extraPart;
-    Debug(msg.sender, "New Extra Tokens Holder");
-    Debug(msg.sender, addressToString(_holder));
-    Debug(msg.sender, appendUintToString("New Extra Tokens Part: ", _extraPart));
   }
 
   function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 
@@ -323,8 +312,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       amountBonuses[lastSlice] = _prices[index];
 
       // AddAmountSlice(msg.sender, _amountSlices[index], _prices[index]);
-      Debug(msg.sender, appendUintToString("Add amount bonus: ", _prices[index]));
-      Debug(msg.sender, appendUintToString("At slice: ", _amountSlices[index]));
     }
 
     amountSlicesCount = amountSlices.length;
@@ -344,8 +331,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _prices[index];
       // AddTimeSlice(msg.sender, _timeSlices[index], _prices[index]);
-      Debug(msg.sender, appendUintToString("Add time bonus: ", _prices[index]));
-      Debug(msg.sender, appendUintToString("At slice: ", _timeSlices[index]));
     }
     timeSlicesCount = timeSlices.length;
   }
@@ -391,8 +376,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     state = State.Active;
-
-    Debug(msg.sender, "Sane it");
   }
 
   // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗
@@ -407,9 +390,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _weiAmount,
     uint _time,
     uint _totalSupply
-  // TODO: Debug
   ) public constant returns(
-  // ) public returns(
     uint calculatedTotal, 
     uint calculatedBeneficiary, 
     uint calculatedExtra, 
@@ -467,18 +448,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return bonus;
   }
 
-  // TODO: Debug
   function calculateTimeBonus(uint _at) public constant returns(uint) {
-  // function calculateTimeBonus(uint _at) public returns(uint) {
     uint bonus = 0;
-    // Debug(msg.sender, appendUintToString("Calculate bonus at: ", _at));
-    for (uint index = 0; index < timeSlices.length; index++) {
-      // Debug(msg.sender, appendUintToString("Time Slice: ", timeSlices[index]));
+    for (uint index = timeSlices.length - 1; index >= 0; index--) {
+      bonus = timeBonuses[timeSlices[index]];
       if(timeSlices[index] < _at) {
         break;
       }
-      bonus = timeBonuses[timeSlices[index]];
-      // Debug(msg.sender, appendUintToString("Fit to bonus: ", bonus));
     }
 
     return bonus;
@@ -492,6 +468,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _totalAmount) 
   public constant returns(bool) 
   {
+    _tokenAmount;
     _extraAmount;
     _weiAmount;
 
@@ -541,8 +518,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
-    Debug(msg.sender, "Start buy tokens");
-
     uint shipAmount = sellTokens(_beneficiary, msg.value);
     require(shipAmount > 0);
     forwardEther();
@@ -556,11 +531,17 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     HashSale(_beneficiary, _value, shipAmount, _timestamp, _hash);
   }
 
+  bytes public latestExtra;
+  
   function receiveApproval(address _from, 
                            uint256 _value, 
                            address _token, 
-                           bytes _extraData) public {
-    _extraData;
+                           bytes _extraData) public 
+  {
+    Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
+    Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
+    latestExtra = _extraData;
+    // require(toUint(_extraData) == tokensValues[_token]);
     require(address(allowedTokens[_token]) != address(0));
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
     uint shipAmount = sellTokens(_from, weiValue);
@@ -599,6 +580,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     whitelist[_beneficiary] = new WhitelistRecord(_min, _max);
     whitelisted.push(_beneficiary);
     whitelistedCount++;
+
+    Whitelisted(_beneficiary, _min, _max);
   }
   
   function setPersonalBonus(
@@ -610,7 +593,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       _bonus,
       _referalAddress,
       _referalBonus
-    ); 
+    );
+
+    PersonalBonus(_beneficiary, _referalAddress, _bonus, _referalBonus);
   }
 
   // ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗
@@ -623,7 +608,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function sellTokens(address _beneficiary, uint _weiAmount) 
     inState(State.Active) internal returns(uint)
   {
-    Debug(msg.sender, "Start sell tokens");
     uint beneficiaryTokens;
     uint extraTokens;
     uint totalTokens;
@@ -634,10 +618,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       _weiAmount, 
       block.timestamp, 
       token.totalSupply());
-      
-    Debug(msg.sender, "Calculate amount");
-    Debug(msg.sender, appendUintToString("Total: ", totalTokens));
-    Debug(msg.sender, appendUintToString("Beneficiary: ", beneficiaryTokens));
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
                           _weiAmount, 
@@ -701,6 +681,21 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     } else {
       allowedToken.transferFrom(_beneficiary, wallet, _amount);
     }
+  }
+
+  // ██╗   ██╗████████╗██╗██╗     ███████╗
+  // ██║   ██║╚══██╔══╝██║██║     ██╔════╝
+  // ██║   ██║   ██║   ██║██║     ███████╗
+  // ██║   ██║   ██║   ██║██║     ╚════██║
+  // ╚██████╔╝   ██║   ██║███████╗███████║
+  //  ╚═════╝    ╚═╝   ╚═╝╚══════╝╚══════╝
+  function toUint(bytes left) public pure returns (uint) {
+      uint out;
+      for (uint i = 0; i < 32; i++) {
+          out |= uint(left[i]) << (31 * 8 - i * 8);
+      }
+      
+      return out;
   }
 
 

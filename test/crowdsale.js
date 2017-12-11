@@ -24,6 +24,33 @@ function tokensWithBonus(n, b) {
   return tokens(n).mul(b).div(10000).add(tokens(n))
 }
 
+function numberToBytearray(long, size) {
+  // we want to represent the input as a 8-bytes array
+  const byteArray = Array(size).fill(0);
+
+  for (let index = byteArray.length - 1; index >= 0; index-- ) {
+      let byte = long & 0xff;
+      byteArray[index] = byte;
+      long = (long - byte) / 256 ;
+  }
+
+  return byteArray;
+}
+function toHex(bytes) {
+  let out = '0x'
+  for (let index = 0; index < bytes.length; index++) {
+    let byte = bytes[index]
+    out += (byte & 0xFF).toString(16)
+  }
+  
+  return out
+}
+
+function toBytes(bn) {
+  return toHex(numberToBytearray(bn.toNumber(), 32))
+}
+
+
 function setFlags (crowdsale, flags, sig) {
   const flagsMap = {
     whitelisted: 0,
@@ -58,11 +85,13 @@ async function makeContext() {
   registry = await UserRegistry.new(ownerSig)
   token = await DefaultToken.new('Test Token', 'TST', 18, registry.address, ownerSig)
   crowdsale = await Crowdsale.new(ownerSig)
-  debugHandler = crowdsale.Debug({}, { fromBlock: 0, toBlock: 'latest'})
-  debugHandler.watch((error, result) => {
-    if (error) { return console.error(error) }
-    return console.log('\t\t\t\tlog: ', result.args.message)
-  })
+  if (crowdsale.Debug) {
+    debugHandler = crowdsale.Debug({}, { fromBlock: 0, toBlock: 'latest'})
+    debugHandler.watch((error, result) => {
+      if (error) { return console.error(error) }
+      return console.log('\t\t\t\tlog: ', result.args.message)
+    })
+  }
 
   await crowdsale.setToken(token.address, ownerSig)
 
@@ -79,7 +108,9 @@ async function makeContext() {
 
 
 async function cleanContext() {
-  await debugHandler.stopWatching()
+  if (debugHandler) {
+    await debugHandler.stopWatching()
+  }
 }
 
 contract('crowdsale', _accs => {
@@ -304,10 +335,20 @@ contract('crowdsale', _accs => {
         const rate = await crowdsale.tokensValues(tokenA.address)
         assert(rate.eq(ether(0.01)), 'incorrect rate')
       })
+      it('reject tx with incorrect token value', async () => {
+        await crowdsale.updateTokenValue(tokenA.address, ether(0.1), ownerSig)
+        await expectThrow(tokenA.approveAndCall(crowdsale.address, 100 * 1e10, '0x00000000000000000000000002386f26fc100', buyerSig))
+      })
       it('raise wei with tokens', async () => {
+        await crowdsale.updateTokenValue(tokenA.address, ether(0.01), ownerSig)
         const raisedBefore = await crowdsale.weiRaised()
-        await tokenA.approveAndCall(crowdsale.address, 100 * 1e10, null, buyerSig)
+        const rate = await crowdsale.tokensValues(tokenA.address)
+        const bytes = toBytes(rate)
+        await tokenA.approveAndCall(crowdsale.address, 100 * 1e10, '0x00000000000000000000000002386f26fc100', buyerSig)
         const raisedAfrer = await crowdsale.weiRaised()
+
+        const latest = await crowdsale.latestExtra()
+        console.log(latest)
 
         assert(raisedAfrer.sub(raisedBefore).div(1e18).eq(1), 'should raise wei amount on 1 ETH')
       })
