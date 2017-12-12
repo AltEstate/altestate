@@ -40,7 +40,7 @@ function toHex(bytes) {
   let out = '0x'
   for (let index = 0; index < bytes.length; index++) {
     let byte = bytes[index]
-    out += (byte & 0xFF).toString(16)
+    out += ('00' + (byte & 0xFF).toString(16)).slice(-2)
   }
   
   return out
@@ -50,6 +50,14 @@ function toBytes(bn) {
   return toHex(numberToBytearray(bn.toNumber(), 32))
 }
 
+function hexToBytes(hexString) {
+  let out = []
+  for(let index = 2; index < hexString.length; index += 2) {
+    out.push(`0x${hexString[index]}${hexString[index+1]}`)
+  }
+
+  return out
+}
 
 function setFlags (crowdsale, flags, sig) {
   const flagsMap = {
@@ -306,13 +314,22 @@ contract('crowdsale', _accs => {
     describe('buy with tokens', async () => {
       let tokenA, tokenB
       before(async () => {
-        tokenA = await DefaultToken.new('Extra Token A', 'EXC', 10, registry.address, ownerSig)
-        await tokenA.mint(accounts[1], 10000 * 1e10)
-        tokenB = await DefaultToken.new('Extra Token B', 'EXB', 15, registry.address, ownerSig)
-        await tokenB.mint(accounts[1], 10000 * 1e15)
+        tokenA = await DefaultToken.new('Extra Token A', 'EXC', 18, registry.address, ownerSig)
+        await tokenA.mint(accounts[1], 10000 * 1e18)
+        tokenB = await DefaultToken.new('Extra Token B', 'EXB', 18, registry.address, ownerSig)
+        await tokenB.mint(accounts[1], 10000 * 1e18)
         await makeContext()
       })
       after(async () => await cleanContext())
+      it('disallow anyone to set token exchange', async () => {
+        await expectThrow(setFlags(crowdsale, { tokenExcange: true }, buyerSig))
+      })
+      it('allow owner to set token exchange', async () => {
+        await setFlags(crowdsale, {
+          tokenExcange: true
+        }, ownerSig)
+        assert(await crowdsale.isTokenExchange(), 'should be whitelisted')
+      })
       it('disallow anyone to setup buy with tokens', async () => {
         await expectThrow(crowdsale.setTokenExcange(tokenA.address, ether(0.1), buyerSig))
       })
@@ -337,20 +354,24 @@ contract('crowdsale', _accs => {
       })
       it('reject tx with incorrect token value', async () => {
         await crowdsale.updateTokenValue(tokenA.address, ether(0.1), ownerSig)
-        await expectThrow(tokenA.approveAndCall(crowdsale.address, 100 * 1e10, '0x00000000000000000000000002386f26fc100', buyerSig))
+        await expectThrow(tokenA.approveAndCall(crowdsale.address, 100 * 1e18, toBytes(bn(10)), buyerSig))
       })
       it('raise wei with tokens', async () => {
         await crowdsale.updateTokenValue(tokenA.address, ether(0.01), ownerSig)
         const raisedBefore = await crowdsale.weiRaised()
         const rate = await crowdsale.tokensValues(tokenA.address)
         const bytes = toBytes(rate)
-        await tokenA.approveAndCall(crowdsale.address, 100 * 1e10, '0x00000000000000000000000002386f26fc100', buyerSig)
-        const raisedAfrer = await crowdsale.weiRaised()
+        const balanceBefore = await tokenA.balanceOf(buyerSig.from)
+        await tokenA.approveAndCall(crowdsale.address, 100 * 1e18, bytes, buyerSig)
+        const raisedAfter = await crowdsale.weiRaised()
+        const balanceAfter = await tokenA.balanceOf(buyerSig.from)
 
-        const latest = await crowdsale.latestExtra()
-        console.log(latest)
+        assert(raisedAfter.sub(raisedBefore).div(1e18).eq(1), `should raise wei amount on 1 ETH, but ${raisedAfter.sub(raisedBefore).div(1e18).toString(10)}`)
+        assert(balanceBefore.sub(balanceAfter).div(1e18).eq(100), `token balance should decrease on 100, but decreased on ${balanceBefore.sub(balanceAfter).div(1e18).toString(10)}`)
+      })
 
-        assert(raisedAfrer.sub(raisedBefore).div(1e18).eq(1), 'should raise wei amount on 1 ETH')
+      it('reject tx with unkown token', async () => {
+        await expectThrow(tokenB.approveAndCall(crowdsale.address, 10 * 1e18, toBytes(bn(0)), buyerSig))
       })
     })
 
@@ -535,8 +556,8 @@ contract('crowdsale', _accs => {
         it('disallow anyone to add time bonuses', async () => {
           await expectThrow(setFlags(crowdsale, { earlyBonus: true}, buyerSig))
           await expectThrow(crowdsale.setTimeBonuses(
-            [ duration.days(20), duration.days(10), duration.days(5) ],
-            [               300,               500,             1000 ],
+            [ duration.days(5), duration.days(10), duration.days(20) ],
+            [             1500,              1000,               500 ],
             buyerSig
           ))
         })
@@ -550,7 +571,7 @@ contract('crowdsale', _accs => {
            */
           await crowdsale.setTimeBonuses(
             [ duration.days(5), duration.days(10), duration.days(20) ],
-            [             1500,               500,                 0 ],
+            [             1500,              1000,               500 ],
             ownerSig
           )
 
@@ -560,7 +581,7 @@ contract('crowdsale', _accs => {
           await expectThrow(
             crowdsale.setTimeBonuses(
               [ duration.days(5), duration.days(10), duration.days(20) ],
-              [             1500,               500,                 0 ],
+              [             1500,              1000,               500 ],
               ownerSig
             )
           )
@@ -569,7 +590,7 @@ contract('crowdsale', _accs => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
             ether(1),
-            latestTime(),
+            latestTime() + duration.hours(2),
             0
           )
 
@@ -578,26 +599,40 @@ contract('crowdsale', _accs => {
             `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokensWithBonus(10, 1500)}`
           )
         })
-        it('time bonuses calculation 10 days', async () => {
+        it('time bonuses calculation before 10 days', async () => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
             ether(1),
-            latestTime() + duration.days(10),
+            latestTime() + duration.days(6),
             0
           )
 
           console.log(calculation)
 
           assert(
+            calculation[1].eq(tokensWithBonus(10, 1000)), 
+            `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokensWithBonus(10, 1000)}`
+          )
+        })
+        it('time bonuses calculation before day 20', async () => {
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime() + duration.days(14),
+            0
+          )
+
+          assert(
             calculation[1].eq(tokensWithBonus(10, 500)), 
             `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokensWithBonus(10, 500)}`
           )
         })
-        it('time bonuses calculation without bonus', async () => {
+
+        it('time bonuses calculation after sales', async () => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
             ether(1),
-            latestTime() + duration.days(20),
+            latestTime() + duration.days(21),
             0
           )
 
@@ -610,17 +645,30 @@ contract('crowdsale', _accs => {
     })
 
     describe('extra distribution', async () => {
-      it('allow to setup extra distribution after sanetize', async () => {
-        
+      before(async () => await makeContext())
+      after(async () => await cleanContext())
+      it('disallow anyone to set extra distribution', async () => {
+        await expectThrow(setFlags(crowdsale, { extraDistribution: true}, buyerSig))
       })
-      it('disallow anyone to setup', async () => {
-        
+      it('allow owner to set extra distribution', async () => {
+        await setFlags(crowdsale, { extraDistribution: true}, ownerSig)
+        await crowdsale.setExtraDistribution(accounts[6], 3000) // 30%
+        await crowdsale.saneIt()
       })
-      it('reject change extra distribution after sanetize', async () => {
-        
+      it('disallow to set extra distribution after sanetize', async () => {
+        await expectThrow(
+          crowdsale.setExtraDistribution(accounts[6], 5000) // 50%
+        )
       })
       it('should mint extra tokens', async () => {
-        
+        console.log((await crowdsale.soldTokens()).div(1e18).toString(10));
+        const balanceBefore = await token.balanceOf(accounts[6])
+        await crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+        const balanceAfter  = await token.balanceOf(accounts[6])
+
+
+        console.log((await crowdsale.soldTokens()).div(1e18).toString(10));
+        assert(balanceAfter.sub(balanceBefore).div(1e18).eq(3), `unxpected extra distribution amount: ${balanceAfter.sub(balanceBefore).div(1e18).toString(10)}`)
       })
     })
 
