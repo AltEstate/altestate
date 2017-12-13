@@ -49,7 +49,6 @@ contract WhitelistRecord {
  * - Only known users
  * - Buy with allowed tokens
  *  - Oraclize based pairs (ETH to TOKEN)
- * - Pulling tokens (temporal balance inside sale)
  * - Revert\refund
  * - Personal bonuses
  * - Amount bonuses
@@ -95,7 +94,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
   bool public isTransferShipment;       // Will ship token via minting?
   bool public isCappedInEther;          // Should be capped in Ether 
-  bool public isPullingTokens;          // Should beneficiaries pull their tokens?
   bool public isPersonalBonuses;        // Should check personal beneficiary bonus?
 
   // List of allowed beneficiaries
@@ -174,19 +172,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   event Whitelisted(address indexed beneficiary, uint min, uint max);
   event PersonalBonus(address indexed beneficiary, address indexed referer, uint bonus, uint refererBonus);
 
-  // event SetToken(address indexed owner, address previousToken, address indexed nextToken);
-  // event SetStartTime(address indexed owner, uint previousStartTime, uint nextStartTime);
-  // event SetEndTime(address indexed owner, uint previousEndTime, uint nextEndTime);
-  // event SetExtraTokensHolder(address indexed owner, address previousExtraTokensHolder, address nextExtraTokensHolder);
-  // event SetExtraTokensPart(address indexed owner, uint previousExtraTokensPart, uint nextExtraTokensPart);
-  // event SetHardCap(address indexed owner, uint previousHardCap, uint nextHardCap);
-  // event SetSoftCap(address indexed owner, uint previousSoftCap, uint nextSoftCap);
-  // event SetPrice(address indexed owner, uint previousPrice, uint nextPrice);
-  // event SetWallet(address indexed owner, address previousWallet, address nextWallet);
-  // event SetRegistry(address indexed owner, address previousRegistry, address nextRegistry);
-  // event AddAmountSlice(address indexed owner, uint slice, uint bonus);
-  // event AddTimeSlice(address indexed owner, uint slice, uint bonus);
-
 
   // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
   // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
@@ -217,8 +202,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Should be capped in ether
     bool _isCappedInEther,
     // Should beneficiaries pull their tokens? 
-    bool _isPullingTokens,
-    // Should check personal bonus?
     bool _isPersonalBonuses)
     inState(State.Setup) onlyOwner public 
   {
@@ -232,7 +215,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isExtraDistribution = _isExtraDistribution;
     isTransferShipment = _isMintingShipment;
     isCappedInEther = _isCappedInEther;
-    isPullingTokens = isRefundable || _isPullingTokens;
     isPersonalBonuses = _isPersonalBonuses;
   }
 
@@ -503,6 +485,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
                                                                                         
   function updateTokenValue(address _token, uint _value) onlyOwner public {
+    require(address(allowedTokens[_token]) != address(0x0));
     tokensValues[_token] = _value;
   }
 
@@ -541,14 +524,15 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
     Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
-    require(address(allowedTokens[_token]) != address(0));
-    require(allowedTokens[_token].balanceOf(_from) >= _value);
-    require(allowedTokens[_token].transferFrom(_from, address(this), _value));
+    require(tokensValues[_token] > 0);
+    require(forwardTokens(_from, _token, _value));
 
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
+    require(weiValue > 0);
+
     uint shipAmount = sellTokens(_from, weiValue);
     require(shipAmount > 0);
-    altDeposit[_token][_from] = altDeposit[_token][_from].add(_value);
+
     TokenSell(_from, _token, _value, weiValue, shipAmount);
   }
 
@@ -662,24 +646,24 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function shipTokens(address _beneficiary, uint _amount) 
     inState(State.Active) internal 
   {
-    if (!isPullingTokens) {
-      if (isTransferShipment) {
-        token.transferFrom(address(this), _beneficiary, _amount);
-      } else {
-        token.mint(_beneficiary, _amount);
-      }
+    if (isTransferShipment) {
+      token.transferFrom(address(this), _beneficiary, _amount);
+    } else {
+      token.mint(_beneficiary, _amount);
     }
   }
 
-  function forwardEther() internal {
+  function forwardEther() internal returns (bool) {
     if (isRefundable) {
       weiDeposit[msg.sender] = msg.value;
     } else {
       wallet.transfer(msg.value);
     }
+
+    return true;
   }
 
-  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal {
+  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal returns (bool) {
     TokenInterface allowedToken = allowedTokens[_tokenAddress];
 
     if (isRefundable) {
@@ -688,6 +672,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     } else {
       allowedToken.transferFrom(_beneficiary, wallet, _amount);
     }
+
+    return true;
   }
 
   // ██╗   ██╗████████╗██╗██╗     ███████╗

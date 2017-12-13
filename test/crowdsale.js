@@ -71,8 +71,7 @@ function setFlags (crowdsale, flags, sig) {
     extraDistribution: 7,
     transferShipment: 8,
     cappedInEther: 9,
-    pullingTokens: 10,
-    personalBonuses: 11,
+    personalBonuses: 10,
   }
 
   let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)
@@ -142,7 +141,6 @@ contract('crowdsale', _accs => {
         extraDistribution: true,
         transferShipment:  true,
         cappedInEther:    true,
-        pullingTokens:    true,
         personalBonuses:  true
       }, ownerSig)
 
@@ -155,7 +153,6 @@ contract('crowdsale', _accs => {
       assert(await crowdsale.isExtraDistribution(), 'should be extra distirbution')
       assert(await crowdsale.isTransferShipment(), 'should be transfer shipment')
       assert(await crowdsale.isCappedInEther(), 'should be capped in ether')
-      assert(await crowdsale.isPullingTokens(), 'should be pulling tokens')
       assert(await crowdsale.isPersonalBonuses(), 'should be personal bonuses')
     })
 
@@ -171,7 +168,6 @@ contract('crowdsale', _accs => {
       assert(!(await crowdsale.isExtraDistribution()), 'shouldn\'t be extra distirbution')
       assert(!(await crowdsale.isTransferShipment()), 'shouldn\'t be transfer shipment')
       assert(!(await crowdsale.isCappedInEther()), 'shouldn\'t be capped in ether')
-      assert(!(await crowdsale.isPullingTokens()), 'shouldn\'t be pulling tokens')
       assert(!(await crowdsale.isPersonalBonuses()), 'shouldn\'t be a personal bonuses')
     })
     
@@ -372,15 +368,6 @@ contract('crowdsale', _accs => {
 
       it('reject tx with unkown token', async () => {
         await expectThrow(tokenB.approveAndCall(crowdsale.address, 10 * 1e18, toBytes(bn(0)), buyerSig))
-      })
-    })
-
-    describe('pulling tokens', async () => {
-      it('reject pulling without finalization', async () => {
-        
-      })
-      it('pull tokens', async () => {
-        
       })
     })
 
@@ -673,35 +660,52 @@ contract('crowdsale', _accs => {
     })
 
     describe('capped', async () => {
-      it('allow owner to setup caps', async () => {
-        
-      })
-      it('disallow anyone to setup caps', async () => {
-        
-      })
-      it('reject setup after sanetize', async () => {
-        
-      })
-      it('reject buy when cap is achived', async () => {
-        
-      })
-      it('fail crowdsale then soft cap isn\'t achived', async () => {
-        
-      })
-      it('success then soft cap is achived', async () => {
-        
+      describe('in ether', async () => {
+        before(async () => await makeContext())
+        after(async () => await cleanContext())
+
+        it('disallow anyone to set caps', async () => {
+          await expectThrow(setFlags(crowdsale, { cappedInEther: true}, buyerSig))
+        })
+        it('allow owner to set caps', async () => {
+          await setFlags(crowdsale, { cappedInEther: true}, ownerSig)
+          await crowdsale.setSoftHardCaps(
+            100,
+            200,
+            ownerSig
+          )
+          await crowdsale.saneIt()
+        })
+        it('disallow to set caps after sanetize', async () => {
+          await expectThrow(
+            crowdsale.setSoftHardCaps(
+              10,
+              20,
+              ownerSig
+            )
+          )
+        })
+        it('reject buy when cap is achived', async () => {
+          assert.fail()
+        })
+        it('fail crowdsale then soft cap isn\'t achived', async () => {
+          assert.fail()
+        })
+        it('success then soft cap is achived', async () => {
+          assert.fail()
+        })
       })
     })
 
     describe('transfer funds', async () => {
       it('allow owner to setup wallet', async () => {
-        
+        assert.fail()
       })
       it('disallow anyone to setup wallet', async () => {
-        
+        assert.fail()
       })
       it('reject setup after sanetize', async () => {
-        
+        assert.fail()
       })
     })
   })

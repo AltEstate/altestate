@@ -45,9 +45,6 @@ contract BaseAltCrowdsale is Crowdsale {
       // Should be capped in ether
       // bool _isCappedInEther,
       true,
-      // Should beneficiaries pull their tokens? 
-      // _isPullingTokens
-      false,
       // Should check personal bonuses?
       // _isPersonalBonuses
       true
