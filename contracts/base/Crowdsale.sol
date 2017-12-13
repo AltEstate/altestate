@@ -18,13 +18,13 @@ contract MintableTokenInterface is TokenInterface {
 }
 
 contract PersonalBonusRecord {
-  address public referalAddress;
+  address public refererAddress;
   uint public bonus;
-  uint public referalBonus;
+  uint public refererBonus;
 
-  function PersonalBonusRecord(uint _bonus, address _referal, uint _referalBonus) public {
-    referalAddress = _referal;
-    referalBonus = _referalBonus;
+  function PersonalBonusRecord(uint _bonus, address _referer, uint _refererBonus) public {
+    refererAddress = _referer;
+    refererBonus = _refererBonus;
     bonus = _bonus;
   }
 }
@@ -147,7 +147,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // Temporal balances to pull tokens after token sale
   // requires to ship required balance to smart contract
   mapping (address => uint) public beneficiaryInvest;
-  uint public temporalTotalSupply;
+  uint public soldTokens;
 
   mapping (address => uint) public weiDeposit;
   mapping (address => mapping(address => uint)) public altDeposit;
@@ -170,6 +170,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   event HashSale(address indexed beneficiary, uint value, uint amount, uint timestamp, bytes32 indexed bitcoinHash);
   event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
   event ShipTokens(address indexed owner, uint amount);
+
+  event Whitelisted(address indexed beneficiary, uint min, uint max);
+  event PersonalBonus(address indexed beneficiary, address indexed referer, uint bonus, uint refererBonus);
 
   // event SetToken(address indexed owner, address previousToken, address indexed nextToken);
   // event SetStartTime(address indexed owner, uint previousStartTime, uint nextStartTime);
@@ -239,7 +242,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_price > 0);
     // SetPrice(msg.sender, price, _price);
     price = _price;
-    Debug(msg.sender, appendUintToString("New Price: ", _price));
   }
 
   function setSoftHardCaps(uint _softCap, uint _hardCap)
@@ -249,8 +251,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetHardCap(msg.sender, hardCap, _hardCap);
     hardCap = _hardCap;
     softCap = _softCap;
-    Debug(msg.sender, appendUintToString("Soft Cap: ", _softCap));
-    Debug(msg.sender, appendUintToString("Hard Cap: ", _hardCap));
   }
 
   function setTime(uint _start, uint _end)
@@ -263,8 +263,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetEndTime(msg.sender, endTime, _end);
     startTime = _start;
     endTime = _end;
-    Debug(msg.sender, appendUintToString("Start Time: ", _start));
-    Debug(msg.sender, appendUintToString("End Time: ", _end));
   }
 
   function setToken(address _tokenAddress) 
@@ -273,8 +271,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetToken(msg.sender, token, _tokenAddress);
     token = MintableTokenInterface(_tokenAddress);
     tokenDecimals = token.decimals();
-    Debug(msg.sender, "New Token");
-    Debug(msg.sender, addressToString(_tokenAddress));
   }
 
   function setWallet(address _wallet) 
@@ -283,8 +279,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_wallet != address(0));
     // SetWallet(msg.sender, wallet, _wallet);
     wallet = _wallet;
-    Debug(msg.sender, "New Wallet");
-    Debug(msg.sender, addressToString(_wallet));
   }
   
   function setRegistry(address _registry) 
@@ -293,8 +287,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(_registry != address(0));
     // SetRegistry(msg.sender, userRegistry, _registry);
     userRegistry = UserRegistryInterface(_registry);
-    Debug(msg.sender, "New Registry");
-    Debug(msg.sender, addressToString(_registry));
   }
 
   function setExtraDistribution(address _holder, uint _extraPart) 
@@ -305,9 +297,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // SetExtraTokensPart(msg.sender, extraDistributionPart, _extraPart);
     extraTokensHolder = _holder;
     extraDistributionPart = _extraPart;
-    Debug(msg.sender, "New Extra Tokens Holder");
-    Debug(msg.sender, addressToString(_holder));
-    Debug(msg.sender, appendUintToString("New Extra Tokens Part: ", _extraPart));
   }
 
   function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 
@@ -323,8 +312,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       amountBonuses[lastSlice] = _prices[index];
 
       // AddAmountSlice(msg.sender, _amountSlices[index], _prices[index]);
-      Debug(msg.sender, appendUintToString("Add amount bonus: ", _prices[index]));
-      Debug(msg.sender, appendUintToString("At slice: ", _amountSlices[index]));
     }
 
     amountSlicesCount = amountSlices.length;
@@ -344,8 +331,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _prices[index];
       // AddTimeSlice(msg.sender, _timeSlices[index], _prices[index]);
-      Debug(msg.sender, appendUintToString("Add time bonus: ", _prices[index]));
-      Debug(msg.sender, appendUintToString("At slice: ", _timeSlices[index]));
     }
     timeSlicesCount = timeSlices.length;
   }
@@ -391,8 +376,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     state = State.Active;
-
-    Debug(msg.sender, "Sane it");
   }
 
   // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗
@@ -407,14 +390,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _weiAmount,
     uint _time,
     uint _totalSupply
-  // TODO: Debug
   ) public constant returns(
-  // ) public returns(
     uint calculatedTotal, 
     uint calculatedBeneficiary, 
     uint calculatedExtra, 
-    uint calculatedReferal, 
-    address referalAddress) 
+    uint calculatedreferer, 
+    address refererAddress) 
   {
     _totalSupply;
     uint bonus = 0;
@@ -445,14 +426,14 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     if (isPersonalBonuses && 
-        personalBonuses[_beneficiary].referalAddress() != address(0) && 
-        personalBonuses[_beneficiary].referalBonus() > 0) 
+        personalBonuses[_beneficiary].refererAddress() != address(0) && 
+        personalBonuses[_beneficiary].refererBonus() > 0) 
     {
-      calculatedReferal = calculatedBeneficiary.mul(personalBonuses[_beneficiary].referalBonus()).div(10000);
-      referalAddress = personalBonuses[_beneficiary].referalAddress();
+      calculatedreferer = calculatedBeneficiary.mul(personalBonuses[_beneficiary].refererBonus()).div(10000);
+      refererAddress = personalBonuses[_beneficiary].refererAddress();
     }
 
-    calculatedTotal = calculatedBeneficiary.add(calculatedExtra).add(calculatedReferal);
+    calculatedTotal = calculatedBeneficiary.add(calculatedExtra).add(calculatedreferer);
   }
 
   function calculateAmountBonus(uint _changeAmount) public constant returns(uint) {
@@ -467,18 +448,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return bonus;
   }
 
-  // TODO: Debug
   function calculateTimeBonus(uint _at) public constant returns(uint) {
-  // function calculateTimeBonus(uint _at) public returns(uint) {
     uint bonus = 0;
-    // Debug(msg.sender, appendUintToString("Calculate bonus at: ", _at));
-    for (uint index = 0; index < timeSlices.length; index++) {
-      // Debug(msg.sender, appendUintToString("Time Slice: ", timeSlices[index]));
-      if(timeSlices[index] < _at) {
+    for (uint index = timeSlices.length; index > 0; index--) {
+      if(timeSlices[index - 1] < _at) {
         break;
       }
-      bonus = timeBonuses[timeSlices[index]];
-      // Debug(msg.sender, appendUintToString("Fit to bonus: ", bonus));
+      bonus = timeBonuses[timeSlices[index - 1]];
     }
 
     return bonus;
@@ -492,6 +468,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _totalAmount) 
   public constant returns(bool) 
   {
+    _tokenAmount;
     _extraAmount;
     _weiAmount;
 
@@ -500,7 +477,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     uint finalBeneficiaryInvest = beneficiaryInvest[_beneficiary].add(_weiAmount);
-    uint finalTotalSupply = temporalTotalSupply.add(_totalAmount);
+    uint finalTotalSupply = soldTokens.add(_totalAmount);
 
     if (isWhitelisted) {
       WhitelistRecord record = whitelist[_beneficiary];
@@ -541,8 +518,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
-    Debug(msg.sender, "Start buy tokens");
-
     uint shipAmount = sellTokens(_beneficiary, msg.value);
     require(shipAmount > 0);
     forwardEther();
@@ -555,16 +530,25 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     require(shipAmount > 0);
     HashSale(_beneficiary, _value, shipAmount, _timestamp, _hash);
   }
-
+  
   function receiveApproval(address _from, 
                            uint256 _value, 
                            address _token, 
-                           bytes _extraData) public {
-    _extraData;
+                           bytes _extraData) public 
+  {
+    require(isTokenExchange);
+
+    Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
+    Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
+    require(toUint(_extraData) == tokensValues[_token]);
     require(address(allowedTokens[_token]) != address(0));
+    require(allowedTokens[_token].balanceOf(_from) >= _value);
+    require(allowedTokens[_token].transferFrom(_from, address(this), _value));
+
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
     uint shipAmount = sellTokens(_from, weiValue);
     require(shipAmount > 0);
+    altDeposit[_token][_from] = altDeposit[_token][_from].add(_value);
     TokenSell(_from, _token, _value, weiValue, shipAmount);
   }
 
@@ -599,18 +583,22 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     whitelist[_beneficiary] = new WhitelistRecord(_min, _max);
     whitelisted.push(_beneficiary);
     whitelistedCount++;
+
+    Whitelisted(_beneficiary, _min, _max);
   }
   
   function setPersonalBonus(
     address _beneficiary, 
     uint _bonus, 
-    address _referalAddress, 
-    uint _referalBonus) onlyOwner public {
+    address _refererAddress, 
+    uint _refererBonus) onlyOwner public {
     personalBonuses[_beneficiary] = new PersonalBonusRecord(
       _bonus,
-      _referalAddress,
-      _referalBonus
-    ); 
+      _refererAddress,
+      _refererBonus
+    );
+
+    PersonalBonus(_beneficiary, _refererAddress, _bonus, _refererBonus);
   }
 
   // ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     ███████╗
@@ -623,21 +611,16 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function sellTokens(address _beneficiary, uint _weiAmount) 
     inState(State.Active) internal returns(uint)
   {
-    Debug(msg.sender, "Start sell tokens");
     uint beneficiaryTokens;
     uint extraTokens;
     uint totalTokens;
-    uint referalTokens;
-    address referalAddress;
-    (totalTokens, beneficiaryTokens, extraTokens, referalTokens, referalAddress) = calculateEthAmount(
+    uint refererTokens;
+    address refererAddress;
+    (totalTokens, beneficiaryTokens, extraTokens, refererTokens, refererAddress) = calculateEthAmount(
       _beneficiary, 
       _weiAmount, 
       block.timestamp, 
       token.totalSupply());
-      
-    Debug(msg.sender, "Calculate amount");
-    Debug(msg.sender, appendUintToString("Total: ", totalTokens));
-    Debug(msg.sender, appendUintToString("Beneficiary: ", beneficiaryTokens));
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
                           _weiAmount, 
@@ -648,6 +631,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     weiRaised = weiRaised.add(_weiAmount); // update state (wei amount)
     beneficiaryInvest[_beneficiary] = beneficiaryInvest[_beneficiary].add(_weiAmount);
     shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
+    // soldTokens = soldTokens.add(beneficiaryTokens);
     TokenPurchase(msg.sender,             // Fire purchase event
                   _beneficiary, 
                   _weiAmount, 
@@ -657,16 +641,21 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     if (isExtraDistribution) {            // calculate and
       shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)
                  extraTokens);
+
+      // soldTokens = soldTokens.add(extraTokens);
       ShipTokens(extraTokensHolder, extraTokens);
     }
 
     if (isPersonalBonuses) {
       PersonalBonusRecord record = personalBonuses[_beneficiary];
-      if (record.referalAddress() != address(0) && record.referalBonus() > 0) {
-        shipTokens(record.referalAddress(), referalTokens);
+      if (record.refererAddress() != address(0) && record.refererBonus() > 0) {
+        shipTokens(record.refererAddress(), refererTokens);
+        // soldTokens = soldTokens.add(_amount);
+      ShipTokens(record.refererAddress(), refererTokens);
       }
     }
 
+    soldTokens = soldTokens.add(totalTokens);
     return beneficiaryTokens;
   }
 
@@ -680,8 +669,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
         token.mint(_beneficiary, _amount);
       }
     }
-
-    temporalTotalSupply = temporalTotalSupply.add(_amount);
   }
 
   function forwardEther() internal {
@@ -701,6 +688,21 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     } else {
       allowedToken.transferFrom(_beneficiary, wallet, _amount);
     }
+  }
+
+  // ██╗   ██╗████████╗██╗██╗     ███████╗
+  // ██║   ██║╚══██╔══╝██║██║     ██╔════╝
+  // ██║   ██║   ██║   ██║██║     ███████╗
+  // ██║   ██║   ██║   ██║██║     ╚════██║
+  // ╚██████╔╝   ██║   ██║███████╗███████║
+  //  ╚═════╝    ╚═╝   ╚═╝╚══════╝╚══════╝
+  function toUint(bytes left) public pure returns (uint) {
+      uint out;
+      for (uint i = 0; i < 32; i++) {
+          out |= uint(left[i]) << (31 * 8 - i * 8);
+      }
+      
+      return out;
   }
 
 
@@ -728,7 +730,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     str = string(s);
   }
 
-  function addressToString(address x) returns (string) {
+  function addressToString(address x) public pure returns (string) {
     bytes memory s = new bytes(40);
     for (uint i = 0; i < 20; i++) {
       byte b = byte(uint8(uint(x) / (2**(8*(19 - i)))));
@@ -740,7 +742,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return string(s);
   }
 
-  function char(byte b) returns (byte c) {
+  function char(byte b) public pure returns (byte c) {
     if (b < 10) return byte(uint8(b) + 0x30);
     else return byte(uint8(b) + 0x57);
   }

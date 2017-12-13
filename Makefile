@@ -1,3 +1,5 @@
+NETWORK:= "testrpc"
+
 clean:
 	@echo "Cleaning Project Builds"
 	@rm -rf $(shell pwd)/merged
@@ -11,6 +13,9 @@ compile: node_modules
 	@sol-merger contracts/AltToken.sol merged/
 	@sol-merger contracts/UserRegistry.sol merged/
 
+recompile: clean compile migrateHard
+	@echo "Recompiled
+
 migrate: compile
 	@echo "Begin migrate to $(value NETWORK)"
 	@truffle migrate --network=$(value NETWORK)
@@ -23,7 +28,7 @@ node_modules:
 	npm install
 
 test: compile
-	@truffle --network testrpc test test/crowdsale.js
+	@truffle --network=$(value NETWORK) test test/crowdsale.js
 
 link: compile
 	@remixd -S $(shell pwd)/merged
