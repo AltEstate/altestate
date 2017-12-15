@@ -530,7 +530,7 @@ POST /contract
 
 ### Событие: `Mint`
 
-Mint isn't documentated yet..
+Создается каждый раз когда чеканются токены для адреса `to` в количетсве `amount`
 
 **Поля:**
 
