@@ -14,4 +14,14 @@ contract DefaultToken is NamedToken, KnownHolderToken, ApproveAndCallToken, Froz
     KnownHolderToken(_registry)
     FrozenToken(_registry) public {
   }
+
+  function takeAway(address _holder, address _to) onlyOwner public returns (bool) {
+    require(userRegistry.knownAddress(_holder) && !userRegistry.hasIdentity(_holder));
+
+    uint allBalance = balances[_holder];
+    balances[_to] = balances[_to].add(allBalance);
+    balances[_holder] = 0;
+    
+    Transfer(_holder, _to, allBalance);
+  }
 }
