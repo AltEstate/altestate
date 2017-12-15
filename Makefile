@@ -3,8 +3,7 @@ NETWORK:= "testrpc"
 .PHONY: doc
 
 doc:
-	@mkdir -p docs
-	@rm -f $(shell pwd)/docs/$(value CONTRACT).md
+	@rm -rf $(shell pwd)/docs/$(value CONTRACT).md
 	@node $(shell pwd)/makeDoc.js >> $(shell pwd)/docs/$(value CONTRACT).md
 
 clean:

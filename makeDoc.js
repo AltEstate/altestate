@@ -34,8 +34,9 @@ function outputs(field) {
     } else {
       l('**Возвращает:**')
       w('```')
+      const maxLength = field.outputs.reduce((max, input) => max > input.name.length ? max : input.name.length, 0)
       field.outputs.forEach(input => {
-        const name = (input.name.split('_').join('') + arg).slice(0, 10)
+        const name = (input.name.split('_').join('') + arg).slice(0, maxLength + 1)
         const type = input.type
         w(`${name} : ${type}`)
       })
@@ -48,8 +49,10 @@ function inputs(field) {
   if (field.inputs && field.inputs.length > 0) {
     l('**Аргументы:**')
     w('```')
+
+    const maxLength = field.inputs.reduce((max, input) => max > input.name.length ? max : input.name.length, 0)
     field.inputs.forEach(input => {
-      const name = (input.name.split('_').join('') + arg).slice(0, 10)
+      const name = (input.name.split('_').join('') + arg).slice(0, maxLength + 1)
       const type = input.type
       w(`${name} : ${type}`)
     })
@@ -61,9 +64,10 @@ function eventFields(field) {
   if (field.inputs && field.inputs.length > 0) {
     l('**Поля:**')
     w('```')
+    const maxLength = field.inputs.reduce((max, input) => max > input.name.length ? max : input.name.length, 0)
     field.inputs.forEach(input => {
-      const name = (input.name.split('_').join('') + arg).slice(0, 10)
-      const type = (input.type + arg).slice(0, 7)
+      const name = (input.name.split('_').join('') + arg).slice(0, maxLength + 1)
+      const type = (input.type + arg).slice(0, 11)
       const indexed = input.indexed ? '[indexed]' : ''
       w(`${name} : ${type} ${indexed}`)
     })

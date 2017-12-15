@@ -2,7 +2,7 @@
 
 ### Вызов: `success`
 
-success isn't documentated yet..
+Возвращает `true` если собран `softCap`
 
 **Возвращает:** `bool`
 
@@ -19,7 +19,7 @@ POST /contract
 ```
 ### Вызов: `ended`
 
-ended isn't documentated yet..
+Возращает `true` если собран `hardCap` или наступил дедлайн указанный в `endTime`
 
 **Возвращает:** `bool`
 
@@ -36,14 +36,15 @@ POST /contract
 ```
 ### Вызов: `timeSlices`
 
-timeSlices isn't documentated yet..
+Массив временных штампов для бонусов за раннее участие.
+Возвращает количество секунд с `startTime`.
 
 **Возвращает:** `uint256`
 
 **Аргументы:**
 
 ```
-           : uint256
+index : uint256
 ```
 **Пример запроса:**
 
@@ -58,26 +59,9 @@ POST /contract
 ]
 }
 ```
-### Вызов: `isRefundable`
-
-isRefundable isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isRefundable",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `endTime`
 
-endTime isn't documentated yet..
+Время завершения краудсейла в UNIX формате
 
 **Возвращает:** `uint256`
 
@@ -94,24 +78,24 @@ POST /contract
 ```
 ### Вызов: `calculateEthAmount`
 
-calculateEthAmount isn't documentated yet..
+Метод расчета участия в краудсейле
 
 **Возвращает:**
 
 ```
-calculated : uint256
-calculated : uint256
-calculated : uint256
-calculated : uint256
-refererAdd : address
+calculatedTotal        : uint256
+calculatedBeneficiary  : uint256
+calculatedExtra        : uint256
+calculatedreferer      : uint256
+refererAddress         : address
 ```
 **Аргументы:**
 
 ```
-beneficiar : address
-weiAmount  : uint256
-time       : uint256
-totalSuppl : uint256
+beneficiary   : address
+weiAmount     : uint256
+time          : uint256
+totalSupply   : uint256
 ```
 **Пример запроса:**
 
@@ -131,7 +115,7 @@ POST /contract
 ```
 ### Вызов: `tokenDecimals`
 
-tokenDecimals isn't documentated yet..
+Кратность продаваемого токена
 
 **Возвращает:** `uint256`
 
@@ -146,35 +130,11 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `whitelisted`
+### Вызов: `isCappedInEther`
 
-whitelisted isn't documentated yet..
+Флаг указывающий в чем ограничен крайдсейл: в продаваемом токене или в ETH.
 
-**Возвращает:** `address`
-
-**Аргументы:**
-
-```
-           : uint256
-```
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "whitelisted",
-  "at": "0x....",
-  "args": [
-    1000000000000
-]
-}
-```
-### Вызов: `weiRaised`
-
-weiRaised isn't documentated yet..
-
-**Возвращает:** `uint256`
+**Возвращает:** `bool`
 
 **Пример запроса:**
 
@@ -182,42 +142,33 @@ weiRaised isn't documentated yet..
 POST /contract
 {
   "contract": "Crowdsale",
-  "method": "weiRaised",
+  "method": "isCappedInEther",
   "at": "0x....",
   "args": []
 }
 ```
-### Вызов: `altDeposit`
+### Вызов: `isWhitelisted`
 
-altDeposit isn't documentated yet..
+Флаг указывающий допускаются ли исключительно разрешенные адреса к участию
 
-**Возвращает:** `uint256`
+**Возвращает:** `bool`
 
-**Аргументы:**
-
-```
-           : address
-           : address
-```
 **Пример запроса:**
 
 ```
 POST /contract
 {
   "contract": "Crowdsale",
-  "method": "altDeposit",
+  "method": "isWhitelisted",
   "at": "0x....",
-  "args": [
-    "0xc569011652c8206daf01775a01e4ba0ddb25dddf",
-    "0xc569011652c8206daf01775a01e4ba0ddb25dddf"
-]
+  "args": []
 }
 ```
-### Вызов: `wallet`
+### Вызов: `isTokenExchange`
 
-wallet isn't documentated yet..
+Флаг указывающий можно ли участвовать в краудсейле за ассоциированный токен
 
-**Возвращает:** `address`
+**Возвращает:** `bool`
 
 **Пример запроса:**
 
@@ -225,7 +176,126 @@ wallet isn't documentated yet..
 POST /contract
 {
   "contract": "Crowdsale",
-  "method": "wallet",
+  "method": "isTokenExchange",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isPersonalBonuses`
+
+Флаг указывает существуют ли персональные бонусы
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isPersonalBonuses",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isAllowClaimBeforeFinalization`
+
+isAllowClaimBeforeFinalization isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isAllowClaimBeforeFinalization",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isAmountBonus`
+
+isAmountBonus isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isAmountBonus",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isTransferShipment`
+
+isTransferShipment isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isTransferShipment",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isExtraDistribution`
+
+isExtraDistribution isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isExtraDistribution",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isKnownOnly`
+
+isKnownOnly isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isKnownOnly",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `isEarlyBonus`
+
+isEarlyBonus isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "isEarlyBonus",
   "at": "0x....",
   "args": []
 }
@@ -247,11 +317,37 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `isCappedInEther`
+### Вызов: `whitelisted`
 
-isCappedInEther isn't documentated yet..
+Массив допущенных к участию адрессов. Возвращает адресс под `index` индексов в массиве.
 
-**Возвращает:** `bool`
+**Возвращает:** `address`
+
+**Аргументы:**
+
+```
+index  : uint256
+```
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "whitelisted",
+  "at": "0x....",
+  "args": [
+    1000000000000
+]
+}
+```
+### Вызов: `weiRaised`
+
+Количество полученного ETH (в том числе и через BTC).
+
+*NB: для вывода в графическом интерфейсе необходимо полученное значение разделать на 10^18*
+
+**Возвращает:** `uint256`
 
 **Пример запроса:**
 
@@ -259,7 +355,50 @@ isCappedInEther isn't documentated yet..
 POST /contract
 {
   "contract": "Crowdsale",
-  "method": "isCappedInEther",
+  "method": "weiRaised",
+  "at": "0x....",
+  "args": []
+}
+```
+### Вызов: `altDeposit`
+
+Ассоциативный словарь с ключами `tokenAddress` и ассоциативными словарями `beneficiary` к внесенным средствам в токенах
+
+**Возвращает:** `uint256`
+
+**Аргументы:**
+
+```
+tokenAddress : address
+beneficiary  : address
+```
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "altDeposit",
+  "at": "0x....",
+  "args": [
+    "0xc569011652c8206daf01775a01e4ba0ddb25dddf",
+    "0xc569011652c8206daf01775a01e4ba0ddb25dddf"
+]
+}
+```
+### Вызов: `wallet`
+
+Кошелек на которой будут переведенны средтства в методе `claimFunds` и `claimTokenFunds`
+
+**Возвращает:** `address`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "Crowdsale",
+  "method": "wallet",
   "at": "0x....",
   "args": []
 }
@@ -290,7 +429,7 @@ amountSlices isn't documentated yet..
 **Аргументы:**
 
 ```
-           : uint256
+  : uint256
 ```
 **Пример запроса:**
 
@@ -314,7 +453,7 @@ addressToString isn't documentated yet..
 **Аргументы:**
 
 ```
-x          : address
+x  : address
 ```
 **Пример запроса:**
 
@@ -363,64 +502,6 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `isWhitelisted`
-
-isWhitelisted isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isWhitelisted",
-  "at": "0x....",
-  "args": []
-}
-```
-### Вызов: `isTokenExchange`
-
-isTokenExchange isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isTokenExchange",
-  "at": "0x....",
-  "args": []
-}
-```
-### Вызов: `char`
-
-char isn't documentated yet..
-
-**Возвращает:** `bytes1`
-
-**Аргументы:**
-
-```
-b          : bytes1
-```
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "char",
-  "at": "0x....",
-  "args": [
-    null
-]
-}
-```
 ### Вызов: `timeSlicesCount`
 
 timeSlicesCount isn't documentated yet..
@@ -447,7 +528,7 @@ calculateTimeBonus isn't documentated yet..
 **Аргументы:**
 
 ```
-at         : uint256
+at   : uint256
 ```
 **Пример запроса:**
 
@@ -488,7 +569,7 @@ personalBonuses isn't documentated yet..
 **Аргументы:**
 
 ```
-           : address
+  : address
 ```
 **Пример запроса:**
 
@@ -503,23 +584,6 @@ POST /contract
 ]
 }
 ```
-### Вызов: `isPersonalBonuses`
-
-isPersonalBonuses isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isPersonalBonuses",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `beneficiaryInvest`
 
 beneficiaryInvest isn't documentated yet..
@@ -529,7 +593,7 @@ beneficiaryInvest isn't documentated yet..
 **Аргументы:**
 
 ```
-           : address
+  : address
 ```
 **Пример запроса:**
 
@@ -553,7 +617,7 @@ toUint isn't documentated yet..
 **Аргументы:**
 
 ```
-left       : bytes
+left  : bytes
 ```
 **Пример запроса:**
 
@@ -577,7 +641,7 @@ calculateAmountBonus isn't documentated yet..
 **Аргументы:**
 
 ```
-changeAmou : uint256
+changeAmount   : uint256
 ```
 **Пример запроса:**
 
@@ -590,23 +654,6 @@ POST /contract
   "args": [
     1000000000000
 ]
-}
-```
-### Вызов: `isAllowClaimBeforeFinalization`
-
-isAllowClaimBeforeFinalization isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isAllowClaimBeforeFinalization",
-  "at": "0x....",
-  "args": []
 }
 ```
 ### Вызов: `publisher`
@@ -660,23 +707,6 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `isAmountBonus`
-
-isAmountBonus isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isAmountBonus",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `whitelist`
 
 whitelist isn't documentated yet..
@@ -686,7 +716,7 @@ whitelist isn't documentated yet..
 **Аргументы:**
 
 ```
-           : address
+  : address
 ```
 **Пример запроса:**
 
@@ -735,23 +765,6 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `isTransferShipment`
-
-isTransferShipment isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isTransferShipment",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `state`
 
 state isn't documentated yet..
@@ -769,23 +782,6 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `isExtraDistribution`
-
-isExtraDistribution isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isExtraDistribution",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `appendUintToString`
 
 appendUintToString isn't documentated yet..
@@ -795,8 +791,8 @@ appendUintToString isn't documentated yet..
 **Аргументы:**
 
 ```
-inStr      : string
-v          : uint256
+inStr  : string
+v      : uint256
 ```
 **Пример запроса:**
 
@@ -821,7 +817,7 @@ amountBonuses isn't documentated yet..
 **Аргументы:**
 
 ```
-           : uint256
+  : uint256
 ```
 **Пример запроса:**
 
@@ -845,7 +841,7 @@ weiDeposit isn't documentated yet..
 **Аргументы:**
 
 ```
-           : address
+  : address
 ```
 **Пример запроса:**
 
@@ -886,7 +882,7 @@ timeBonuses isn't documentated yet..
 **Аргументы:**
 
 ```
-           : uint256
+  : uint256
 ```
 **Пример запроса:**
 
@@ -910,7 +906,7 @@ checkOwner isn't documentated yet..
 **Аргументы:**
 
 ```
-maybeowner : address
+maybeowner   : address
 ```
 **Пример запроса:**
 
@@ -942,23 +938,6 @@ POST /contract
   "args": []
 }
 ```
-### Вызов: `isKnownOnly`
-
-isKnownOnly isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isKnownOnly",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `allowedTokens`
 
 allowedTokens isn't documentated yet..
@@ -968,7 +947,7 @@ allowedTokens isn't documentated yet..
 **Аргументы:**
 
 ```
-           : address
+  : address
 ```
 **Пример запроса:**
 
@@ -1009,7 +988,7 @@ uintToString isn't documentated yet..
 **Аргументы:**
 
 ```
-v          : uint256
+v  : uint256
 ```
 **Пример запроса:**
 
@@ -1024,23 +1003,6 @@ POST /contract
 ]
 }
 ```
-### Вызов: `isEarlyBonus`
-
-isEarlyBonus isn't documentated yet..
-
-**Возвращает:** `bool`
-
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "Crowdsale",
-  "method": "isEarlyBonus",
-  "at": "0x....",
-  "args": []
-}
-```
 ### Вызов: `validPurchase`
 
 validPurchase isn't documentated yet..
@@ -1050,12 +1012,12 @@ validPurchase isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-weiAmount  : uint256
-tokenAmoun : uint256
-extraAmoun : uint256
-totalAmoun : uint256
-time       : uint256
+beneficiary   : address
+weiAmount     : uint256
+tokenAmount   : uint256
+extraAmount   : uint256
+totalAmount   : uint256
+time          : uint256
 ```
 **Пример запроса:**
 
@@ -1084,7 +1046,7 @@ tokensValues isn't documentated yet..
 **Аргументы:**
 
 ```
-           : address
+  : address
 ```
 **Пример запроса:**
 
@@ -1159,7 +1121,7 @@ setToken isn't documentated yet..
 **Аргументы:**
 
 ```
-tokenAddre : address
+tokenAddress   : address
 ```
 **Пример запроса:**
 
@@ -1181,8 +1143,8 @@ setTimeBonuses isn't documentated yet..
 **Аргументы:**
 
 ```
-timeSlices : uint256[]
-prices     : uint256[]
+timeSlices   : uint256[]
+prices       : uint256[]
 ```
 **Пример запроса:**
 
@@ -1205,10 +1167,10 @@ buyWithHash isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-value      : uint256
-timestamp  : uint256
-hash       : bytes32
+beneficiary   : address
+value         : uint256
+timestamp     : uint256
+hash          : bytes32
 ```
 **Пример запроса:**
 
@@ -1233,8 +1195,8 @@ updateTokenValue isn't documentated yet..
 **Аргументы:**
 
 ```
-token      : address
-value      : uint256
+token   : address
+value   : uint256
 ```
 **Пример запроса:**
 
@@ -1259,7 +1221,7 @@ claimRefundEther isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
+beneficiary   : address
 ```
 **Пример запроса:**
 
@@ -1281,8 +1243,8 @@ setAmountBonuses isn't documentated yet..
 **Аргументы:**
 
 ```
-amountSlic : uint256[]
-prices     : uint256[]
+amountSlices   : uint256[]
+prices         : uint256[]
 ```
 **Пример запроса:**
 
@@ -1305,7 +1267,7 @@ grant isn't documentated yet..
 **Аргументы:**
 
 ```
-owner      : address
+owner   : address
 ```
 **Пример запроса:**
 
@@ -1327,7 +1289,7 @@ revoke isn't documentated yet..
 **Аргументы:**
 
 ```
-owner      : address
+owner   : address
 ```
 **Пример запроса:**
 
@@ -1394,8 +1356,8 @@ setExtraDistribution isn't documentated yet..
 **Аргументы:**
 
 ```
-holder     : address
-extraPart  : uint256
+holder      : address
+extraPart   : uint256
 ```
 **Пример запроса:**
 
@@ -1418,10 +1380,10 @@ receiveApproval isn't documentated yet..
 **Аргументы:**
 
 ```
-from       : address
-value      : uint256
-token      : address
-extraData  : bytes
+from        : address
+value       : uint256
+token       : address
+extraData   : bytes
 ```
 **Пример запроса:**
 
@@ -1446,7 +1408,7 @@ setPrice isn't documentated yet..
 **Аргументы:**
 
 ```
-price      : uint256
+price   : uint256
 ```
 **Пример запроса:**
 
@@ -1470,7 +1432,7 @@ claimTokenFunds isn't documentated yet..
 **Аргументы:**
 
 ```
-token      : address
+token   : address
 ```
 **Пример запроса:**
 
@@ -1492,8 +1454,8 @@ setTime isn't documentated yet..
 **Аргументы:**
 
 ```
-start      : uint256
-end        : uint256
+start   : uint256
+end     : uint256
 ```
 **Пример запроса:**
 
@@ -1518,8 +1480,8 @@ claimRefundTokens isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-token      : address
+beneficiary   : address
+token         : address
 ```
 **Пример запроса:**
 
@@ -1581,9 +1543,9 @@ addToWhitelist isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-min        : uint256
-max        : uint256
+beneficiary   : address
+min           : uint256
+max           : uint256
 ```
 **Пример запроса:**
 
@@ -1607,8 +1569,8 @@ setTokenExcange isn't documentated yet..
 **Аргументы:**
 
 ```
-token      : address
-value      : uint256
+token   : address
+value   : uint256
 ```
 **Пример запроса:**
 
@@ -1631,8 +1593,8 @@ setSoftHardCaps isn't documentated yet..
 **Аргументы:**
 
 ```
-softCap    : uint256
-hardCap    : uint256
+softCap   : uint256
+hardCap   : uint256
 ```
 **Пример запроса:**
 
@@ -1655,18 +1617,18 @@ setFlags isn't documentated yet..
 **Аргументы:**
 
 ```
-isWhitelis : bool
-isKnownOnl : bool
-isAmountBo : bool
-isEarlyBon : bool
-isRefundab : bool
-isTokenExc : bool
-isAllowToI : bool
-isExtraDis : bool
-isMintingS : bool
-isCappedIn : bool
-isPersonal : bool
-isAllowCla : bool
+isWhitelisted           : bool
+isKnownOnly           : bool
+isAmountBonus           : bool
+isEarlyBonus           : bool
+isRefundable           : bool
+isTokenExchange           : bool
+isAllowToIssue           : bool
+isExtraDistribution           : bool
+isMintingShipment           : bool
+isCappedInEther           : bool
+isPersonalBonuses           : bool
+isAllowClaimBeforeFinalization   : bool
 ```
 **Пример запроса:**
 
@@ -1699,7 +1661,7 @@ setWallet isn't documentated yet..
 **Аргументы:**
 
 ```
-wallet     : address
+wallet   : address
 ```
 **Пример запроса:**
 
@@ -1721,7 +1683,7 @@ buyTokens isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
+beneficiary   : address
 ```
 **Пример запроса:**
 
@@ -1743,10 +1705,10 @@ setPersonalBonus isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-bonus      : uint256
-refererAdd : address
-refererBon : uint256
+beneficiary      : address
+bonus           : uint256
+refererAddress   : address
+refererBonus     : uint256
 ```
 **Пример запроса:**
 
@@ -1786,10 +1748,10 @@ TokenPurchase isn't documentated yet..
 **Аргументы:**
 
 ```
-purchaser  : address
-beneficiar : address
-value      : uint256
-amount     : uint256
+purchaser    : address
+beneficiary  : address
+value        : uint256
+amount       : uint256
 ```
 **Пример запроса:**
 
@@ -1814,11 +1776,11 @@ HashSale isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-value      : uint256
-amount     : uint256
-timestamp  : uint256
-bitcoinHas : bytes32
+beneficiary  : address
+value        : uint256
+amount       : uint256
+timestamp    : uint256
+bitcoinHash  : bytes32
 ```
 **Пример запроса:**
 
@@ -1844,11 +1806,11 @@ TokenSell isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-allowedTok : address
-allowedTok : uint256
-ethValue   : uint256
-shipAmount : uint256
+beneficiary        : address
+allowedToken       : address
+allowedTokenValue  : uint256
+ethValue           : uint256
+shipAmount         : uint256
 ```
 **Пример запроса:**
 
@@ -1874,8 +1836,8 @@ ShipTokens isn't documentated yet..
 **Аргументы:**
 
 ```
-owner      : address
-amount     : uint256
+owner   : address
+amount  : uint256
 ```
 **Пример запроса:**
 
@@ -1928,9 +1890,9 @@ Whitelisted isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-min        : uint256
-max        : uint256
+beneficiary  : address
+min          : uint256
+max          : uint256
 ```
 **Пример запроса:**
 
@@ -1954,10 +1916,10 @@ PersonalBonus isn't documentated yet..
 **Аргументы:**
 
 ```
-beneficiar : address
-referer    : address
-bonus      : uint256
-refererBon : uint256
+beneficiary   : address
+referer       : address
+bonus         : uint256
+refererBonus  : uint256
 ```
 **Пример запроса:**
 
@@ -1982,8 +1944,8 @@ FundsClaimed isn't documentated yet..
 **Аргументы:**
 
 ```
-owner      : address
-amount     : uint256
+owner   : address
+amount  : uint256
 ```
 **Пример запроса:**
 
@@ -2006,8 +1968,8 @@ Debug isn't documentated yet..
 **Аргументы:**
 
 ```
-sender     : address
-message    : string
+sender   : address
+message  : string
 ```
 **Пример запроса:**
 
@@ -2030,7 +1992,7 @@ AccessGrant isn't documentated yet..
 **Аргументы:**
 
 ```
-owner      : address
+owner  : address
 ```
 **Пример запроса:**
 
@@ -2052,7 +2014,7 @@ AccessRevoke isn't documentated yet..
 **Аргументы:**
 
 ```
-owner      : address
+owner  : address
 ```
 **Пример запроса:**
 
@@ -2076,10 +2038,10 @@ TokenPurchase isn't documentated yet..
 **Поля:**
 
 ```
-purchaser  : address [indexed]
-beneficiar : address [indexed]
-value      : uint256 
-amount     : uint256 
+purchaser    : address     [indexed]
+beneficiary  : address     [indexed]
+value        : uint256     
+amount       : uint256     
 ```
 ### Событие: `HashSale`
 
@@ -2088,11 +2050,11 @@ HashSale isn't documentated yet..
 **Поля:**
 
 ```
-beneficiar : address [indexed]
-value      : uint256 
-amount     : uint256 
-timestamp  : uint256 
-bitcoinHas : bytes32 [indexed]
+beneficiary  : address     [indexed]
+value        : uint256     
+amount       : uint256     
+timestamp    : uint256     
+bitcoinHash  : bytes32     [indexed]
 ```
 ### Событие: `TokenSell`
 
@@ -2101,11 +2063,11 @@ TokenSell isn't documentated yet..
 **Поля:**
 
 ```
-beneficiar : address [indexed]
-allowedTok : address [indexed]
-allowedTok : uint256 
-ethValue   : uint256 
-shipAmount : uint256 
+beneficiary        : address     [indexed]
+allowedToken       : address     [indexed]
+allowedTokenValue  : uint256     
+ethValue           : uint256     
+shipAmount         : uint256     
 ```
 ### Событие: `ShipTokens`
 
@@ -2114,8 +2076,8 @@ ShipTokens isn't documentated yet..
 **Поля:**
 
 ```
-owner      : address [indexed]
-amount     : uint256 
+owner   : address     [indexed]
+amount  : uint256     
 ```
 ### Событие: `Sanetize`
 
@@ -2132,9 +2094,9 @@ Whitelisted isn't documentated yet..
 **Поля:**
 
 ```
-beneficiar : address [indexed]
-min        : uint256 
-max        : uint256 
+beneficiary  : address     [indexed]
+min          : uint256     
+max          : uint256     
 ```
 ### Событие: `PersonalBonus`
 
@@ -2143,10 +2105,10 @@ PersonalBonus isn't documentated yet..
 **Поля:**
 
 ```
-beneficiar : address [indexed]
-referer    : address [indexed]
-bonus      : uint256 
-refererBon : uint256 
+beneficiary   : address     [indexed]
+referer       : address     [indexed]
+bonus         : uint256     
+refererBonus  : uint256     
 ```
 ### Событие: `FundsClaimed`
 
@@ -2155,8 +2117,8 @@ FundsClaimed isn't documentated yet..
 **Поля:**
 
 ```
-owner      : address [indexed]
-amount     : uint256 
+owner   : address     [indexed]
+amount  : uint256     
 ```
 ### Событие: `Debug`
 
@@ -2165,8 +2127,8 @@ Debug isn't documentated yet..
 **Поля:**
 
 ```
-sender     : address [indexed]
-message    : string  
+sender   : address     [indexed]
+message  : string      
 ```
 ### Событие: `AccessGrant`
 
@@ -2175,7 +2137,7 @@ AccessGrant isn't documentated yet..
 **Поля:**
 
 ```
-owner      : address [indexed]
+owner  : address     [indexed]
 ```
 ### Событие: `AccessRevoke`
 
@@ -2184,5 +2146,5 @@ AccessRevoke isn't documentated yet..
 **Поля:**
 
 ```
-owner      : address [indexed]
+owner  : address     [indexed]
 ```
