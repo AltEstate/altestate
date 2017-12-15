@@ -4,9 +4,9 @@ import './base/UserRegistryInterface.sol';
 import './base/MultiOwners.sol';
 
 contract UserRegistry is MultiOwners, UserRegistryInterface {
-  mapping (address => bool) private addresses;
-  mapping (address => bool) private identities;
-  mapping (address => bool) private system;
+  mapping (address => bool) internal addresses;
+  mapping (address => bool) internal identities;
+  mapping (address => bool) internal system;
 
   function addAddress(address _who) onlyOwner public returns(bool) {
     require(!knownAddress(_who));
@@ -39,7 +39,7 @@ contract UserRegistry is MultiOwners, UserRegistryInterface {
     return knownAddress(_who) && identities[_who];
   }
 
-  function systemAddresses(address _to) public constant returns(bool) {
-    return system[_to];
+  function systemAddresses(address _to, address _from) public constant returns(bool) {
+    return system[_to] || system[_from];
   }
 }

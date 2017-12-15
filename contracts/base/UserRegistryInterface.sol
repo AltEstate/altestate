@@ -5,5 +5,5 @@ contract UserRegistryInterface {
 
   function knownAddress(address _who) public constant returns(bool);
   function hasIdentity(address _who) public constant returns(bool);
-  function systemAddresses(address _to) public constant returns(bool);
+  function systemAddresses(address _to, address _from) public constant returns(bool);
 }

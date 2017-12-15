@@ -101,6 +101,8 @@ async function makeContext() {
     })
   }
 
+  await registry.addSystem(crowdsale.address, ownerSig)
+
   await crowdsale.setToken(token.address, ownerSig)
 
   const time = latestTime()
@@ -311,11 +313,11 @@ contract('crowdsale', _accs => {
     describe('buy with tokens', async () => {
       let tokenA, tokenB
       before(async () => {
-        tokenA = await DefaultToken.new('Extra Token A', 'EXC', 18, registry.address, ownerSig)
-        await tokenA.mint(accounts[1], 10000 * 1e18)
-        tokenB = await DefaultToken.new('Extra Token B', 'EXB', 18, registry.address, ownerSig)
-        await tokenB.mint(accounts[1], 10000 * 1e18)
         await makeContext()
+        tokenA = await DefaultToken.new('Extra Token A', 'EXC', 18, registry.address, ownerSig)
+        await tokenA.mint(accounts[1], 10000 * 1e18, ownerSig)
+        tokenB = await DefaultToken.new('Extra Token B', 'EXB', 18, registry.address, ownerSig)
+        await tokenB.mint(accounts[1], 10000 * 1e18, ownerSig)
       })
       after(async () => await cleanContext())
       it('disallow anyone to set token exchange', async () => {
@@ -359,6 +361,9 @@ contract('crowdsale', _accs => {
         const rate = await crowdsale.tokensValues(tokenA.address)
         const bytes = toBytes(rate)
         const balanceBefore = await tokenA.balanceOf(buyerSig.from)
+        await registry.addSystem(crowdsale.address, ownerSig)
+        console.log(await tokenA.frozUserRegistry())
+        console.log(registry.address)
         await tokenA.approveAndCall(crowdsale.address, 100 * 1e18, bytes, buyerSig)
         const raisedAfter = await crowdsale.weiRaised()
         const balanceAfter = await tokenA.balanceOf(buyerSig.from)

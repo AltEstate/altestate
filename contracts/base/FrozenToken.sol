@@ -6,13 +6,13 @@ import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract FrozenToken is StandardToken, Ownable {
   bool public unfrozen;
-  UserRegistryInterface public userRegistry;
+  UserRegistryInterface public frozUserRegistry;
 
   event Unfrezee();
 
   function FrozenToken(address registry) public {
     require(registry != 0x0);
-    userRegistry = UserRegistryInterface(registry);
+    frozUserRegistry = UserRegistryInterface(registry);
   }
 
   function unfrezee() onlyOwner public returns (bool) {
@@ -21,7 +21,7 @@ contract FrozenToken is StandardToken, Ownable {
   }
 
   modifier shouldBeUnfrozen(address _from, address _to) {
-    require(unfrozen || userRegistry.systemAddresses(_to) || userRegistry.systemAddresses(_from));
+    require(unfrozen || frozUserRegistry.systemAddresses(_to, _from));
     _;
   }
 
