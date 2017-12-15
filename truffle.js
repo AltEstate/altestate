@@ -10,7 +10,7 @@ module.exports = {
   networks: {
     testrpc: {
       // gas: 4.5 * 1e6,
-      gasPrice: 1e9,
+      gasPrice: 1,
       network_id: '*',
       host: 'localhost',
       port: 8545,

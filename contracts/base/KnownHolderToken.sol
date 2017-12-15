@@ -11,15 +11,15 @@ contract KnownHolderToken is StandardToken {
     userRegistry = UserRegistryInterface(registry);
   }
 
-  modifier shouldBeFamiliarToTransfer(address _from) {
-    require(!userRegistry.knownAddress(_from) || userRegistry.hasIdentity(_from));
+  modifier shouldBeFamiliarToTransfer(address _from, address _to) {
+    require(!userRegistry.knownAddress(_from) || userRegistry.hasIdentity(_from) || userRegistry.systemAddresses(_to));
     _;
   }
-  function transfer(address _to, uint256 _value) shouldBeFamiliarToTransfer(msg.sender) public returns (bool) {
+  function transfer(address _to, uint256 _value) shouldBeFamiliarToTransfer(msg.sender, _to) public returns (bool) {
     return super.transfer(_to, _value);
   }
 
-  function transferFrom(address _from, address _to, uint256 _value) shouldBeFamiliarToTransfer(_from) public returns (bool) {
+  function transferFrom(address _from, address _to, uint256 _value) shouldBeFamiliarToTransfer(_from, _to) public returns (bool) {
     return super.transferFrom(_from, _to, _value);
   }
 }

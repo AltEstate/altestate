@@ -47,7 +47,9 @@ contract BaseAltCrowdsale is Crowdsale {
       true,
       // Should check personal bonuses?
       // _isPersonalBonuses
-      true
+      true,
+      // Should allow to claimFunds before finalizations?
+      false
     );
 
     setToken(_token); 
