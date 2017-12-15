@@ -72,7 +72,10 @@ function eventFields(field) {
 }
 
 function request(field) {
-  const argsSample = field.inputs.map(input => argTypesData[input.type])
+  let argsSample = []
+  if (field.inputs && field.inputs.length > 0) {
+    argsSample = field.inputs.map(input => argTypesData[input.type])
+  }
   l('**Пример запроса:**')
   w(`\`\`\`
 POST /contract
