@@ -77,6 +77,23 @@ POST /contract
   "args": []
 }
 ```
+### Вызов: `unfrozen`
+
+unfrozen isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "DefaultToken",
+  "method": "unfrozen",
+  "at": "0x....",
+  "args": []
+}
+```
 ### Вызов: `userRegistry`
 
 Адрес смартконтракта `UserRegistry` ассоциированного с токеном (для реализации правил `KnownHolderToken`)

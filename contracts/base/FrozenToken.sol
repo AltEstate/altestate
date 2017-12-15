@@ -8,13 +8,20 @@ contract FrozenToken is StandardToken, Ownable {
   bool public unfrozen;
   UserRegistryInterface public userRegistry;
 
+  event Unfrezee();
+
   function FrozenToken(address registry) public {
     require(registry != 0x0);
     userRegistry = UserRegistryInterface(registry);
   }
 
+  function unfrezee() onlyOwner public returns (bool) {
+    require(!unfrozen);
+    unfrozen = true;
+  }
+
   modifier shouldBeUnfrozen(address _from, address _to) {
-    require(unfrozen || userRegistry.systemAddresses(_to));
+    require(unfrozen || userRegistry.systemAddresses(_to) || userRegistry.systemAddresses(_from));
     _;
   }
 
