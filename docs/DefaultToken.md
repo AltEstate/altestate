@@ -1,8 +1,17 @@
+## Контруктор
+
+**Аргументы ожидаемые контрактом при создании**
+```
+name       : string
+ticker     : string
+decimals   : uint256
+registry   : address – адрес реестра пользователей
+```
+
 ## Чтение данных
 
 ### Вызов: `mintingFinished`
-
-mintingFinished isn't documentated yet..
+Возвращает `true` если чеканка завершена
 
 **Возвращает:** `bool`
 
@@ -19,7 +28,7 @@ POST /contract
 ```
 ### Вызов: `name`
 
-name isn't documentated yet..
+Возвращает название токена
 
 **Возвращает:** `string`
 
@@ -36,7 +45,7 @@ POST /contract
 ```
 ### Вызов: `totalSupply`
 
-totalSupply isn't documentated yet..
+Возвращает количество эмитированных токенов
 
 **Возвращает:** `uint256`
 
@@ -53,7 +62,7 @@ POST /contract
 ```
 ### Вызов: `decimals`
 
-decimals isn't documentated yet..
+Кратность токена или количество знаков после запятой в графических интерфейсах
 
 **Возвращает:** `uint256`
 
@@ -70,7 +79,7 @@ POST /contract
 ```
 ### Вызов: `userRegistry`
 
-userRegistry isn't documentated yet..
+Адрес смартконтракта `UserRegistry` ассоциированного с токеном (для реализации правил `KnownHolderToken`)
 
 **Возвращает:** `address`
 
@@ -87,7 +96,9 @@ POST /contract
 ```
 ### Вызов: `balanceOf`
 
-balanceOf isn't documentated yet..
+Возвращает баланс (токенов) для переданного адреса
+
+*NB: Для вывода в графическом интерфейсе требуется полученное значение разделить на 10 в степени `decimals`!*
 
 **Возвращает:** `uint256`
 
@@ -111,7 +122,7 @@ POST /contract
 ```
 ### Вызов: `ticker`
 
-ticker isn't documentated yet..
+Возвращает тикер токена (короткое наименование для листинга на бирже)
 
 **Возвращает:** `string`
 
@@ -128,7 +139,7 @@ POST /contract
 ```
 ### Вызов: `owner`
 
-owner isn't documentated yet..
+Адрес текущего владельца токена
 
 **Возвращает:** `address`
 
@@ -145,7 +156,9 @@ POST /contract
 ```
 ### Вызов: `allowance`
 
-allowance isn't documentated yet..
+Возвращает количество токенов переданное `owner`ом в управление `spender`у.
+
+Выделенные в управление токены доступны для перевода через `transferFrom`.
 
 **Возвращает:** `uint256`
 
@@ -173,9 +186,9 @@ POST /contract
 
 ### Метод: `approve`
 
-approve isn't documentated yet..
+Выделить `value` токенов в управление `spender`у.
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -199,9 +212,9 @@ POST /contract
 ```
 ### Метод: `transferFrom`
 
-transferFrom isn't documentated yet..
+Перевести `value` токенов с адреса `from` на адрес `to`. Для перевода требуется наличие разрешения (`approve`) у вызывающего метод адреса
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -227,9 +240,9 @@ POST /contract
 ```
 ### Метод: `mint`
 
-mint isn't documentated yet..
+Чеканда `amount` токенов для адреса `to`. Требуется наличие `owner` прав у адреса вызывающего метод.
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -253,9 +266,9 @@ POST /contract
 ```
 ### Метод: `decreaseApproval`
 
-decreaseApproval isn't documentated yet..
+Уменьшает количество выделенных в управление для `spender` токенов на значение `subtracted`.
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -279,9 +292,9 @@ POST /contract
 ```
 ### Метод: `finishMinting`
 
-finishMinting isn't documentated yet..
+Объявляет завершение чеканки. Требуются права владельца
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Пример запроса:**
 
@@ -296,9 +309,9 @@ POST /contract
 ```
 ### Метод: `transfer`
 
-transfer isn't documentated yet..
+Переводит `value` токенов с адреса вызывающего метод на адресс `to`.
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -322,9 +335,11 @@ POST /contract
 ```
 ### Метод: `approveAndCall`
 
-approveAndCall isn't documentated yet..
+Передает в управление `spender` токены в количестве `value` и вызывает метод `receiveApproval` из `TokenRecipient` интерфейса.
 
-**Возвращает:** `bool`
+Третий аргумент произвольные данные для дополнительной логики.
+
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -352,7 +367,7 @@ POST /contract
 
 increaseApproval isn't documentated yet..
 
-**Возвращает:** `bool`
+**Возвращает:** `true` в случае успеха или ошибку.
 
 **Аргументы:**
 
@@ -392,34 +407,6 @@ POST /contract
   "method": "transferOwnership",
   "at": "0x....",
   "args": [
-    "0xc569011652c8206daf01775a01e4ba0ddb25dddf"
-]
-}
-```
-### Метод: `undefined`
-
-undefined isn't documentated yet..
-
-**Аргументы:**
-
-```
-name       : string
-ticker     : string
-decimals   : uint256
-registry   : address
-```
-**Пример запроса:**
-
-```
-POST /contract
-{
-  "contract": "DefaultToken",
-  "method": "undefined",
-  "at": "0x....",
-  "args": [
-    "Sample String",
-    "Sample String",
-    1000000000000,
     "0xc569011652c8206daf01775a01e4ba0ddb25dddf"
 ]
 }
@@ -553,21 +540,21 @@ amount     : uint256
 ```
 ### Событие: `MintFinished`
 
-MintFinished isn't documentated yet..
+Создается единоразово в момент завершения чеканки
 
 ### Событие: `OwnershipTransferred`
 
-OwnershipTransferred isn't documentated yet..
+Создается каждый раз когда владелец токена передает права другому
 
 **Поля:**
 
 ```
-previousOw : address [indexed]
-newOwner   : address [indexed]
+previousOwner : address [indexed]
+newOwner      : address [indexed]
 ```
 ### Событие: `Approval`
 
-Approval isn't documentated yet..
+Создается каждый раз когда `owner` передает `value` токенов в управление `spender`
 
 **Поля:**
 
@@ -578,7 +565,7 @@ value      : uint256
 ```
 ### Событие: `Transfer`
 
-Transfer isn't documentated yet..
+Создается каждый раз когда `from` переводит `value` токенов на адрес `to`
 
 **Поля:**
 
