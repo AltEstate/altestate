@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import './base/Crowdsale.sol';
 contract BaseAltCrowdsale is Crowdsale {
@@ -47,7 +47,9 @@ contract BaseAltCrowdsale is Crowdsale {
       true,
       // Should check personal bonuses?
       // _isPersonalBonuses
-      true
+      true,
+      // Should allow to claimFunds before finalizations?
+      false
     );
 
     setToken(_token); 

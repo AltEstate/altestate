@@ -1,13 +1,22 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import './base/UserRegistryInterface.sol';
 import './base/MultiOwners.sol';
 
 contract UserRegistry is MultiOwners, UserRegistryInterface {
+  mapping (address => bool) private addresses;
+  mapping (address => bool) private identities;
+  mapping (address => bool) private system;
+
   function addAddress(address _who) onlyOwner public returns(bool) {
     require(!knownAddress(_who));
     addresses[_who] = true;
     AddAddress(_who);
+    return true;
+  }
+
+  function addSystem(address _address) onlyOwner public returns(bool) {
+    system[_address] = true;
     return true;
   }
 
@@ -28,5 +37,9 @@ contract UserRegistry is MultiOwners, UserRegistryInterface {
 
   function hasIdentity(address _who) public constant returns(bool) {
     return knownAddress(_who) && identities[_who];
+  }
+
+  function systemAddresses(address _to) public constant returns(bool) {
+    return system[_to];
   }
 }
