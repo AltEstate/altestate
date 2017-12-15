@@ -71,8 +71,8 @@ function setFlags (crowdsale, flags, sig) {
     extraDistribution: 7,
     transferShipment: 8,
     cappedInEther: 9,
-    pullingTokens: 10,
-    personalBonuses: 11,
+    personalBonuses: 10,
+    allowClaimBeforeFinalization: 11
   }
 
   let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)
@@ -142,7 +142,6 @@ contract('crowdsale', _accs => {
         extraDistribution: true,
         transferShipment:  true,
         cappedInEther:    true,
-        pullingTokens:    true,
         personalBonuses:  true
       }, ownerSig)
 
@@ -155,7 +154,6 @@ contract('crowdsale', _accs => {
       assert(await crowdsale.isExtraDistribution(), 'should be extra distirbution')
       assert(await crowdsale.isTransferShipment(), 'should be transfer shipment')
       assert(await crowdsale.isCappedInEther(), 'should be capped in ether')
-      assert(await crowdsale.isPullingTokens(), 'should be pulling tokens')
       assert(await crowdsale.isPersonalBonuses(), 'should be personal bonuses')
     })
 
@@ -171,7 +169,6 @@ contract('crowdsale', _accs => {
       assert(!(await crowdsale.isExtraDistribution()), 'shouldn\'t be extra distirbution')
       assert(!(await crowdsale.isTransferShipment()), 'shouldn\'t be transfer shipment')
       assert(!(await crowdsale.isCappedInEther()), 'shouldn\'t be capped in ether')
-      assert(!(await crowdsale.isPullingTokens()), 'shouldn\'t be pulling tokens')
       assert(!(await crowdsale.isPersonalBonuses()), 'shouldn\'t be a personal bonuses')
     })
     
@@ -372,15 +369,6 @@ contract('crowdsale', _accs => {
 
       it('reject tx with unkown token', async () => {
         await expectThrow(tokenB.approveAndCall(crowdsale.address, 10 * 1e18, toBytes(bn(0)), buyerSig))
-      })
-    })
-
-    describe('pulling tokens', async () => {
-      it('reject pulling without finalization', async () => {
-        
-      })
-      it('pull tokens', async () => {
-        
       })
     })
 
@@ -673,35 +661,91 @@ contract('crowdsale', _accs => {
     })
 
     describe('capped', async () => {
-      it('allow owner to setup caps', async () => {
-        
-      })
-      it('disallow anyone to setup caps', async () => {
-        
-      })
-      it('reject setup after sanetize', async () => {
-        
-      })
-      it('reject buy when cap is achived', async () => {
-        
-      })
-      it('fail crowdsale then soft cap isn\'t achived', async () => {
-        
-      })
-      it('success then soft cap is achived', async () => {
-        
+      describe('in ether', async () => {
+        before(async () => await makeContext())
+        after(async () => await cleanContext())
+
+        it('disallow anyone to set caps', async () => {
+          await expectThrow(setFlags(crowdsale, { cappedInEther: true}, buyerSig))
+        })
+        it('allow owner to set caps', async () => {
+          await setFlags(crowdsale, { cappedInEther: true}, ownerSig)
+          await crowdsale.setSoftHardCaps(
+            ether(100),
+            ether(200),
+            ownerSig
+          )
+          await crowdsale.saneIt()
+        })
+        it('disallow to set caps after sanetize', async () => {
+          await expectThrow(
+            crowdsale.setSoftHardCaps(
+              ether(10),
+              ether(20),
+              ownerSig
+            )
+          )
+        })
+        it('fail crowdsale then soft cap isn\'t achived', async () => {
+          await crowdsale.buyTokens(accounts[5], { value: ether(90), from: accounts[5] })
+          assert(!(await crowdsale.success()), 'should fail crowdsale')
+        })
+        it('success then soft cap is achived', async () => {
+          await crowdsale.buyTokens(accounts[5], { value: ether(10), from: accounts[5] })
+          assert(await crowdsale.success(), 'should success crowdsale (soft cap is achived')
+        })
+        it('reject buy when cap is achived', async () => {
+          // hard cap achived here
+          await crowdsale.buyTokens(accounts[5], { value: ether(100), from: accounts[5] })
+          // reject future buy
+          await expectThrow(crowdsale.buyTokens(accounts[5], { value: 1, from: accounts[5] }))
+        })
       })
     })
 
     describe('transfer funds', async () => {
-      it('allow owner to setup wallet', async () => {
-        
-      })
+      before(async () => await makeContext())
+      after(async () => await cleanContext())
       it('disallow anyone to setup wallet', async () => {
-        
+        await expectThrow(crowdsale.setWallet(accounts[6], buyerSig))
       })
+      it('allow owner to setup wallet', async () => {
+        await setFlags(crowdsale, { 
+          cappedInEther: true,
+          allowClaimBeforeFinalization: true
+        }, ownerSig)
+        await crowdsale.setWallet(accounts[0], ownerSig)
+        await crowdsale.setSoftHardCaps(
+          ether(100),
+          ether(500)
+        )
+      })
+      
       it('reject setup after sanetize', async () => {
-        
+        const wallet = await crowdsale.wallet()
+        assert(wallet === accounts[0])
+        await crowdsale.saneIt()
+        await expectThrow(crowdsale.setWallet(accounts[6], ownerSig))
+      })
+
+      it('should hold funds before finalization', async () => {
+        const balanceBefore = await web3.eth.getBalance(crowdsale.address)
+        await crowdsale.buyTokens(accounts[5], { value: ether(10), from: accounts[5] })
+        const balanceAfter = await web3.eth.getBalance(crowdsale.address)
+        assert(balanceAfter.sub(balanceBefore).div(1e18).eq(10), `unxpected balance: ${balanceAfter.sub(balanceBefore).div(1e18).toString(10)} ETH`)
+      })
+
+      it('should reject claim before softcap', async () => {
+        await expectThrow(crowdsale.claimFunds(ownerSig))
+      })
+
+      it('should allow to claim after softcap', async () => {
+        await crowdsale.buyTokens(accounts[5], { value: ether(91), from: accounts[5] })
+        const balanceBefore = await web3.eth.getBalance(accounts[0])
+        console.log((await web3.eth.getBalance(crowdsale.address)).toString(10))
+        await crowdsale.claimFunds(ownerSig)
+        const balanceAfter = await web3.eth.getBalance(accounts[0])
+        assert(balanceAfter.sub(balanceBefore).gt(0))
       })
     })
   })

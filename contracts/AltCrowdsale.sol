@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import './base/Crowdsale.sol';
 contract BaseAltCrowdsale is Crowdsale {
@@ -45,12 +45,11 @@ contract BaseAltCrowdsale is Crowdsale {
       // Should be capped in ether
       // bool _isCappedInEther,
       true,
-      // Should beneficiaries pull their tokens? 
-      // _isPullingTokens
-      false,
       // Should check personal bonuses?
       // _isPersonalBonuses
-      true
+      true,
+      // Should allow to claimFunds before finalizations?
+      false
     );
 
     setToken(_token); 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import 'zeppelin-solidity/contracts/token/ERC20.sol';
@@ -49,7 +49,6 @@ contract WhitelistRecord {
  * - Only known users
  * - Buy with allowed tokens
  *  - Oraclize based pairs (ETH to TOKEN)
- * - Pulling tokens (temporal balance inside sale)
  * - Revert\refund
  * - Personal bonuses
  * - Amount bonuses
@@ -72,7 +71,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   enum State {
     Setup,          // Non active yet (require to be setuped)
     Active,         // Crowdsale in a live
-    Success,        // Finalization state (forward funds, transfer tokens (if not yet), refunding via owner if it requires (KYC))
+    Claim,          // Claim funds by owner
     Refund,         // Unsucceseful crowdsale (refund ether)
     History         // Close and store only historical fact of existence
   }
@@ -95,8 +94,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
   bool public isTransferShipment;       // Will ship token via minting?
   bool public isCappedInEther;          // Should be capped in Ether 
-  bool public isPullingTokens;          // Should beneficiaries pull their tokens?
   bool public isPersonalBonuses;        // Should check personal beneficiary bonus?
+  bool public isAllowClaimBeforeFinalization;
+                                        // Should allow to claim funds before finalization?
 
   // List of allowed beneficiaries
   mapping (address => WhitelistRecord) public whitelist;
@@ -152,8 +152,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   mapping (address => uint) public weiDeposit;
   mapping (address => mapping(address => uint)) public altDeposit;
 
-  mapping (address => bool) public claimRefundAllowance;
-
   modifier inState(State _target) {
     require(state == _target);
     _;
@@ -171,21 +169,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
   event ShipTokens(address indexed owner, uint amount);
 
+  event Sanetize();
+  event Finalize();
+
   event Whitelisted(address indexed beneficiary, uint min, uint max);
   event PersonalBonus(address indexed beneficiary, address indexed referer, uint bonus, uint refererBonus);
-
-  // event SetToken(address indexed owner, address previousToken, address indexed nextToken);
-  // event SetStartTime(address indexed owner, uint previousStartTime, uint nextStartTime);
-  // event SetEndTime(address indexed owner, uint previousEndTime, uint nextEndTime);
-  // event SetExtraTokensHolder(address indexed owner, address previousExtraTokensHolder, address nextExtraTokensHolder);
-  // event SetExtraTokensPart(address indexed owner, uint previousExtraTokensPart, uint nextExtraTokensPart);
-  // event SetHardCap(address indexed owner, uint previousHardCap, uint nextHardCap);
-  // event SetSoftCap(address indexed owner, uint previousSoftCap, uint nextSoftCap);
-  // event SetPrice(address indexed owner, uint previousPrice, uint nextPrice);
-  // event SetWallet(address indexed owner, address previousWallet, address nextWallet);
-  // event SetRegistry(address indexed owner, address previousRegistry, address nextRegistry);
-  // event AddAmountSlice(address indexed owner, uint slice, uint bonus);
-  // event AddTimeSlice(address indexed owner, uint slice, uint bonus);
+  event FundsClaimed(address indexed owner, uint amount);
 
 
   // ███████╗███████╗████████╗██╗   ██╗██████╗     ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
@@ -217,9 +206,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Should be capped in ether
     bool _isCappedInEther,
     // Should beneficiaries pull their tokens? 
-    bool _isPullingTokens,
-    // Should check personal bonus?
-    bool _isPersonalBonuses)
+    bool _isPersonalBonuses,
+    // Should allow to claim funds before finalization?
+    bool _isAllowClaimBeforeFinalization)
     inState(State.Setup) onlyOwner public 
   {
     isWhitelisted = _isWhitelisted;
@@ -232,8 +221,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isExtraDistribution = _isExtraDistribution;
     isTransferShipment = _isMintingShipment;
     isCappedInEther = _isCappedInEther;
-    isPullingTokens = isRefundable || _isPullingTokens;
     isPersonalBonuses = _isPersonalBonuses;
+    isAllowClaimBeforeFinalization = _isAllowClaimBeforeFinalization;
   }
 
   function setPrice(uint _price)
@@ -378,6 +367,21 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     state = State.Active;
   }
 
+  function finalizeIt() inState(State.Active) onlyOwner public {
+    require(ended());
+
+    if (success()) {
+      state = State.Claim;
+    } else {
+      state = State.Refund;
+    }
+  }
+
+  function historyIt() inState(State.Claim) onlyOwner public {
+    require(address(this).balance == 0);
+    state = State.History;
+  }
+
   // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗
   // ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔════╝
   // █████╗   ╚███╔╝ █████╗  ██║     ██║   ██║   ██║   █████╗  
@@ -399,21 +403,17 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     _totalSupply;
     uint bonus = 0;
+    
+    if (isAmountBonus) {
+      bonus = bonus.add(calculateAmountBonus(_weiAmount));
+    }
 
-    if (_time < startTime || _time > endTime) {
-      return (0, 0, 0, 0, address(0));
-    } else {
-      if (isAmountBonus) {
-        bonus = bonus.add(calculateAmountBonus(_weiAmount));
-      }
+    if (isEarlyBonus) {
+      bonus = bonus.add(calculateTimeBonus(_time.sub(startTime)));
+    }
 
-      if (isEarlyBonus) {
-        bonus = bonus.add(calculateTimeBonus(_time - startTime));
-      }
-
-      if (isPersonalBonuses && personalBonuses[_beneficiary].bonus() > 0) {
-        bonus = bonus.add(personalBonuses[_beneficiary].bonus());
-      }
+    if (isPersonalBonuses && personalBonuses[_beneficiary].bonus() > 0) {
+      bonus = bonus.add(personalBonuses[_beneficiary].bonus());
     }
 
     calculatedBeneficiary = _weiAmount.mul(10 ** tokenDecimals).div(price);
@@ -465,12 +465,17 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _weiAmount, 
     uint _tokenAmount,
     uint _extraAmount,
-    uint _totalAmount) 
+    uint _totalAmount,
+    uint _time) 
   public constant returns(bool) 
   {
     _tokenAmount;
     _extraAmount;
     _weiAmount;
+
+    if (_time < startTime || _time > endTime) {
+      return false;
+    }
 
     if (isKnownOnly && !userRegistry.knownAddress(_beneficiary)) {
       return false;
@@ -503,8 +508,36 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
                                                                                         
   function updateTokenValue(address _token, uint _value) onlyOwner public {
+    require(address(allowedTokens[_token]) != address(0x0));
     tokensValues[_token] = _value;
   }
+
+  // ██████╗ ███████╗ █████╗ ██████╗ 
+  // ██╔══██╗██╔════╝██╔══██╗██╔══██╗
+  // ██████╔╝█████╗  ███████║██║  ██║
+  // ██╔══██╗██╔══╝  ██╔══██║██║  ██║
+  // ██║  ██║███████╗██║  ██║██████╔╝
+  // ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝ 
+  function success() public constant returns(bool) {
+    if (isCappedInEther) {
+      return weiRaised >= softCap;
+    } else {
+      return token.totalSupply() >= softCap;
+    }
+  }
+
+  function capped() public constant returns(bool) {
+    if (isCappedInEther) {
+      return weiRaised >= hardCap;
+    } else {
+      return token.totalSupply() >= hardCap;
+    }
+  }
+
+  function ended() public constant returns(bool) {
+    return capped() || block.timestamp >= endTime;
+  }
+
 
   //  ██████╗ ██╗   ██╗████████╗███████╗██╗██████╗ ███████╗
   // ██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██║██╔══██╗██╔════╝
@@ -518,15 +551,15 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
-    uint shipAmount = sellTokens(_beneficiary, msg.value);
+    uint shipAmount = sellTokens(_beneficiary, msg.value, block.timestamp);
     require(shipAmount > 0);
-    forwardEther();
+    // forwardEther();
   }
 
   function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash) 
     inState(State.Active) onlyOwner public 
   {
-    uint shipAmount = sellTokens(_beneficiary, _value);
+    uint shipAmount = sellTokens(_beneficiary, _value, _timestamp);
     require(shipAmount > 0);
     HashSale(_beneficiary, _value, shipAmount, _timestamp, _hash);
   }
@@ -541,34 +574,42 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
     Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
-    require(address(allowedTokens[_token]) != address(0));
-    require(allowedTokens[_token].balanceOf(_from) >= _value);
-    require(allowedTokens[_token].transferFrom(_from, address(this), _value));
+    require(tokensValues[_token] > 0);
+    require(forwardTokens(_from, _token, _value));
 
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
-    uint shipAmount = sellTokens(_from, weiValue);
+    require(weiValue > 0);
+
+    uint shipAmount = sellTokens(_from, weiValue, block.timestamp);
     require(shipAmount > 0);
-    altDeposit[_token][_from] = altDeposit[_token][_from].add(_value);
+
     TokenSell(_from, _token, _value, weiValue, shipAmount);
   }
 
-  function refund(address _beneficiary) onlyOwner public {
-    require(isRefundable);
-    claimRefundAllowance[_beneficiary] = true;
+  function claimFunds() onlyOwner public returns(bool) {
+    require(state == State.Claim || (isAllowClaimBeforeFinalization && success()));
+    wallet.transfer(address(this).balance);
+    return true;
   }
 
-  // if crowdsale is unsuccessful, investors can claim refunds here
-  function claimRefund(address _beneficiary) public returns(bool) {
-    require(isRefundable);
-    require(claimRefundAllowance[_beneficiary] || state == State.Refund);
+  function claimTokenFunds(address _token) onlyOwner public returns(bool) {
+    require(state == State.Claim || (isAllowClaimBeforeFinalization && success()));
+    uint balance = allowedTokens[_token].balanceOf(address(this));
+    require(balance > 0);
+    require(allowedTokens[_token].transfer(wallet, balance));
+    return true;
+  }
 
-    // refund all deposited wei
+  function claimRefundEther(address _beneficiary) inState(State.Refund) public returns(bool) {
+    require(weiDeposit[_beneficiary] > 0);
     _beneficiary.transfer(weiDeposit[_beneficiary]);
+    return true;
+  }
 
-    // refund all deposited alt tokens
-    if (isTokenExchange) {
-      // token.transfer(_beneficiary, altDeposit[_beneficiary]);
-    }
+  function claimRefundTokens(address _beneficiary, address _token) inState(State.Refund) public returns(bool) {
+    require(altDeposit[_token][_beneficiary] > 0);
+    require(allowedTokens[_token].transfer(_beneficiary, altDeposit[_token][_beneficiary]));
+    return true;
   }
 
   function addToWhitelist(address _beneficiary, uint _min, uint _max) onlyOwner public
@@ -608,7 +649,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗███████║
   // ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝
   // low level token purchase function
-  function sellTokens(address _beneficiary, uint _weiAmount) 
+  function sellTokens(address _beneficiary, uint _weiAmount, uint timestamp) 
     inState(State.Active) internal returns(uint)
   {
     uint beneficiaryTokens;
@@ -619,14 +660,15 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     (totalTokens, beneficiaryTokens, extraTokens, refererTokens, refererAddress) = calculateEthAmount(
       _beneficiary, 
       _weiAmount, 
-      block.timestamp, 
+      timestamp, 
       token.totalSupply());
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
                           _weiAmount, 
                           beneficiaryTokens,
                           extraTokens,
-                          totalTokens));
+                          totalTokens,
+                          timestamp));
 
     weiRaised = weiRaised.add(_weiAmount); // update state (wei amount)
     beneficiaryInvest[_beneficiary] = beneficiaryInvest[_beneficiary].add(_weiAmount);
@@ -662,32 +704,23 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function shipTokens(address _beneficiary, uint _amount) 
     inState(State.Active) internal 
   {
-    if (!isPullingTokens) {
-      if (isTransferShipment) {
-        token.transferFrom(address(this), _beneficiary, _amount);
-      } else {
-        token.mint(_beneficiary, _amount);
-      }
-    }
-  }
-
-  function forwardEther() internal {
-    if (isRefundable) {
-      weiDeposit[msg.sender] = msg.value;
+    if (isTransferShipment) {
+      token.transferFrom(address(this), _beneficiary, _amount);
     } else {
-      wallet.transfer(msg.value);
+      token.mint(_beneficiary, _amount);
     }
   }
 
-  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal {
+  function forwardEther() internal returns (bool) {
+    weiDeposit[msg.sender] = msg.value;
+    return true;
+  }
+
+  function forwardTokens(address _beneficiary, address _tokenAddress, uint _amount) internal returns (bool) {
     TokenInterface allowedToken = allowedTokens[_tokenAddress];
-
-    if (isRefundable) {
-      allowedToken.transferFrom(_beneficiary, address(this), _amount);
-      altDeposit[_tokenAddress][_beneficiary] = _amount;
-    } else {
-      allowedToken.transferFrom(_beneficiary, wallet, _amount);
-    }
+    allowedToken.transferFrom(_beneficiary, address(this), _amount);
+    altDeposit[_tokenAddress][_beneficiary] = _amount;
+    return true;
   }
 
   // ██╗   ██╗████████╗██╗██╗     ███████╗
