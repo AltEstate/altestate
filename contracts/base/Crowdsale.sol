@@ -164,9 +164,24 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
   // ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
   
-  event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
-  event HashSale(address indexed beneficiary, uint value, uint amount, uint timestamp, bytes32 indexed bitcoinHash);
-  event TokenSell(address indexed beneficiary, address indexed allowedToken, uint allowedTokenValue, uint ethValue, uint shipAmount);
+  event EthBuy(
+    address indexed purchaser, 
+    address indexed beneficiary, 
+    uint value, 
+    uint amount);
+  event HashBuy(
+    address indexed beneficiary, 
+    uint value, 
+    uint amount, 
+    uint timestamp, 
+    bytes32 indexed bitcoinHash);
+  event AltBuy(
+    address indexed beneficiary, 
+    address indexed allowedToken, 
+    uint allowedTokenValue, 
+    uint ethValue, 
+    uint shipAmount);
+    
   event ShipTokens(address indexed owner, uint amount);
 
   event Sanetize();
@@ -561,7 +576,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     uint shipAmount = sellTokens(_beneficiary, _value, _timestamp);
     require(shipAmount > 0);
-    HashSale(_beneficiary, _value, shipAmount, _timestamp, _hash);
+    HashBuy(_beneficiary, _value, shipAmount, _timestamp, _hash);
   }
   
   function receiveApproval(address _from, 
@@ -583,7 +598,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint shipAmount = sellTokens(_from, weiValue, block.timestamp);
     require(shipAmount > 0);
 
-    TokenSell(_from, _token, _value, weiValue, shipAmount);
+    AltBuy(_from, _token, _value, weiValue, shipAmount);
   }
 
   function claimFunds() onlyOwner public returns(bool) {
@@ -674,7 +689,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     beneficiaryInvest[_beneficiary] = beneficiaryInvest[_beneficiary].add(_weiAmount);
     shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
     // soldTokens = soldTokens.add(beneficiaryTokens);
-    TokenPurchase(msg.sender,             // Fire purchase event
+    EthBuy(msg.sender,             // Fire purchase event
                   _beneficiary, 
                   _weiAmount, 
                   beneficiaryTokens);
