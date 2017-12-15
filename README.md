@@ -16,7 +16,11 @@ Alt.Estate Smart-contracts
 * `AltCrowdsale` – контракты краудсейла AltToken'а.
   * `AltCrowdsalePhaseOne` – первый раунд краудсейла – PreICO
   * `AltCrowdsalePhaseTwo` – второй раунд краудсейла – ICO
-* `AltToken`
-* `SqmCrowdsale`
-* `SqmToken`
-* `UserRegistry`
+* `AltToken` – основной токен платформы. Наследует: `DefaultToken`, `ApproveAndCall`, `KnownHolderToken`, `NamedToken`
+* `UserRegistry` – реестр пользователей
+
+## Взаимодействие с контрактами
+
+* [UserRegistry API References](docs/UserRegistry.md)
+* [Token API References](docs/DefaultToken.md)
+* [Crowdsale API References](docs/Crowdsale.md)
