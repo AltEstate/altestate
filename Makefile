@@ -1,5 +1,11 @@
 NETWORK:= "testrpc"
 
+.PHONY: doc
+
+doc:
+	@rm -f $(shell pwd)/build/contracts/$(value CONTRACT).md
+	@node $(shell pwd)/makeDoc.js >> $(shell pwd)/build/contracts/$(value CONTRACT).md
+
 clean:
 	@echo "Cleaning Project Builds"
 	@rm -rf $(shell pwd)/merged
