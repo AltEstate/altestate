@@ -3,8 +3,8 @@ NETWORK:= "testrpc"
 .PHONY: doc
 
 doc:
-	@rm -rf $(shell pwd)/docs/$(value CONTRACT).md
-	@node $(shell pwd)/makeDoc.js >> $(shell pwd)/docs/$(value CONTRACT).md
+	@rm -rf $(shell pwd)/build/docs/$(value CONTRACT).md
+	@node $(shell pwd)/makeDoc.js >> $(shell pwd)/build/docs/$(value CONTRACT).md
 
 clean:
 	@echo "Cleaning Project Builds"

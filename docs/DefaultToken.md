@@ -77,6 +77,23 @@ POST /contract
   "args": []
 }
 ```
+### Вызов: `unfrozen`
+
+unfrozen isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "DefaultToken",
+  "method": "unfrozen",
+  "at": "0x....",
+  "args": []
+}
+```
 ### Вызов: `userRegistry`
 
 Адрес смартконтракта `UserRegistry` ассоциированного с токеном (для реализации правил `KnownHolderToken`)
@@ -235,6 +252,49 @@ POST /contract
     "0xc569011652c8206daf01775a01e4ba0ddb25dddf",
     "0xc569011652c8206daf01775a01e4ba0ddb25dddf",
     1000000000000
+]
+}
+```
+### Метод: `unfrezee`
+
+unfrezee isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "DefaultToken",
+  "method": "unfrezee",
+  "at": "0x....",
+  "args": []
+}
+```
+### Метод: `takeAway`
+
+takeAway isn't documentated yet..
+
+**Возвращает:** `bool`
+
+**Аргументы:**
+
+```
+holder   : address
+to       : address
+```
+**Пример запроса:**
+
+```
+POST /contract
+{
+  "contract": "DefaultToken",
+  "method": "takeAway",
+  "at": "0x....",
+  "args": [
+    "0xc569011652c8206daf01775a01e4ba0ddb25dddf",
+    "0xc569011652c8206daf01775a01e4ba0ddb25dddf"
 ]
 }
 ```
