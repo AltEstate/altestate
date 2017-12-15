@@ -740,13 +740,13 @@ contract('crowdsale', _accs => {
       })
 
       it('should allow to claim after softcap', async () => {
-
+        await crowdsale.buyTokens(accounts[5], { value: ether(91), from: accounts[5] })
+        const balanceBefore = await web3.eth.getBalance(accounts[0])
+        console.log((await web3.eth.getBalance(crowdsale.address)).toString(10))
+        await crowdsale.claimFunds(ownerSig)
+        const balanceAfter = await web3.eth.getBalance(accounts[0])
+        assert(balanceAfter.sub(balanceBefore).gt(0))
       })
-
-      it('should transfer funds immediately', async () => {
-      })
-
-      it('')
     })
   })
 })

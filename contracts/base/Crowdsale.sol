@@ -469,6 +469,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _time) 
   public constant returns(bool) 
   {
+    _tokenAmount;
     _extraAmount;
     _weiAmount;
 
@@ -586,13 +587,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function claimFunds() onlyOwner public returns(bool) {
-    require(state == State.Claim || isAllowClaimBeforeFinalization);
+    require(state == State.Claim || (isAllowClaimBeforeFinalization && success()));
     wallet.transfer(address(this).balance);
     return true;
   }
 
   function claimTokenFunds(address _token) onlyOwner public returns(bool) {
-    require(state == State.Claim || isAllowClaimBeforeFinalization);
+    require(state == State.Claim || (isAllowClaimBeforeFinalization && success()));
     uint balance = allowedTokens[_token].balanceOf(address(this));
     require(balance > 0);
     require(allowedTokens[_token].transfer(wallet, balance));
