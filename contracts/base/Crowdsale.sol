@@ -15,6 +15,7 @@ contract TokenInterface is ERC20 {
 contract MintableTokenInterface is TokenInterface {
   address public owner;
   function mint(address beneficiary, uint amount) public returns(bool);
+  function transferOwnership(address nextOwner) public;
 }
 
 /**
@@ -206,7 +207,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Should mint extra tokens for future distribution?
     bool _isExtraDistribution,
     // Will ship token via minting? 
-    bool _isMintingShipment,
+    bool _isTransferShipment,
     // Should be capped in ether
     bool _isCappedInEther,
     // Should beneficiaries pull their tokens? 
@@ -223,7 +224,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isTokenExchange = _isTokenExchange;
     isAllowToIssue = _isAllowToIssue;
     isExtraDistribution = _isExtraDistribution;
-    isTransferShipment = _isMintingShipment;
+    isTransferShipment = _isTransferShipment;
     isCappedInEther = _isCappedInEther;
     isPersonalBonuses = _isPersonalBonuses;
     isAllowClaimBeforeFinalization = _isAllowClaimBeforeFinalization;
@@ -371,8 +372,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     state = State.Active;
   }
 
-  function finalizeIt() inState(State.Active) onlyOwner public {
+  function finalizeIt(address _futureOwner) inState(State.Active) onlyOwner public {
     require(ended());
+
+    token.transferOwnership(_futureOwner);
 
     if (success()) {
       state = State.Claim;

@@ -26,7 +26,7 @@ contract BaseAltCrowdsale is Crowdsale {
       false,
       // Enable early bird bonus in crowdsale?
       // _isEarlyBonus,
-      true,
+      false,
       // Allow to refund money?
       // _isRefundable,
       false,
@@ -40,8 +40,8 @@ contract BaseAltCrowdsale is Crowdsale {
       // _isExtraDistribution,
       false,
       // Will ship token via minting? 
-      // _isMintingShipment,
-      true,
+      // _isTransferShipment,
+      false,
       // Should be capped in ether
       // bool _isCappedInEther,
       true,
@@ -101,7 +101,7 @@ contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
     15000 ether
   ) 
   public {
-
+    // saneIt();
   } 
 }
 
@@ -135,6 +135,6 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     1500 ether
   ) 
   public {
-
+    // saneIt();
   } 
 } 
