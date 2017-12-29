@@ -24,5 +24,8 @@
     "ethereumjs-testrpc": "^6.0.3",
     "moment": "^2.18.1",
     "zeppelin-solidity": "^1.4.0"
+  },
+  "devDependencies": {
+    "ethereumjs-wallet": "^0.6.0"
   }
 }

@@ -17,30 +17,6 @@ contract MintableTokenInterface is TokenInterface {
   function mint(address beneficiary, uint amount) public returns(bool);
 }
 
-contract PersonalBonusRecord {
-  address public refererAddress;
-  uint public bonus;
-  uint public refererBonus;
-
-  function PersonalBonusRecord(uint _bonus, address _referer, uint _refererBonus) public {
-    refererAddress = _referer;
-    refererBonus = _refererBonus;
-    bonus = _bonus;
-  }
-}
-
-contract WhitelistRecord {
-  bool public allow;
-  uint public min;
-  uint public max;
-
-  function WhitelistRecord(uint _minAmount, uint _maxAmount) public {
-    allow = true;
-    min = _minAmount;
-    max = _maxAmount;
-  }
-}
-
 /**
  * Complex crowdsale with huge posibilities
  * Core features:
@@ -74,6 +50,19 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     Claim,          // Claim funds by owner
     Refund,         // Unsucceseful crowdsale (refund ether)
     History         // Close and store only historical fact of existence
+  }
+
+
+  struct PersonalBonusRecord {
+    uint bonus;
+    address refererAddress;
+    uint refererBonus;
+  }
+
+  struct WhitelistRecord {
+    bool allow;
+    uint min;
+    uint max;
   }
 
 
@@ -427,8 +416,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       bonus = bonus.add(calculateTimeBonus(_time.sub(startTime)));
     }
 
-    if (isPersonalBonuses && personalBonuses[_beneficiary].bonus() > 0) {
-      bonus = bonus.add(personalBonuses[_beneficiary].bonus());
+    if (isPersonalBonuses && personalBonuses[_beneficiary].bonus > 0) {
+      bonus = bonus.add(personalBonuses[_beneficiary].bonus);
     }
 
     calculatedBeneficiary = _weiAmount.mul(10 ** tokenDecimals).div(price);
@@ -441,11 +430,11 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     if (isPersonalBonuses && 
-        personalBonuses[_beneficiary].refererAddress() != address(0) && 
-        personalBonuses[_beneficiary].refererBonus() > 0) 
+        personalBonuses[_beneficiary].refererAddress != address(0) && 
+        personalBonuses[_beneficiary].refererBonus > 0) 
     {
-      calculatedreferer = calculatedBeneficiary.mul(personalBonuses[_beneficiary].refererBonus()).div(10000);
-      refererAddress = personalBonuses[_beneficiary].refererAddress();
+      calculatedreferer = calculatedBeneficiary.mul(personalBonuses[_beneficiary].refererBonus).div(10000);
+      refererAddress = personalBonuses[_beneficiary].refererAddress;
     }
 
     calculatedTotal = calculatedBeneficiary.add(calculatedExtra).add(calculatedreferer);
@@ -500,10 +489,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint finalTotalSupply = soldTokens.add(_totalAmount);
 
     if (isWhitelisted) {
-      WhitelistRecord record = whitelist[_beneficiary];
-      if (!record.allow() || 
-          record.min() > finalBeneficiaryInvest ||
-          record.max() < finalBeneficiaryInvest) {
+      WhitelistRecord storage record = whitelist[_beneficiary];
+      if (!record.allow || 
+          record.min > finalBeneficiaryInvest ||
+          record.max < finalBeneficiaryInvest) {
         return false;
       }
     }
@@ -636,7 +625,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       _max = 10 ** 40; // should be huge enough? :0
     }
 
-    whitelist[_beneficiary] = new WhitelistRecord(_min, _max);
+    whitelist[_beneficiary] = WhitelistRecord(true, _min, _max);
     whitelisted.push(_beneficiary);
     whitelistedCount++;
 
@@ -648,7 +637,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _bonus, 
     address _refererAddress, 
     uint _refererBonus) onlyOwner public {
-    personalBonuses[_beneficiary] = new PersonalBonusRecord(
+    personalBonuses[_beneficiary] = PersonalBonusRecord(
       _bonus,
       _refererAddress,
       _refererBonus
@@ -704,11 +693,11 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     if (isPersonalBonuses) {
-      PersonalBonusRecord record = personalBonuses[_beneficiary];
-      if (record.refererAddress() != address(0) && record.refererBonus() > 0) {
-        shipTokens(record.refererAddress(), refererTokens);
+      PersonalBonusRecord storage record = personalBonuses[_beneficiary];
+      if (record.refererAddress != address(0) && record.refererBonus > 0) {
+        shipTokens(record.refererAddress, refererTokens);
         // soldTokens = soldTokens.add(_amount);
-      ShipTokens(record.refererAddress(), refererTokens);
+      ShipTokens(record.refererAddress, refererTokens);
       }
     }
 

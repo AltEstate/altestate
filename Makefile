@@ -1,6 +1,7 @@
 NETWORK:= "testrpc"
+TEST:= "test/crowdsale.test.js"
 
-.PHONY: doc
+.PHONY: doc test clean
 
 doc:
 	@rm -rf $(shell pwd)/build/docs/$(value CONTRACT).md
@@ -33,8 +34,11 @@ migrateHard: clean compile
 node_modules:
 	npm install
 
-test: compile
-	@truffle --network=$(value NETWORK) test test/crowdsale.js
+retest: clean compile
+	@make test
+
+test:
+	@truffle --network=$(value NETWORK) test $(value TEST)
 
 link: compile
 	@remixd -S $(shell pwd)/merged

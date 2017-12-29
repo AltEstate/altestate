@@ -7,7 +7,6 @@ import moment from 'moment';
 const Crowdsale = artifacts.require('./Crowdsale.sol')
 const DefaultToken = artifacts.require('./DefaultToken.sol')
 const UserRegistry = artifacts.require('./UserRegistry.sol')
-const PersonalBonusRecord = artifacts.require('./PersonalBonusRecord.sol')
 
 let crowdsale, registry, token, debugHandler, accounts,
     ownerSig, buyerSig
@@ -181,7 +180,6 @@ contract('crowdsale', _accs => {
     it('should be sanable', async() => {
       await crowdsale.saneIt(ownerSig)
       let sane = await crowdsale.state()
-      console.log(sane.toString(10))
       assert(sane.eq(1), `not ready yet? state is ${sane}`)
     })
     
@@ -362,8 +360,6 @@ contract('crowdsale', _accs => {
         const bytes = toBytes(rate)
         const balanceBefore = await tokenA.balanceOf(buyerSig.from)
         await registry.addSystem(crowdsale.address, ownerSig)
-        console.log(await tokenA.frozUserRegistry())
-        console.log(registry.address)
         await tokenA.approveAndCall(crowdsale.address, 100 * 1e18, bytes, buyerSig)
         const raisedAfter = await crowdsale.weiRaised()
         const balanceAfter = await tokenA.balanceOf(buyerSig.from)
@@ -410,8 +406,8 @@ contract('crowdsale', _accs => {
           await setFlags(crowdsale, { personalBonuses: true }, ownerSig)
           await crowdsale.saneIt()
           await crowdsale.setPersonalBonus(accounts[1], 2000, 0, 0, ownerSig)
-          const bonusRecord = PersonalBonusRecord.at(await crowdsale.personalBonuses(accounts[1]))
-          const bonus = await bonusRecord.bonus()
+          const bonusRecord = await crowdsale.personalBonuses(accounts[1])
+          const bonus = bonusRecord[0]
           assert(bonus.eq(2000))
         })
         it('personal bonus calculation', async () => {
@@ -600,8 +596,6 @@ contract('crowdsale', _accs => {
             0
           )
 
-          console.log(calculation)
-
           assert(
             calculation[1].eq(tokensWithBonus(10, 1000)), 
             `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokensWithBonus(10, 1000)}`
@@ -654,13 +648,9 @@ contract('crowdsale', _accs => {
         )
       })
       it('should mint extra tokens', async () => {
-        console.log((await crowdsale.soldTokens()).div(1e18).toString(10));
         const balanceBefore = await token.balanceOf(accounts[6])
         await crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
         const balanceAfter  = await token.balanceOf(accounts[6])
-
-
-        console.log((await crowdsale.soldTokens()).div(1e18).toString(10));
         assert(balanceAfter.sub(balanceBefore).div(1e18).eq(3), `unxpected extra distribution amount: ${balanceAfter.sub(balanceBefore).div(1e18).toString(10)}`)
       })
     })
@@ -747,7 +737,6 @@ contract('crowdsale', _accs => {
       it('should allow to claim after softcap', async () => {
         await crowdsale.buyTokens(accounts[5], { value: ether(91), from: accounts[5] })
         const balanceBefore = await web3.eth.getBalance(accounts[0])
-        console.log((await web3.eth.getBalance(crowdsale.address)).toString(10))
         await crowdsale.claimFunds(ownerSig)
         const balanceAfter = await web3.eth.getBalance(accounts[0])
         assert(balanceAfter.sub(balanceBefore).gt(0))
