@@ -21,7 +21,7 @@ compile: node_modules
 	@sol-merger contracts/UserRegistry.sol merged/
 
 recompile: clean compile migrateHard
-	@echo "Recompiled
+	@echo "Recompiled"
 
 migrate: compile
 	@echo "Begin migrate to $(value NETWORK)"
