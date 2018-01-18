@@ -67,11 +67,12 @@ function setFlags (crowdsale, flags, sig) {
     refundable: 4,
     tokenExcange: 5,
     allowToIssue: 6,
-    extraDistribution: 7,
-    transferShipment: 8,
-    cappedInEther: 9,
-    personalBonuses: 10,
-    allowClaimBeforeFinalization: 11
+    disableEther: 7,
+    extraDistribution: 8,
+    transferShipment: 9,
+    cappedInEther: 10,
+    personalBonuses: 11,
+    allowClaimBeforeFinalization: 12
   }
 
   let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)

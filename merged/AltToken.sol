@@ -370,6 +370,6 @@ contract DefaultToken is NamedToken, KnownHolderToken, ApproveAndCallToken, Froz
 }
 
 contract AltToken is DefaultToken {
-  function AltToken(address _registry) DefaultToken("Alt Estate", "ALT", 10, _registry) public {
+  function AltToken(address _registry) DefaultToken("Alt Estate", "ALT", 18, _registry) public {
   }
 }
