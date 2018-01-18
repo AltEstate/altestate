@@ -81,6 +81,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isRefundable;             // Allow to refund money?
   bool public isTokenExchange;          // Allow to buy tokens for another tokens?
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
+  bool public isDisableEther;           // Disable purchase with the Ether
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
   bool public isTransferShipment;       // Will ship token via minting?
   bool public isCappedInEther;          // Should be capped in Ether 
@@ -97,12 +98,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   UserRegistryInterface public userRegistry;
 
   mapping (uint => uint) public amountBonuses; // Amount bonuses
-  uint[] public amountSlices;           // Key is min amount of buy
-  uint public amountSlicesCount;        // 10000 - totaly free
-                                        //  5000 - 50% sale
-                                        //     0 - 100% (no bonus)
-  mapping (uint => uint) public timeBonuses; // Time bonuses
-  uint[] public timeSlices;             // Same as amount but key is seconds after start
+  uint[] public amountSlices;                  // Key is min amount of buy
+  uint public amountSlicesCount;               // 10000 - 100.00% bonus over base pricetotaly free
+                                               //  5000 - 50.00% bonus
+                                               //     0 - no bonus at all
+  mapping (uint => uint) public timeBonuses;   // Time bonuses
+  uint[] public timeSlices;                    // Same as amount but key is seconds after start
   uint public timeSlicesCount;
 
   mapping (address => PersonalBonusRecord) public personalBonuses; 
@@ -204,6 +205,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     bool _isTokenExchange,
     // Allow to issue tokens with tx hash (ex bitcoin)
     bool _isAllowToIssue,
+    // Should reject purchases with Ether?
+    bool _isDisableEther,
     // Should mint extra tokens for future distribution?
     bool _isExtraDistribution,
     // Will ship token via minting? 
@@ -223,6 +226,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isRefundable = _isRefundable;
     isTokenExchange = _isTokenExchange;
     isAllowToIssue = _isAllowToIssue;
+    isDisableEther = _isDisableEther;
     isExtraDistribution = _isExtraDistribution;
     isTransferShipment = _isTransferShipment;
     isCappedInEther = _isCappedInEther;
@@ -293,38 +297,38 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     extraDistributionPart = _extraPart;
   }
 
-  function setAmountBonuses(uint[] _amountSlices, uint[] _prices) 
+  function setAmountBonuses(uint[] _amountSlices, uint[] _bonuses) 
     inState(State.Setup) onlyOwner public 
   {
     require(_amountSlices.length > 1);
-    require(_prices.length == _amountSlices.length);
+    require(_bonuses.length == _amountSlices.length);
     uint lastSlice = 0;
     for (uint index = 0; index < _amountSlices.length; index++) {
-      require(_amountSlices[index] >= lastSlice);
+      require(_amountSlices[index] > lastSlice);
       lastSlice = _amountSlices[index];
       amountSlices.push(lastSlice);
-      amountBonuses[lastSlice] = _prices[index];
+      amountBonuses[lastSlice] = _bonuses[index];
 
-      // AddAmountSlice(msg.sender, _amountSlices[index], _prices[index]);
+      // AddAmountSlice(msg.sender, _amountSlices[index], _bonuses[index]);
     }
 
     amountSlicesCount = amountSlices.length;
   }
 
-  function setTimeBonuses(uint[] _timeSlices, uint[] _prices) 
+  function setTimeBonuses(uint[] _timeSlices, uint[] _bonuses) 
     inState(State.Setup) onlyOwner public 
   {
     // Only once in life time
     require(timeSlicesCount == 0);
     require(_timeSlices.length > 1);
-    require(_prices.length == _timeSlices.length);
+    require(_bonuses.length == _timeSlices.length);
     uint lastSlice = 0;
     for (uint index = 0; index < _timeSlices.length; index++) {
       require(_timeSlices[index] > lastSlice);
       lastSlice = _timeSlices[index];
       timeSlices.push(lastSlice);
-      timeBonuses[lastSlice] = _prices[index];
-      // AddTimeSlice(msg.sender, _timeSlices[index], _prices[index]);
+      timeBonuses[lastSlice] = _bonuses[index];
+      // AddTimeSlice(msg.sender, _timeSlices[index], _bonuses[index]);
     }
     timeSlicesCount = timeSlices.length;
   }
@@ -478,7 +482,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     _tokenAmount;
     _extraAmount;
-    _weiAmount;
 
     if (_time < startTime || _time > endTime) {
       return false;
@@ -558,14 +561,16 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
+    require(!isDisableEther);
     uint shipAmount = sellTokens(_beneficiary, msg.value, block.timestamp);
     require(shipAmount > 0);
-    // forwardEther();
+    forwardEther();
   }
 
   function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash) 
     inState(State.Active) onlyOwner public 
   {
+    require(isAllowToIssue);
     uint shipAmount = sellTokens(_beneficiary, _value, _timestamp);
     require(shipAmount > 0);
     HashBuy(_beneficiary, _value, shipAmount, _timestamp, _hash);
