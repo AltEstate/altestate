@@ -17,4 +17,4 @@ module.exports = async function(deployer) {
 
   await SQM1Token.at(SQM1Token.address).transfer(SQM1Crowdsale.address, web3.toWei(10000, 'ether'), { from: owner })
   await SQM1Crowdsale.at(SQM1Crowdsale.address).saneIt()
-};
+}
