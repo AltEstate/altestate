@@ -266,7 +266,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function setToken(address _tokenAddress) 
     inState(State.Setup) onlyOwner public
   {
-    // SetToken(msg.sender, token, _tokenAddress);
     token = MintableTokenInterface(_tokenAddress);
     tokenDecimals = token.decimals();
   }
@@ -581,10 +580,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                            address _token, 
                            bytes _extraData) public 
   {
-    require(isTokenExchange);
-
-    Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
-    Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
+    // Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
+    // Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
     require(tokensValues[_token] > 0);
     require(forwardTokens(_from, _token, _value));
@@ -592,6 +589,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
     require(weiValue > 0);
 
+    Debug(msg.sender, appendUintToString("Token to wei: ", weiValue));
     uint shipAmount = sellTokens(_from, weiValue, block.timestamp);
     require(shipAmount > 0);
 
@@ -717,7 +715,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Active) internal 
   {
     if (isTransferShipment) {
-      token.transferFrom(address(this), _beneficiary, _amount);
+      token.transfer(_beneficiary, _amount);
     } else {
       token.mint(_beneficiary, _amount);
     }
