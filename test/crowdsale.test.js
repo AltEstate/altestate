@@ -375,8 +375,28 @@ contract('crowdsale', _accs => {
     })
 
     describe('refunding', async () => {
-      it('allow owner to setup extra distribution', async () => {
-        
+      let anotherToken
+
+      before(makeContext)
+      after(cleanContext)
+
+      it('disallow anyone to setup refunding', async () => {
+        await expectThrow(setFlags(crowdsale, { isRefundable: true }, buyerSig))
+      })
+      it('allow owner to setup refundable crowdsale', async () => {
+        anotherToken = await DefaultToken.new('Extra Token A', 'EXC', 18, registry.address, ownerSig)
+        await anotherToken.mint(buyerSig.from, 1e6 * 1e18, ownerSig)
+        await setFlags(crowdsale, { isRefundable: true, isTokenExchange: true, }, ownerSig)
+        await crowdsale.setTokenExcange(anotherToken.address, ether(1), ownerSig)
+        await crowdsale.saneIt()
+
+        // buy 10 tokens with Ether
+        await crowdsale.buyTokens(ether(1), buyerSig)
+        // buy 10 tokens with another token
+        await anotherToken.approveAndCall(crowdsale.address, 1e18, toBytes(bn(1e18)), buyerSig)
+
+        const buyerBalance = await token.balanceOf(buyerSig.from)
+        assert(buyerBalance.eq(ether(2)), 'unxpected token balance')
       })
       it('reject refunding without finalization', async () => {
         
