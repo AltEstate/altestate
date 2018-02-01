@@ -14,17 +14,17 @@ clean:
 	@rm -rf $(shell pwd)/build/contracts
 
 merge:
-	@$(shell pwd)/node_modules/.bin/sol-merger $(value MERGE_FILE) $(shell pwd)/$(value MERGE_PATH)
-	@node $(shell pwd)/replace.js $(value MERGE_FILE)
+	@$(shell pwd)/node_modules/.bin/sol-merger $(shell pwd)/contracts/$(value MERGE_FILE) $(shell pwd)/$(value MERGE_PATH)
+	@node $(shell pwd)/replace.js $(value MERGE_PATH)/$(value MERGE_FILE)
 	
 compile: node_modules
 	@echo "Begining of compilation"
 	@$(shell pwd)/node_modules/.bin/truffle compile
-	@make merge MERGE_FILE=$(shell pwd)/contracts/AltCrowdsalePhases.sol
-	@make merge MERGE_FILE=$(shell pwd)/contracts/AltToken.sol
-	@make merge MERGE_FILE=$(shell pwd)/contracts/SQM1Token.sol
-	@make merge MERGE_FILE=$(shell pwd)/contracts/SQM1Crowdsale.sol
-	@make merge MERGE_FILE=$(shell pwd)/contracts/UserRegistry.sol
+	@make merge MERGE_FILE=AltCrowdsalePhases.sol
+	@make merge MERGE_FILE=AltToken.sol
+	@make merge MERGE_FILE=SQM1Token.sol
+	@make merge MERGE_FILE=SQM1Crowdsale.sol
+	@make merge MERGE_FILE=UserRegistry.sol
 
 recompile: clean compile migrateHard
 	@echo "Recompiled"
