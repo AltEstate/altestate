@@ -521,7 +521,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
       // ! Check min purchase value in tokens (since 02.2018)
       if (!isMinimumInEther && _tokenAmount < minimumPurchaseValue) {
-        return false
+        return false;
       }
     }
 

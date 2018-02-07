@@ -190,6 +190,42 @@ contract('crowdsale', _accs => {
   })
 
   describe('features tests', async () => {
+    describe('min amount', async () => {
+      before(makeContext)
+      after(cleanContext)
+
+      it('disallow anyone to set minimum', async () => {
+        await expectThrow(
+          crowdsale.setMinimum(ether(100), false, buyerSig)
+        )
+        await expectThrow(
+          crowdsale.setMinimum(tokens(1), true, buyerSig)
+        )
+        await expectThrow(
+          crowdsale.setMinimum(0, true, buyerSig)
+        )
+      })
+      it('allow owner to set minimum', async () => {
+        await crowdsale.setMinimum(ether(5), false)
+        await crowdsale.saneIt()
+      })
+      it('reject transaction less than min', async () => {
+        await expectThrow(
+          crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+        )
+      })
+      it('accept transaction more than min', async () => {
+        await crowdsale.buyTokens(accounts[1], { value: ether(6), from: accounts[1] })
+      })
+
+      it('allow to change minimum in sale process', async () => {
+        await crowdsale.setMinimum(ether(0.1), false)
+      })
+      
+      it('accept transaction more than with new min', async () => {
+        await crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+      })
+    })
     describe('known users', async () => {
       before(async () => await makeContext())
       after(async () => await cleanContext())
