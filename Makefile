@@ -26,14 +26,14 @@ compile: node_modules
 	@make merge MERGE_FILE=SQM1Crowdsale.sol
 	@make merge MERGE_FILE=UserRegistry.sol
 
-recompile: clean compile migrateHard
+recompile: clean compile migrate-hard
 	@echo "Recompiled"
 
 migrate: compile
 	@echo "Begin migrate to $(value NETWORK)"
 	@t$(shell pwd)/node_modules/.bin/ruffle migrate --network=$(value NETWORK)
 
-migrate-hard: compile
+migrate-hard: clean compile
 	@echo "Begin migrate --reset to $(value NETWORK)"
 	@$(shell pwd)/node_modules/.bin/truffle migrate --reset --network=$(value NETWORK)
 
