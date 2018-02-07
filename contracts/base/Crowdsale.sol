@@ -311,19 +311,35 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function setTimeBonuses(uint[] _timeSlices, uint[] _bonuses) 
-    inState(State.Setup) onlyOwner public 
+    // ! Not need to check state since changes at 02.2018
+    // inState(State.Setup)
+    onlyOwner 
+    public 
   {
     // Only once in life time
-    require(timeSlicesCount == 0);
-    require(_timeSlices.length > 1);
+    // ! Time bonuses is changable after 02.2018
+    // require(timeSlicesCount == 0);
+    require(_timeSlices.length > 0);
     require(_bonuses.length == _timeSlices.length);
     uint lastSlice = 0;
+    uint lastBonus = 10000;
+    if (timeSlicesCount > 0) {
+      // ! Since time bonuses is changable we should take latest first
+      lastSlice = timeSlices[timeSlicesCount - 1];
+      lastBonus = timeBonuses[lastSlice];
+    }
+
     for (uint index = 0; index < _timeSlices.length; index++) {
       require(_timeSlices[index] > lastSlice);
+
+      // ! Add check for next bonus is equal or less than previous
+      require(_bonuses[index] <= lastBonus);
+
+      // ? Should we check bonus in a future
+
       lastSlice = _timeSlices[index];
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _bonuses[index];
-      // AddTimeSlice(msg.sender, _timeSlices[index], _bonuses[index]);
     }
     timeSlicesCount = timeSlices.length;
   }

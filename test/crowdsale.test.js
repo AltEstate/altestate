@@ -542,15 +542,32 @@ contract('crowdsale', _accs => {
 
           await crowdsale.saneIt()
         })
-        it('disallow to add time bonuses after sanetize', async () => {
+        it('allow owner to add extra bonuses', async () => {
+          await crowdsale.setTimeBonuses(
+            [ duration.days(30) ],
+            [               200 ],
+            ownerSig
+          )
+        })
+        it('disallow owner to add past bonuses', async () => {
           await expectThrow(
             crowdsale.setTimeBonuses(
-              [ duration.days(5), duration.days(10), duration.days(20) ],
-              [             1500,              1000,               500 ],
+              [ duration.days(10) ],
+              [              2000 ],
               ownerSig
             )
           )
         })
+        // ! Not needed anymore, because bonuses is changable after sanetize with a business rules since 02.2018
+        // it('disallow to add time bonuses after sanetize', async () => {
+        //   await expectThrow(
+        //     crowdsale.setTimeBonuses(
+        //       [ duration.days(5), duration.days(10), duration.days(20) ],
+        //       [             1500,              1000,               500 ],
+        //       ownerSig
+        //     )
+        //   )
+        // })
         it('time bonuses calculation max sale', async () => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
@@ -591,11 +608,25 @@ contract('crowdsale', _accs => {
           )
         })
 
-        it('time bonuses calculation after sales', async () => {
+        it('time bonuses calculation in added bonuses', async () => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
             ether(1),
-            latestTime() + duration.days(21),
+            latestTime() + duration.days(25),
+            0
+          )
+
+          assert(
+            calculation[1].eq(tokensWithBonus(10, 200)), 
+            `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokens(10)}`
+          )
+        })
+        
+        it('time bonuses calculation after bonuses', async () => {
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime() + duration.days(35),
             0
           )
 
