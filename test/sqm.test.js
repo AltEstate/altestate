@@ -5,6 +5,36 @@ const SQM1Token = artifacts.require('./SQM1Token.sol')
 const SQM1Crowdsale = artifacts.require('./SQM1Crowdsale.sol')
 const UserRegistry = artifacts.require('./UserRegistry.sol')
 
+function setFlags (crowdsale, flags, sig) {
+  const flagsMap = {
+    whitelisted: 0,
+    knownOnly: 1,
+    amountBonus: 2,
+    earlyBonus: 3,
+    refundable: 4,
+    tokenExcange: 5,
+    allowToIssue: 6,
+    disableEther: 7,
+    extraDistribution: 8,
+    transferShipment: 9,
+    cappedInEther: 10,
+    personalBonuses: 11,
+    allowClaimBeforeFinalization: 12
+  }
+
+  let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)
+  for (let key in flags) {
+    if (typeof flagsMap[key] === 'undefined') {
+      throw new Error(`undefined arg key: ${key}`)
+    }
+
+    flagArgs[flagsMap[key]] = true
+  }
+
+  sig = sig || {}
+
+  return crowdsale.setFlags(...flagArgs, sig)
+}
 
 function numberToBytearray(long, size) {
   // we want to represent the input as a 8-bytes array
@@ -45,10 +75,12 @@ function hexToBytes(hexString) {
 
 contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
   let crowdsale, sqm, alt
+
   it('setup tests', async () => {
     alt = await AltToken.new(UserRegistry.address)
     alt.mint(owner, ether(1e6))
     alt.mint(buyer, ether(1e6))
+
     sqm = await SQM1Token.new(
       UserRegistry.address
     )
@@ -60,12 +92,12 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
       alt.address
     )
 
-    console.log(await sqm.unfrozen())
     let balance
     balance = await sqm.balanceOf(crowdsale.address)
     console.log(balance.div(1e18).toString(10))
     await UserRegistry.at(UserRegistry.address).addSystem(crowdsale.address, { from: owner })
     await sqm.transfer(crowdsale.address, ether(10000), { from: owner })
+    await UserRegistry.at(UserRegistry.address).addAddress(buyer, { from: owner })
     balance = await sqm.balanceOf(crowdsale.address)
     console.log(balance.div(1e18).toString(10))
     await crowdsale.saneIt()
@@ -76,9 +108,10 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
     const bytes = toBytes(rate)
     console.log(bytes, rate.toString(10))
     console.log((await alt.balanceOf(buyer)).toString(10))
-    await alt.approve(crowdsale.address, ether(10), { from: buyer })
     await alt.approveAndCall(crowdsale.address, ether(10), bytes, { from: buyer })
-    throw new Error()
+
+    const balance = await sqm.balanceOf(buyer)
+    console.log(balance.div(1e18).toString(10))
   })
 
   // it('should increase balance', async () => {

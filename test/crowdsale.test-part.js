@@ -112,7 +112,7 @@ async function makeContext() {
     tokens(1e5), // soft cap is 100k
     tokens(1e6)  // hard cap is 1kk
   )  
-  await token.transferOwnership(crowdsale.address, ownerSig)
+  // await token.transferOwnership(crowdsale.address, ownerSig)
 }
 
 
@@ -140,8 +140,11 @@ contract('crowdsale', (_accs) => {
       it('allow owner to setup refundable crowdsale', async () => {
         anotherToken = await DefaultToken.new('Extra Token A', 'EXC', 18, registry.address, ownerSig)
         await anotherToken.mint(buyerSig.from, 1e6 * 1e18, ownerSig)
-        await setFlags(crowdsale, { refundable: true, tokenExcange: true, }, ownerSig)
+        await setFlags(crowdsale, { refundable: true, tokenExcange: true, transferShipment: true }, ownerSig)
+        await token.mint(crowdsale.address, tokens(1e6), ownerSig)
         await crowdsale.setTokenExcange(anotherToken.address, ether(1), ownerSig)
+      })
+      it('3', async () => {
         await crowdsale.saneIt()
 
         // buy 10 tokens with Ether
@@ -151,7 +154,7 @@ contract('crowdsale', (_accs) => {
         await anotherToken.approveAndCall(crowdsale.address, 1e18, toBytes(bn(1e18)), buyerSig)
 
         const buyerBalance = await token.balanceOf(buyerSig.from)
-        assert(buyerBalance.eq(ether(0)), `unxpected token balance: ${buyerBalance.div(1e18).toString(10)}`)
+        assert(buyerBalance.eq(ether(20)), `unxpected token balance: ${buyerBalance.div(1e18).toString(10)}`)
       })
       it('reject refunding without finalization', async () => {
         

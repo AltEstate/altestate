@@ -150,7 +150,6 @@ contract('crowdsale', _accs => {
       assert(await crowdsale.isWhitelisted(), 'should be whitelisted')
       assert(await crowdsale.isKnownOnly(), 'should be known only')
       assert(await crowdsale.isAmountBonus(), 'shold be amount bonus')
-      assert(await crowdsale.isRefundable(), 'should be refundable')
       assert(await crowdsale.isTokenExchange(), 'should be a token exchange')
       assert(await crowdsale.isAllowToIssue(), 'should be issue allow')
       assert(await crowdsale.isExtraDistribution(), 'should be extra distirbution')
@@ -165,7 +164,6 @@ contract('crowdsale', _accs => {
       assert(!(await crowdsale.isWhitelisted()), 'shouldn\'t be whitelisted')
       assert(!(await crowdsale.isKnownOnly()), 'shouldn\'t be known only')
       assert(!(await crowdsale.isAmountBonus()), 'sholdn\'t be amount bonus')
-      assert(!(await crowdsale.isRefundable()), 'shouldn\'t be refundable')
       assert(!(await crowdsale.isTokenExchange()), 'shouldn\'t be a token exchange')
       assert(!(await crowdsale.isAllowToIssue()), 'shouldn\'t be issue allow')
       assert(!(await crowdsale.isExtraDistribution()), 'shouldn\'t be extra distirbution')
@@ -371,47 +369,6 @@ contract('crowdsale', _accs => {
 
       it('reject tx with unkown token', async () => {
         await expectThrow(tokenB.approveAndCall(crowdsale.address, 10 * 1e18, toBytes(bn(0)), buyerSig))
-      })
-    })
-
-    describe('refunding', async () => {
-      let anotherToken
-
-      before(makeContext)
-      after(cleanContext)
-
-      it('disallow anyone to setup refunding', async () => {
-        await expectThrow(setFlags(crowdsale, { isRefundable: true }, buyerSig))
-      })
-      it('allow owner to setup refundable crowdsale', async () => {
-        anotherToken = await DefaultToken.new('Extra Token A', 'EXC', 18, registry.address, ownerSig)
-        await anotherToken.mint(buyerSig.from, 1e6 * 1e18, ownerSig)
-        await setFlags(crowdsale, { isRefundable: true, isTokenExchange: true, }, ownerSig)
-        await crowdsale.setTokenExcange(anotherToken.address, ether(1), ownerSig)
-        await crowdsale.saneIt()
-
-        // buy 10 tokens with Ether
-        await crowdsale.buyTokens(ether(1), buyerSig)
-        // buy 10 tokens with another token
-        await anotherToken.approveAndCall(crowdsale.address, 1e18, toBytes(bn(1e18)), buyerSig)
-
-        const buyerBalance = await token.balanceOf(buyerSig.from)
-        assert(buyerBalance.eq(ether(2)), 'unxpected token balance')
-      })
-      it('reject refunding without finalization', async () => {
-        
-      })
-      it('allow refund when cap isn\'t achived', async () => {
-        
-      })
-      it('disallow refund if cap is achived', async () => {
-        
-      })
-      it('should transfer funds to wallet only if cap is achived', async () => {
-        
-      })
-      it('allow enable refund if requires', async () => {
-        
       })
     })
 
