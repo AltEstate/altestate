@@ -87,6 +87,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isPersonalBonuses;        // Should check personal beneficiary bonus?
   bool public isAllowClaimBeforeFinalization;
                                         // Should allow to claim funds before finalization?
+  bool public isMinimumValue;           // Validate minimum amount to purchase
+  bool public isMinimumInEther;         // Is minimum amount setuped in Ether or Tokens?
+
+  uint public minimumPurchaseValue;     // How less buyer could to purchase
 
   // List of allowed beneficiaries
   mapping (address => WhitelistRecord) public whitelist;
@@ -228,6 +232,20 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isCappedInEther = _isCappedInEther;
     isPersonalBonuses = _isPersonalBonuses;
     isAllowClaimBeforeFinalization = _isAllowClaimBeforeFinalization;
+  }
+
+  // ! Could be changed in process of sale (since 02.2018)
+  function setMinimum(uint _amount, bool _inToken) 
+    onlyOwner public
+  {
+    if (_amount == 0) {
+      isMinimumValue = false;
+      minimumPurchaseValue = 0;
+    } else {
+      isMinimumValue = true;
+      isMinimumInEther = !_inToken;
+      minimumPurchaseValue = _amount;
+    }
   }
 
   function setPrice(uint _price)
@@ -493,6 +511,19 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     _tokenAmount;
     _extraAmount;
+
+    // ! Check min purchase value (since 02.2018)
+    if (isMinimumValue) {
+      // ! Check min purchase value in ether (since 02.2018)
+      if (isMinimumInEther && _weiAmount < minimumPurchaseValue) {
+        return false;
+      }
+
+      // ! Check min purchase value in tokens (since 02.2018)
+      if (!isMinimumInEther && _tokenAmount < minimumPurchaseValue) {
+        return false
+      }
+    }
 
     if (_time < startTime || _time > endTime) {
       return false;
