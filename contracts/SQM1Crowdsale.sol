@@ -15,8 +15,8 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 10 ALT -> 1 SQM
-    uint(10 ether).div(1), 
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
 
     // from now
     block.timestamp,

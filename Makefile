@@ -1,5 +1,6 @@
 NETWORK:= "testrpc"
 TEST:= "test/crowdsale.test.js"
+MERGE_PATH:=merged
 
 .PHONY: doc test clean
 
@@ -11,25 +12,30 @@ clean:
 	@echo "Cleaning Project Builds"
 	@rm -rf $(shell pwd)/merged
 	@rm -rf $(shell pwd)/build/contracts
+
+merge:
+	@$(shell pwd)/node_modules/.bin/sol-merger $(shell pwd)/contracts/$(value MERGE_FILE) $(shell pwd)/$(value MERGE_PATH)
+	@node $(shell pwd)/replace.js $(value MERGE_PATH)/$(value MERGE_FILE)
 	
 compile: node_modules
 	@echo "Begining of compilation"
-	@truffle compile
-	@sol-merger contracts/base/Crowdsale.sol merged/
-	@sol-merger contracts/AltCrowdsale.sol merged/
-	@sol-merger contracts/AltToken.sol merged/
-	@sol-merger contracts/UserRegistry.sol merged/
+	@$(shell pwd)/node_modules/.bin/truffle compile
+	@make merge MERGE_FILE=AltCrowdsalePhases.sol
+	@make merge MERGE_FILE=AltToken.sol
+	@make merge MERGE_FILE=SQM1Token.sol
+	@make merge MERGE_FILE=SQM1Crowdsale.sol
+	@make merge MERGE_FILE=UserRegistry.sol
 
 recompile: clean compile migrateHard
 	@echo "Recompiled"
 
 migrate: compile
 	@echo "Begin migrate to $(value NETWORK)"
-	@truffle migrate --network=$(value NETWORK)
+	@t$(shell pwd)/node_modules/.bin/ruffle migrate --network=$(value NETWORK)
 
-migrateHard: clean compile
+migrate-hard: compile
 	@echo "Begin migrate --reset to $(value NETWORK)"
-	@truffle migrate --reset --network=$(value NETWORK)
+	@$(shell pwd)/node_modules/.bin/truffle migrate --reset --network=$(value NETWORK)
 
 node_modules:
 	npm install
@@ -38,14 +44,18 @@ retest: clean compile
 	@make test
 
 test:
-	@truffle --network=$(value NETWORK) test $(value TEST)
+	@$(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
+
+
+test-hard: migrate-hard 
+	@$(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
 
 link: compile
-	@remixd -S $(shell pwd)/merged
+	@$(shell pwd)/node_modules/.bin/remixd -S $(shell pwd)/merged
 
 
 testrpc: node_modules
-	./node_modules/.bin/testrpc --gasPrice=1 --gasLimit=50000000 \
+	@$(shell pwd)/node_modules/.bin/ganache-cli --gasPrice=1 --gasLimit=50000000 \
   	-d="candy maple velvet cake sugar cream honey rich smooth crumble sweet treat" \
 		--account="0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d,100000000000000000000000" \
 		--account="0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1,100000000000000000000000" \
