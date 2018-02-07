@@ -78,7 +78,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isKnownOnly;              // Should be known user to buy tokens
   bool public isAmountBonus;            // Enable amount bonuses in crowdsale?
   bool public isEarlyBonus;             // Enable early bird bonus in crowdsale?
-  bool public isRefundable;             // Allow to refund money?
   bool public isTokenExchange;          // Allow to buy tokens for another tokens?
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
   bool public isDisableEther;           // Disable purchase with the Ether
@@ -199,8 +198,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     bool _isAmountBonus,
     // Enable early bird bonus in crowdsale?
     bool _isEarlyBonus,
-    // Allow to refund money?
-    bool _isRefundable,
     // Allow to buy tokens for another tokens?
     bool _isTokenExchange,
     // Allow to issue tokens with tx hash (ex bitcoin)
@@ -223,7 +220,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isKnownOnly = _isKnownOnly;
     isAmountBonus = _isAmountBonus;
     isEarlyBonus = _isEarlyBonus;
-    isRefundable = _isRefundable;
     isTokenExchange = _isTokenExchange;
     isAllowToIssue = _isAllowToIssue;
     isDisableEther = _isDisableEther;

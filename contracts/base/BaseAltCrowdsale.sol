@@ -27,9 +27,6 @@ contract BaseAltCrowdsale is Crowdsale {
       // Enable early bird bonus in crowdsale?
       // _isEarlyBonus,
       false,
-      // Allow to refund money?
-      // _isRefundable,
-      false,
       // Allow to buy tokens for another tokens?
       // _isTokenExcange,
       false,

@@ -27,9 +27,6 @@ contract BaseSqmCrowdsale is Crowdsale {
       // Enable early bird bonus in crowdsale?
       // _isEarlyBonus,
       false,
-      // Allow to refund money?
-      // _isRefundable,
-      true,
       // Allow to buy tokens for another tokens?
       // _isTokenExcange,
       true,

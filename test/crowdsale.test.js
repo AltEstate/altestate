@@ -64,15 +64,14 @@ function setFlags (crowdsale, flags, sig) {
     knownOnly: 1,
     amountBonus: 2,
     earlyBonus: 3,
-    refundable: 4,
-    tokenExcange: 5,
-    allowToIssue: 6,
-    disableEther: 7,
-    extraDistribution: 8,
-    transferShipment: 9,
-    cappedInEther: 10,
-    personalBonuses: 11,
-    allowClaimBeforeFinalization: 12
+    tokenExcange: 4,
+    allowToIssue: 5,
+    disableEther: 6,
+    extraDistribution: 7,
+    transferShipment: 8,
+    cappedInEther: 9,
+    personalBonuses: 10,
+    allowClaimBeforeFinalization: 11
   }
 
   let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)
@@ -138,7 +137,6 @@ contract('crowdsale', _accs => {
         knownOnly:        true,
         amountBonus:      true,
         earlyBonus:       true,
-        refundable:       true,
         tokenExcange:     true,
         allowToIssue:     true,
         extraDistribution: true,
