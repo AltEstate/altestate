@@ -37,6 +37,18 @@ migrate-hard: clean compile
 	@echo "Begin migrate --reset to $(value NETWORK)"
 	@$(shell pwd)/node_modules/.bin/truffle migrate --reset --network=$(value NETWORK)
 
+exec: 
+	@$(shell pwd)/node_modules/.bin/truffle exec $(value EXEC_SCRIPT) --network=$(value NETWORK) 
+
+setup:
+	@echo "Setup ALT token"
+	@make exec EXEC_SCRIPT=$(shell pwd)/scripts/1_setup_alt_phases.js 
+	@echo "Setup SQM1"
+	@make exec EXEC_SCRIPT=$(shell pwd)/scripts/2_setup_sqm.js
+
+
+deploy: clean compile migrate setup
+
 node_modules:
 	npm install
 
