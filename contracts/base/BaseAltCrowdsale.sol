@@ -23,10 +23,10 @@ contract BaseAltCrowdsale is Crowdsale {
       true,
       // Enable amount bonuses in crowdsale? 
       // _isAmountBonus,
-      false,
+      true,
       // Enable early bird bonus in crowdsale?
       // _isEarlyBonus,
-      false,
+      true,
       // Allow to buy tokens for another tokens?
       // _isTokenExcange,
       false,
@@ -38,7 +38,7 @@ contract BaseAltCrowdsale is Crowdsale {
       false,
       // Should mint extra tokens for future distribution?
       // _isExtraDistribution,
-      false,
+      true,
       // Will ship token via minting? 
       // _isTransferShipment,
       false,
@@ -58,7 +58,7 @@ contract BaseAltCrowdsale is Crowdsale {
     setWallet(_wallet);
     setExtraDistribution(
       _extraTokensHolder,
-      3000 // 30%
+      6667 // 66.67%
     );
 
     setSoftHardCaps(

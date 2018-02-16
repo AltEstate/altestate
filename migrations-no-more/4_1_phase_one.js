@@ -5,7 +5,11 @@ const AltToken = artifacts.require("./AltToken.sol")
 const UserRegistry = artifacts.require("./UserRegistry.sol")
 
 module.exports = async function (deployer) {
-  await AltToken.at(AltToken.address).transferOwnership(AltCrowdsalePhaseOne.address)
-  await Crowdsale.at(AltCrowdsalePhaseOne.address).saneIt()
+  let owner = web3.eth.accounts[0]
+  deployer.deploy(AltCrowdsalePhaseOne,
+    UserRegistry.address,
+    AltToken.address,
+    owner,
+    owner
+  )
 }
-

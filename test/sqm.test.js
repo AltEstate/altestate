@@ -77,16 +77,17 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
   let crowdsale, sqm, alt
 
   it('setup tests', async () => {
-    alt = await AltToken.new(UserRegistry.address)
-    alt.mint(owner, ether(1e6))
-    alt.mint(buyer, ether(1e6))
+    var registry = await UserRegistry.new()
+    alt = await AltToken.new(registry.address)
+    await alt.mint(owner, ether(1e6))
+    await alt.mint(buyer, ether(1e6))
 
     sqm = await SQM1Token.new(
-      UserRegistry.address
+      registry.address
     )
     
     crowdsale = await SQM1Crowdsale.new(
-      UserRegistry.address,
+      registry.address,
       sqm.address,
       owner,
       alt.address
@@ -95,9 +96,9 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
     let balance
     balance = await sqm.balanceOf(crowdsale.address)
     console.log(balance.div(1e18).toString(10))
-    await UserRegistry.at(UserRegistry.address).addSystem(crowdsale.address, { from: owner })
+    await registry.addSystem(crowdsale.address, { from: owner })
     await sqm.transfer(crowdsale.address, ether(10000), { from: owner })
-    await UserRegistry.at(UserRegistry.address).addAddress(buyer, { from: owner })
+    await registry.addAddress(buyer, { from: owner })
     balance = await sqm.balanceOf(crowdsale.address)
     console.log(balance.div(1e18).toString(10))
     await crowdsale.saneIt()

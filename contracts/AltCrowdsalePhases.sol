@@ -32,7 +32,6 @@ contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
     15000 ether
   ) 
   public {
-    // saneIt();
   } 
 }
 
@@ -66,6 +65,5 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     1500 ether
   ) 
   public {
-    // saneIt();
   } 
 } 

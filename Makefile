@@ -31,7 +31,7 @@ recompile: clean compile migrate-hard
 
 migrate: compile
 	@echo "Begin migrate to $(value NETWORK)"
-	@t$(shell pwd)/node_modules/.bin/ruffle migrate --network=$(value NETWORK)
+	@$(shell pwd)/node_modules/.bin/truffle migrate --network=$(value NETWORK)
 
 migrate-hard: clean compile
 	@echo "Begin migrate --reset to $(value NETWORK)"

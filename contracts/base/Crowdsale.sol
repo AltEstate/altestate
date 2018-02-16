@@ -94,8 +94,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
   // List of allowed beneficiaries
   mapping (address => WhitelistRecord) public whitelist;
-  address[] public whitelisted;
-  uint public whitelistedCount;
 
   // Known users registry (required to known rules)
   UserRegistryInterface public userRegistry;
@@ -388,9 +386,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       require(amountSlicesCount > 0);
     }
 
-    if (isEarlyBonus) {
-      require(timeSlicesCount > 0);
-    }
+    // ! not needed anymore (since 02.2018 time bonuses isn't constant)
+    // if (isEarlyBonus) {
+    //   require(timeSlicesCount > 0);
+    // }
 
     if (isExtraDistribution) {
       require(extraTokensHolder != address(0));
@@ -675,9 +674,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     whitelist[_beneficiary] = WhitelistRecord(true, _min, _max);
-    whitelisted.push(_beneficiary);
-    whitelistedCount++;
-
     Whitelisted(_beneficiary, _min, _max);
   }
   
