@@ -77,21 +77,13 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
   let crowdsale, sqm, alt
 
   it('setup tests', async () => {
-    var registry = await UserRegistry.new()
-    alt = await AltToken.new(registry.address)
+    var registry = UserRegistry.at(UserRegistry.address)
+    alt = AltToken.at(AltToken.address)
     await alt.mint(owner, ether(1e6))
     await alt.mint(buyer, ether(1e6))
 
-    sqm = await SQM1Token.new(
-      registry.address
-    )
-    
-    crowdsale = await SQM1Crowdsale.new(
-      registry.address,
-      sqm.address,
-      owner,
-      alt.address
-    )
+    sqm = SQM1Token.at(SQM1Token.address)
+    crowdsale = SQM1Crowdsale.at(SQM1Crowdsale.address)
 
     let balance
     balance = await sqm.balanceOf(crowdsale.address)

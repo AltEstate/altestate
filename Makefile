@@ -46,7 +46,6 @@ setup:
 	@echo "Setup SQM1"
 	@make exec EXEC_SCRIPT=$(shell pwd)/scripts/2_setup_sqm.js
 
-
 deploy: clean compile migrate setup
 
 node_modules:
@@ -59,7 +58,7 @@ test:
 	@$(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
 
 
-test-hard: migrate-hard 
+test-hard: deploy
 	@$(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
 
 link: compile
