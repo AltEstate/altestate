@@ -1,4 +1,5 @@
 import ether from 'zeppelin-solidity/test/helpers/ether';
+import expectThrow from 'zeppelin-solidity/test/helpers/expectThrow';
 
 const AltToken = artifacts.require('./AltToken.sol')
 const SQM1Token = artifacts.require('./SQM1Token.sol')
@@ -74,10 +75,10 @@ function hexToBytes(hexString) {
 }
 
 contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
-  let crowdsale, sqm, alt
+  let crowdsale, sqm, alt, registry
 
   it('setup tests', async () => {
-    var registry = UserRegistry.at(UserRegistry.address)
+    registry = UserRegistry.at(UserRegistry.address)
     alt = AltToken.at(AltToken.address)
     await alt.mint(owner, ether(1e6))
     await alt.mint(buyer, ether(1e6))
@@ -90,13 +91,19 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
     console.log(balance.div(1e18).toString(10))
     await registry.addSystem(crowdsale.address, { from: owner })
     await sqm.transfer(crowdsale.address, ether(10000), { from: owner })
-    await registry.addAddress(buyer, { from: owner })
     balance = await sqm.balanceOf(crowdsale.address)
     console.log(balance.div(1e18).toString(10))
     await crowdsale.saneIt()
   })
 
+  it('should reject buy from unkown buyer', async () => {
+    const rate = await crowdsale.tokensValues(alt.address)
+    const bytes = toBytes(rate)
+    await expectThrow(alt.approveAndCall(crowdsale.address, ether(10), bytes, { from: buyer }))
+  })
+
   it('should allow to buy', async () => {
+    await registry.addAddress(buyer, { from: owner })
     const rate = await crowdsale.tokensValues(alt.address)
     const bytes = toBytes(rate)
     console.log(bytes, rate.toString(10))
@@ -106,10 +113,8 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
     const balance = await sqm.balanceOf(buyer)
     console.log(balance.div(1e18).toString(10))
   })
-
-  // it('should increase balance', async () => {
-  //   const balance = await sqm.balanceOf(buyer)
-  //   console.log(balance.div(1e18).toString(10))
-  //   assert(balance.eq(0))
-  // })
+  
+  it('should reject buy with ether', async () => {
+    await expectThrow(crowdsale.buyTokens(buyer, { value: ether(1), from: buyer }))
+  })
 })
