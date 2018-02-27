@@ -25,6 +25,7 @@ compile: node_modules
 	@make merge MERGE_FILE=SQM1Crowdsale.sol
 	@make merge MERGE_FILE=UserRegistry.sol
 	@make merge MERGE_FILE=extra/ExtraHolderContract.sol
+	@make merge MERGE_FILE=extra/AltExtraHolderContract.sol
 
 recompile: clean compile migrate-hard
 	@echo "Recompiled"
