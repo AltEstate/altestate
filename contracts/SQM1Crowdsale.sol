@@ -24,9 +24,9 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     block.timestamp + 90 days,
 
     // _softCap,
-    150 ether,
+    150,
     // _hardCap
-    150 ether
+    150
   ) 
   public {
   } 

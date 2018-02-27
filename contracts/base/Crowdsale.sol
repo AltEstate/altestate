@@ -622,13 +622,29 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                            address _token, 
                            bytes _extraData) public 
   {
+    if (_token == address(token)) {
+      TokenInterface(_token).transferFrom(_from, address(this), _value);
+      return;
+    }
+
+    require(isTokenExchange);
+    
     // Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
     // Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
     require(tokensValues[_token] > 0);
-    require(forwardTokens(_from, _token, _value));
 
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
+    require(
+      forwardTokens(
+        _from, 
+        _token, 
+        weiValue
+          .div(tokensValues[_token])
+          .mul(10 ** allowedTokens[_token].decimals())
+      )
+    );
+
     require(weiValue > 0);
 
     Debug(msg.sender, appendUintToString("Token to wei: ", weiValue));

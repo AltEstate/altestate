@@ -12,7 +12,11 @@ module.exports = async function (callback) {
     console.log('Add SQM crowdsale address to registry as system')
     await registry.addSystem(sale.address)
     console.log('Transfer SQM tokens to sale address')
-    await token.transfer(sale.address, web3.toWei(10000, 'ether'))
+    const decimals = await token.decimals()
+    const hardcap = await sale.hardCap()
+    const balance = await token.balanceOf(owner)
+    console.log(decimals.toNumber(), hardcap.toNumber(), balance.toNumber())
+    await token.transfer(sale.address, hardcap.mul(10 ** decimals.toNumber()))
     console.log('Sanetize sale contract')
     await sale.saneIt()
 
