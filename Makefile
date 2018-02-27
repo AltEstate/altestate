@@ -15,7 +15,6 @@ clean:
 
 merge:
 	@exec $(shell pwd)/node_modules/.bin/sol-merger $(shell pwd)/contracts/$(value MERGE_FILE) $(shell pwd)/$(value MERGE_PATH)
-	@exec node $(shell pwd)/replace.js $(value MERGE_PATH)/$(value MERGE_FILE)
 	
 compile: node_modules
 	@echo "Begining of compilation"
@@ -25,6 +24,7 @@ compile: node_modules
 	@make merge MERGE_FILE=SQM1Token.sol
 	@make merge MERGE_FILE=SQM1Crowdsale.sol
 	@make merge MERGE_FILE=UserRegistry.sol
+	@make merge MERGE_FILE=extra/ExtraHolderContract.sol
 
 recompile: clean compile migrate-hard
 	@echo "Recompiled"
