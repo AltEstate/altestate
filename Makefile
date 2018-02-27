@@ -14,12 +14,12 @@ clean:
 	@rm -rf $(shell pwd)/build/contracts
 
 merge:
-	@$(shell pwd)/node_modules/.bin/sol-merger $(shell pwd)/contracts/$(value MERGE_FILE) $(shell pwd)/$(value MERGE_PATH)
-	@node $(shell pwd)/replace.js $(value MERGE_PATH)/$(value MERGE_FILE)
+	@exec $(shell pwd)/node_modules/.bin/sol-merger $(shell pwd)/contracts/$(value MERGE_FILE) $(shell pwd)/$(value MERGE_PATH)
+	@exec node $(shell pwd)/replace.js $(value MERGE_PATH)/$(value MERGE_FILE)
 	
 compile: node_modules
 	@echo "Begining of compilation"
-	@$(shell pwd)/node_modules/.bin/truffle compile
+	@exec $(shell pwd)/node_modules/.bin/truffle compile
 	@make merge MERGE_FILE=AltCrowdsalePhases.sol
 	@make merge MERGE_FILE=AltToken.sol
 	@make merge MERGE_FILE=SQM1Token.sol
@@ -31,14 +31,14 @@ recompile: clean compile migrate-hard
 
 migrate: compile
 	@echo "Begin migrate to $(value NETWORK)"
-	@$(shell pwd)/node_modules/.bin/truffle migrate --network=$(value NETWORK)
+	@exec $(shell pwd)/node_modules/.bin/truffle migrate --network=$(value NETWORK)
 
 migrate-hard: clean compile
 	@echo "Begin migrate --reset to $(value NETWORK)"
-	@$(shell pwd)/node_modules/.bin/truffle migrate --reset --network=$(value NETWORK)
+	@exec $(shell pwd)/node_modules/.bin/truffle migrate --reset --network=$(value NETWORK)
 
 exec: 
-	@$(shell pwd)/node_modules/.bin/truffle exec $(value EXEC_SCRIPT) --network=$(value NETWORK) 
+	@exec $(shell pwd)/node_modules/.bin/truffle exec $(value EXEC_SCRIPT) --network=$(value NETWORK) 
 
 setup:
 	@echo "Setup ALT token"
@@ -55,18 +55,18 @@ retest: clean compile
 	@make test
 
 test:
-	@$(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
+	@exec $(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
 
 
 test-hard: deploy
-	@$(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
+	@exec $(shell pwd)/node_modules/.bin/truffle --network=$(value NETWORK) test $(value TEST)
 
 link: compile
-	@$(shell pwd)/node_modules/.bin/remixd -S $(shell pwd)/merged
+	@exec $(shell pwd)/node_modules/.bin/remixd -S $(shell pwd)/merged
 
 
 testrpc: node_modules
-	@$(shell pwd)/node_modules/.bin/ganache-cli --gasPrice=0x01 --gasLimit=0xfffffffffff \
+	@exec $(shell pwd)/node_modules/.bin/ganache-cli --gasPrice=0x01 --gasLimit=0xfffffffffff \
   	-d="candy maple velvet cake sugar cream honey rich smooth crumble sweet treat" \
 		--account="0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d,100000000000000000000000000000000" \
 		--account="0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1,100000000000000000000000000000000" \
