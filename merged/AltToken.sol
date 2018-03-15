@@ -1,12 +1,7 @@
 pragma solidity ^0.4.18;
 
-contract UserRegistryInterface {
-  event AddAddress(address indexed who);
-  event AddIdentity(address indexed who);
-
-  function knownAddress(address _who) public constant returns(bool);
-  function hasIdentity(address _who) public constant returns(bool);
-  function systemAddresses(address _to, address _from) public constant returns(bool);
+contract TokenRecipient {
+  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
 }
 
 /**
@@ -141,7 +136,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
-  function approve(address _spender, uint _value) public returns (bool) {
+  function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
@@ -158,10 +153,14 @@ contract StandardToken is ERC20, BasicToken {
   }
 
   /**
+   * @dev Increase the amount of tokens that an owner allowed to a spender.
+   *
    * approve should be called when allowed[_spender] == 0. To increment
    * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
+   * @param _spender The address which will spend the funds.
+   * @param _addedValue The amount of tokens to increase the allowance by.
    */
   function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
@@ -169,6 +168,16 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
+  /**
+   * @dev Decrease the amount of tokens that an owner allowed to a spender.
+   *
+   * approve should be called when allowed[_spender] == 0. To decrement
+   * allowed value is better to use this function to avoid 2 calls (and wait until
+   * the first transaction is mined)
+   * From MonolithDAO Token.sol
+   * @param _spender The address which will spend the funds.
+   * @param _subtractedValue The amount of tokens to decrease the allowance by.
+   */
   function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -182,34 +191,6 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
-contract KnownHolderToken is StandardToken {
-  UserRegistryInterface public userRegistry;
-
-  function KnownHolderToken(address registry) public {
-    require(registry != 0x0);
-    userRegistry = UserRegistryInterface(registry);
-  }
-
-  modifier shouldBeFamiliarToTransfer(address _from, address _to) {
-    require(
-      !userRegistry.knownAddress(_from) || 
-       userRegistry.hasIdentity(_from) || 
-       userRegistry.systemAddresses(_to, _from));
-    _;
-  }
-  function transfer(address _to, uint256 _value) shouldBeFamiliarToTransfer(msg.sender, _to) public returns (bool) {
-    return super.transfer(_to, _value);
-  }
-
-  function transferFrom(address _from, address _to, uint256 _value) shouldBeFamiliarToTransfer(_from, _to) public returns (bool) {
-    return super.transferFrom(_from, _to, _value);
-  }
-}
-
-contract TokenRecipient {
-  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
-}
-
 contract ApproveAndCallToken is StandardToken {
   function approveAndCall(address _spender, uint _value, bytes _data) public returns (bool) {
     TokenRecipient spender = TokenRecipient(_spender);
@@ -219,18 +200,43 @@ contract ApproveAndCallToken is StandardToken {
     }
     return false;
   }
+
+  // ERC223 Token improvement to send tokens to smart-contracts
+  function transfer(address _to, uint _value) public returns (bool success) { 
+    //standard function transfer similar to ERC20 transfer with no _data
+    //added due to backwards compatibility reasons
+    bytes memory empty;
+    if(isContract(_to)) {
+        return transferToContract(_to, _value, empty);
+    }
+    else {
+        return super.transfer(_to, _value);
+    }
+  }
+
+  //assemble the given address bytecode. If bytecode exists then the _addr is a contract.
+  function isContract(address _addr) private view returns (bool is_contract) {
+    uint length;
+    assembly {
+      //retrieve the size of the code on target address, this needs assembly
+      length := extcodesize(_addr)
+    }
+    return (length>0);
+  }
+
+  //function that is called when transaction target is a contract
+  function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
+    return approveAndCall(_to, _value, _data);
+  }
 }
 
-contract NamedToken is StandardToken {
-  string public name;
-  string public ticker;
-  uint public decimals;
-  
-  function NamedToken(string _name, string _ticker, uint _decimals) public {
-    name = _name;
-    ticker = _ticker;
-    decimals = _decimals;
-  }
+contract UserRegistryInterface {
+  event AddAddress(address indexed who);
+  event AddIdentity(address indexed who);
+
+  function knownAddress(address _who) public constant returns(bool);
+  function hasIdentity(address _who) public constant returns(bool);
+  function systemAddresses(address _to, address _from) public constant returns(bool);
 }
 
 /**
@@ -275,33 +281,40 @@ contract Ownable {
 
 }
 
-contract FrozenToken is StandardToken, Ownable {
+contract TokenPolicy is StandardToken, Ownable {
   bool public unfrozen;
-  UserRegistryInterface public frozUserRegistry;
+  UserRegistryInterface public userRegistry;
+
+  function TokenPolicy(address registry) public {
+    require(registry != 0x0);
+    userRegistry = UserRegistryInterface(registry);
+  }
 
   event Unfrezee();
 
-  function FrozenToken(address registry) public {
-    require(registry != 0x0);
-    frozUserRegistry = UserRegistryInterface(registry);
+  modifier shouldPassPolicy(address _from, address _to) {
+    // KYC policy
+    require(
+      !userRegistry.knownAddress(_from) || 
+       userRegistry.hasIdentity(_from) || 
+       userRegistry.systemAddresses(_to, _from));
+
+    // Freeze policy
+    require(unfrozen || userRegistry.systemAddresses(_to, _from));
+
+    _;
+  }
+  function transfer(address _to, uint256 _value) shouldPassPolicy(msg.sender, _to) public returns (bool) {
+    return super.transfer(_to, _value);
+  }
+
+  function transferFrom(address _from, address _to, uint256 _value) shouldPassPolicy(_from, _to) public returns (bool) {
+    return super.transferFrom(_from, _to, _value);
   }
 
   function unfrezee() onlyOwner public returns (bool) {
     require(!unfrozen);
     unfrozen = true;
-  }
-
-  modifier shouldBeUnfrozen(address _from, address _to) {
-    require(unfrozen || frozUserRegistry.systemAddresses(_to, _from));
-    _;
-  }
-
-  function transfer(address _to, uint256 _value) shouldBeUnfrozen(msg.sender, _to) public returns (bool) {
-    return super.transfer(_to, _value);
-  }
-
-  function transferFrom(address _from, address _to, uint256 _value) shouldBeUnfrozen(_from, _to) public returns (bool) {
-    return super.transferFrom(_from, _to, _value);
   }
 }
 
@@ -349,13 +362,20 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-contract DefaultToken is NamedToken, KnownHolderToken, ApproveAndCallToken, FrozenToken, MintableToken {
-  function DefaultToken(string name, string ticker, uint decimals, address _registry) 
-    NamedToken(name, ticker, decimals)
+contract DefaultToken is MintableToken, TokenPolicy, ApproveAndCallToken {
+  using SafeMath for uint;
+
+  string public name;
+  string public ticker;
+  uint public decimals;
+  
+  function DefaultToken(string _name, string _ticker, uint _decimals, address _registry) 
     ApproveAndCallToken()
     MintableToken()
-    KnownHolderToken(_registry)
-    FrozenToken(_registry) public {
+    TokenPolicy(_registry) public {
+    name = _name;
+    ticker = _ticker;
+    decimals = _decimals;
   }
 
   function takeAway(address _holder, address _to) onlyOwner public returns (bool) {

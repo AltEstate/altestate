@@ -181,7 +181,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isKnownOnly;              // Should be known user to buy tokens
   bool public isAmountBonus;            // Enable amount bonuses in crowdsale?
   bool public isEarlyBonus;             // Enable early bird bonus in crowdsale?
-  bool public isRefundable;             // Allow to refund money?
   bool public isTokenExchange;          // Allow to buy tokens for another tokens?
   bool public isAllowToIssue;           // Allow to issue tokens with tx hash (ex bitcoin)
   bool public isDisableEther;           // Disable purchase with the Ether
@@ -191,11 +190,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isPersonalBonuses;        // Should check personal beneficiary bonus?
   bool public isAllowClaimBeforeFinalization;
                                         // Should allow to claim funds before finalization?
+  bool public isMinimumValue;           // Validate minimum amount to purchase
+  bool public isMinimumInEther;         // Is minimum amount setuped in Ether or Tokens?
+
+  uint public minimumPurchaseValue;     // How less buyer could to purchase
 
   // List of allowed beneficiaries
   mapping (address => WhitelistRecord) public whitelist;
-  address[] public whitelisted;
-  uint public whitelistedCount;
 
   // Known users registry (required to known rules)
   UserRegistryInterface public userRegistry;
@@ -302,8 +303,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     bool _isAmountBonus,
     // Enable early bird bonus in crowdsale?
     bool _isEarlyBonus,
-    // Allow to refund money?
-    bool _isRefundable,
     // Allow to buy tokens for another tokens?
     bool _isTokenExchange,
     // Allow to issue tokens with tx hash (ex bitcoin)
@@ -326,7 +325,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isKnownOnly = _isKnownOnly;
     isAmountBonus = _isAmountBonus;
     isEarlyBonus = _isEarlyBonus;
-    isRefundable = _isRefundable;
     isTokenExchange = _isTokenExchange;
     isAllowToIssue = _isAllowToIssue;
     isDisableEther = _isDisableEther;
@@ -335,6 +333,20 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     isCappedInEther = _isCappedInEther;
     isPersonalBonuses = _isPersonalBonuses;
     isAllowClaimBeforeFinalization = _isAllowClaimBeforeFinalization;
+  }
+
+  // ! Could be changed in process of sale (since 02.2018)
+  function setMinimum(uint _amount, bool _inToken) 
+    onlyOwner public
+  {
+    if (_amount == 0) {
+      isMinimumValue = false;
+      minimumPurchaseValue = 0;
+    } else {
+      isMinimumValue = true;
+      isMinimumInEther = !_inToken;
+      minimumPurchaseValue = _amount;
+    }
   }
 
   function setPrice(uint _price)
@@ -369,7 +381,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   function setToken(address _tokenAddress) 
     inState(State.Setup) onlyOwner public
   {
-    // SetToken(msg.sender, token, _tokenAddress);
     token = MintableTokenInterface(_tokenAddress);
     tokenDecimals = token.decimals();
   }
@@ -419,19 +430,35 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function setTimeBonuses(uint[] _timeSlices, uint[] _bonuses) 
-    inState(State.Setup) onlyOwner public 
+    // ! Not need to check state since changes at 02.2018
+    // inState(State.Setup)
+    onlyOwner 
+    public 
   {
     // Only once in life time
-    require(timeSlicesCount == 0);
-    require(_timeSlices.length > 1);
+    // ! Time bonuses is changable after 02.2018
+    // require(timeSlicesCount == 0);
+    require(_timeSlices.length > 0);
     require(_bonuses.length == _timeSlices.length);
     uint lastSlice = 0;
+    uint lastBonus = 10000;
+    if (timeSlicesCount > 0) {
+      // ! Since time bonuses is changable we should take latest first
+      lastSlice = timeSlices[timeSlicesCount - 1];
+      lastBonus = timeBonuses[lastSlice];
+    }
+
     for (uint index = 0; index < _timeSlices.length; index++) {
       require(_timeSlices[index] > lastSlice);
+
+      // ! Add check for next bonus is equal or less than previous
+      require(_bonuses[index] <= lastBonus);
+
+      // ? Should we check bonus in a future
+
       lastSlice = _timeSlices[index];
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _bonuses[index];
-      // AddTimeSlice(msg.sender, _timeSlices[index], _bonuses[index]);
     }
     timeSlicesCount = timeSlices.length;
   }
@@ -462,9 +489,10 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       require(amountSlicesCount > 0);
     }
 
-    if (isEarlyBonus) {
-      require(timeSlicesCount > 0);
-    }
+    // ! not needed anymore (since 02.2018 time bonuses isn't constant)
+    // if (isEarlyBonus) {
+    //   require(timeSlicesCount > 0);
+    // }
 
     if (isExtraDistribution) {
       require(extraTokensHolder != address(0));
@@ -586,6 +614,19 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     _tokenAmount;
     _extraAmount;
 
+    // ! Check min purchase value (since 02.2018)
+    if (isMinimumValue) {
+      // ! Check min purchase value in ether (since 02.2018)
+      if (isMinimumInEther && _weiAmount < minimumPurchaseValue) {
+        return false;
+      }
+
+      // ! Check min purchase value in tokens (since 02.2018)
+      if (!isMinimumInEther && _tokenAmount < minimumPurchaseValue) {
+        return false;
+      }
+    }
+
     if (_time < startTime || _time > endTime) {
       return false;
     }
@@ -664,14 +705,16 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function buyTokens(address _beneficiary) inState(State.Active) public payable {
+    require(!isDisableEther);
     uint shipAmount = sellTokens(_beneficiary, msg.value, block.timestamp);
     require(shipAmount > 0);
-    // forwardEther();
+    forwardEther();
   }
 
   function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash) 
     inState(State.Active) onlyOwner public 
   {
+    require(isAllowToIssue);
     uint shipAmount = sellTokens(_beneficiary, _value, _timestamp);
     require(shipAmount > 0);
     HashBuy(_beneficiary, _value, shipAmount, _timestamp, _hash);
@@ -682,17 +725,32 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                            address _token, 
                            bytes _extraData) public 
   {
-    require(isTokenExchange);
+    if (_token == address(token)) {
+      TokenInterface(_token).transferFrom(_from, address(this), _value);
+      return;
+    }
 
-    Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
-    Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
+    require(isTokenExchange);
+    
+    // Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
+    // Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
     require(tokensValues[_token] > 0);
-    require(forwardTokens(_from, _token, _value));
 
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
+    require(
+      forwardTokens(
+        _from, 
+        _token, 
+        weiValue
+          .div(tokensValues[_token])
+          .mul(10 ** allowedTokens[_token].decimals())
+      )
+    );
+
     require(weiValue > 0);
 
+    Debug(msg.sender, appendUintToString("Token to wei: ", weiValue));
     uint shipAmount = sellTokens(_from, weiValue, block.timestamp);
     require(shipAmount > 0);
 
@@ -735,9 +793,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     whitelist[_beneficiary] = WhitelistRecord(true, _min, _max);
-    whitelisted.push(_beneficiary);
-    whitelistedCount++;
-
     Whitelisted(_beneficiary, _min, _max);
   }
   
@@ -818,7 +873,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Active) internal 
   {
     if (isTransferShipment) {
-      token.transferFrom(address(this), _beneficiary, _amount);
+      token.transfer(_beneficiary, _amount);
     } else {
       token.mint(_beneficiary, _amount);
     }
@@ -913,4 +968,160 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
     str = string(s);
   }
+}
+
+contract BaseSqmCrowdsale is Crowdsale {
+  function BaseSqmCrowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken,
+    uint _price,
+    uint _start,
+    uint _end,
+    uint _softCap,
+    uint _hardCap
+  ) public {
+    setFlags(
+      // Should be whitelisted to buy tokens
+      // _isWhitelisted,
+      false,
+      // Should be known user to buy tokens
+      // _isKnownOnly,
+      true,
+      // Enable amount bonuses in crowdsale? 
+      // _isAmountBonus,
+      false,
+      // Enable early bird bonus in crowdsale?
+      // _isEarlyBonus,
+      false,
+      // Allow to buy tokens for another tokens?
+      // _isTokenExcange,
+      true,
+      // Allow to issue tokens with tx hash (ex bitcoin)
+      // _isAllowToIssue,
+      false,
+      // Should reject purchases with Ether?
+      // _isDisableEther,
+      true,
+      // Should mint extra tokens for future distribution?
+      // _isExtraDistribution,
+      false,
+      // Will ship token via minting? 
+      // _isTransferShipment,
+      true,
+      // Should be capped in ether
+      // bool _isCappedInEther,
+      false,
+      // Should check personal bonuses?
+      // _isPersonalBonuses
+      false,
+      // Should allow to claimFunds before finalizations?
+      false
+    );
+
+    setToken(_token); 
+    setTime(_start, _end);
+    setRegistry(_registry);
+    setWallet(_wallet);
+
+    setSoftHardCaps(
+      _softCap, // soft
+      _hardCap  // hard
+    );
+
+    setPrice(_price);
+
+    setTokenExcange(_altToken, 1 ether);
+  }
+}
+
+contract SQM1Crowdsale is BaseSqmCrowdsale {
+  function SQM1Crowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken
+  )
+  BaseSqmCrowdsale(
+    _registry,
+    _token,
+    _wallet,
+    _altToken,
+
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
+
+    // from now
+    block.timestamp,
+    // to 90 days in future
+    block.timestamp + 90 days,
+
+    // _softCap,
+    150,
+    // _hardCap
+    150
+  ) 
+  public {
+  } 
+}
+
+contract SQM2Crowdsale is BaseSqmCrowdsale {
+  function SQM2Crowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken
+  )
+  BaseSqmCrowdsale(
+    _registry,
+    _token,
+    _wallet,
+    _altToken,
+
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
+
+    // from now
+    block.timestamp,
+    // to 90 days in future
+    block.timestamp + 90 days,
+
+    // _softCap,
+    150,
+    // _hardCap
+    150
+  ) 
+  public {
+  } 
+}
+
+contract SQM3Crowdsale is BaseSqmCrowdsale {
+  function SQM3Crowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken
+  )
+  BaseSqmCrowdsale(
+    _registry,
+    _token,
+    _wallet,
+    _altToken,
+
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
+
+    // from now
+    block.timestamp,
+    // to 90 days in future
+    block.timestamp + 90 days,
+
+    // _softCap,
+    150,
+    // _hardCap
+    150
+  ) 
+  public {
+  } 
 }

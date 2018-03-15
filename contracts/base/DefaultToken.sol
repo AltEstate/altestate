@@ -1,18 +1,25 @@
 pragma solidity ^0.4.18;
 
-import './KnownHolderToken.sol';
+import './TokenRecipient.sol';
 import './ApproveAndCallToken.sol';
-import './NamedToken.sol';
-import './FrozenToken.sol';
+import './TokenPolicy.sol';
 import 'zeppelin-solidity/contracts/token/MintableToken.sol';
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
-contract DefaultToken is NamedToken, KnownHolderToken, ApproveAndCallToken, FrozenToken, MintableToken {
-  function DefaultToken(string name, string ticker, uint decimals, address _registry) 
-    NamedToken(name, ticker, decimals)
+contract DefaultToken is MintableToken, TokenPolicy, ApproveAndCallToken {
+  using SafeMath for uint;
+
+  string public name;
+  string public ticker;
+  uint public decimals;
+  
+  function DefaultToken(string _name, string _ticker, uint _decimals, address _registry) 
     ApproveAndCallToken()
     MintableToken()
-    KnownHolderToken(_registry)
-    FrozenToken(_registry) public {
+    TokenPolicy(_registry) public {
+    name = _name;
+    ticker = _ticker;
+    decimals = _decimals;
   }
 
   function takeAway(address _holder, address _to) onlyOwner public returns (bool) {

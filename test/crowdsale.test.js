@@ -64,15 +64,14 @@ function setFlags (crowdsale, flags, sig) {
     knownOnly: 1,
     amountBonus: 2,
     earlyBonus: 3,
-    refundable: 4,
-    tokenExcange: 5,
-    allowToIssue: 6,
-    disableEther: 7,
-    extraDistribution: 8,
-    transferShipment: 9,
-    cappedInEther: 10,
-    personalBonuses: 11,
-    allowClaimBeforeFinalization: 12
+    tokenExcange: 4,
+    allowToIssue: 5,
+    disableEther: 6,
+    extraDistribution: 7,
+    transferShipment: 8,
+    cappedInEther: 9,
+    personalBonuses: 10,
+    allowClaimBeforeFinalization: 11
   }
 
   let flagArgs = Array(Object.keys(flagsMap).length).fill().map(e => false)
@@ -138,7 +137,6 @@ contract('crowdsale', _accs => {
         knownOnly:        true,
         amountBonus:      true,
         earlyBonus:       true,
-        refundable:       true,
         tokenExcange:     true,
         allowToIssue:     true,
         extraDistribution: true,
@@ -150,7 +148,6 @@ contract('crowdsale', _accs => {
       assert(await crowdsale.isWhitelisted(), 'should be whitelisted')
       assert(await crowdsale.isKnownOnly(), 'should be known only')
       assert(await crowdsale.isAmountBonus(), 'shold be amount bonus')
-      assert(await crowdsale.isRefundable(), 'should be refundable')
       assert(await crowdsale.isTokenExchange(), 'should be a token exchange')
       assert(await crowdsale.isAllowToIssue(), 'should be issue allow')
       assert(await crowdsale.isExtraDistribution(), 'should be extra distirbution')
@@ -165,7 +162,6 @@ contract('crowdsale', _accs => {
       assert(!(await crowdsale.isWhitelisted()), 'shouldn\'t be whitelisted')
       assert(!(await crowdsale.isKnownOnly()), 'shouldn\'t be known only')
       assert(!(await crowdsale.isAmountBonus()), 'sholdn\'t be amount bonus')
-      assert(!(await crowdsale.isRefundable()), 'shouldn\'t be refundable')
       assert(!(await crowdsale.isTokenExchange()), 'shouldn\'t be a token exchange')
       assert(!(await crowdsale.isAllowToIssue()), 'shouldn\'t be issue allow')
       assert(!(await crowdsale.isExtraDistribution()), 'shouldn\'t be extra distirbution')
@@ -194,6 +190,42 @@ contract('crowdsale', _accs => {
   })
 
   describe('features tests', async () => {
+    describe('min amount', async () => {
+      before(makeContext)
+      after(cleanContext)
+
+      it('disallow anyone to set minimum', async () => {
+        await expectThrow(
+          crowdsale.setMinimum(ether(100), false, buyerSig)
+        )
+        await expectThrow(
+          crowdsale.setMinimum(tokens(1), true, buyerSig)
+        )
+        await expectThrow(
+          crowdsale.setMinimum(0, true, buyerSig)
+        )
+      })
+      it('allow owner to set minimum', async () => {
+        await crowdsale.setMinimum(ether(5), false)
+        await crowdsale.saneIt()
+      })
+      it('reject transaction less than min', async () => {
+        await expectThrow(
+          crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+        )
+      })
+      it('accept transaction more than min', async () => {
+        await crowdsale.buyTokens(accounts[1], { value: ether(6), from: accounts[1] })
+      })
+
+      it('allow to change minimum in sale process', async () => {
+        await crowdsale.setMinimum(ether(0.1), false)
+      })
+      
+      it('accept transaction more than with new min', async () => {
+        await crowdsale.buyTokens(accounts[1], { value: ether(1), from: accounts[1] })
+      })
+    })
     describe('known users', async () => {
       before(async () => await makeContext())
       after(async () => await cleanContext())
@@ -374,27 +406,6 @@ contract('crowdsale', _accs => {
       })
     })
 
-    describe('refunding', async () => {
-      it('allow owner to setup extra distribution', async () => {
-        
-      })
-      it('reject refunding without finalization', async () => {
-        
-      })
-      it('allow refund when cap isn\'t achived', async () => {
-        
-      })
-      it('disallow refund if cap is achived', async () => {
-        
-      })
-      it('should transfer funds to wallet only if cap is achived', async () => {
-        
-      })
-      it('allow enable refund if requires', async () => {
-        
-      })
-    })
-
     describe('bonuses', async () => {
       describe('personal bonuses', () => {
         before(async () => await makeContext())
@@ -567,15 +578,32 @@ contract('crowdsale', _accs => {
 
           await crowdsale.saneIt()
         })
-        it('disallow to add time bonuses after sanetize', async () => {
+        it('allow owner to add extra bonuses', async () => {
+          await crowdsale.setTimeBonuses(
+            [ duration.days(30) ],
+            [               200 ],
+            ownerSig
+          )
+        })
+        it('disallow owner to add past bonuses', async () => {
           await expectThrow(
             crowdsale.setTimeBonuses(
-              [ duration.days(5), duration.days(10), duration.days(20) ],
-              [             1500,              1000,               500 ],
+              [ duration.days(10) ],
+              [              2000 ],
               ownerSig
             )
           )
         })
+        // ! Not needed anymore, because bonuses is changable after sanetize with a business rules since 02.2018
+        // it('disallow to add time bonuses after sanetize', async () => {
+        //   await expectThrow(
+        //     crowdsale.setTimeBonuses(
+        //       [ duration.days(5), duration.days(10), duration.days(20) ],
+        //       [             1500,              1000,               500 ],
+        //       ownerSig
+        //     )
+        //   )
+        // })
         it('time bonuses calculation max sale', async () => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
@@ -616,11 +644,25 @@ contract('crowdsale', _accs => {
           )
         })
 
-        it('time bonuses calculation after sales', async () => {
+        it('time bonuses calculation in added bonuses', async () => {
           let calculation = await crowdsale.calculateEthAmount(
             accounts[1],
             ether(1),
-            latestTime() + duration.days(21),
+            latestTime() + duration.days(25),
+            0
+          )
+
+          assert(
+            calculation[1].eq(tokensWithBonus(10, 200)), 
+            `unxpected calculation result: \ngot: ${calculation[1].toString(10)} expected ${tokens(10)}`
+          )
+        })
+        
+        it('time bonuses calculation after bonuses', async () => {
+          let calculation = await crowdsale.calculateEthAmount(
+            accounts[1],
+            ether(1),
+            latestTime() + duration.days(35),
             0
           )
 

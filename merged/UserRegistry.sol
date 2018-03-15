@@ -85,7 +85,11 @@ contract UserRegistry is MultiOwners, UserRegistryInterface {
     return knownAddress(_who) && identities[_who];
   }
 
+  function systemAddress(address _where) public constant returns(bool) {
+    return system[_where];
+  }
+
   function systemAddresses(address _to, address _from) public constant returns(bool) {
-    return system[_to] || system[_from];
+    return systemAddress(_to) || systemAddress(_from);
   }
 }
