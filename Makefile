@@ -21,8 +21,8 @@ compile: node_modules
 	@exec $(shell pwd)/node_modules/.bin/truffle compile
 	@make merge MERGE_FILE=AltCrowdsalePhases.sol
 	@make merge MERGE_FILE=AltToken.sol
-	@make merge MERGE_FILE=SQM1Token.sol
-	@make merge MERGE_FILE=SQM1Crowdsale.sol
+	@make merge MERGE_FILE=SQMTokens.sol
+	@make merge MERGE_FILE=SQMCrowdsales.sol
 	@make merge MERGE_FILE=UserRegistry.sol
 	@make merge MERGE_FILE=extra/ExtraHolderContract.sol
 	@make merge MERGE_FILE=extra/AltExtraHolderContract.sol
