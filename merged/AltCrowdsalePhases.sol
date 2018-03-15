@@ -1056,8 +1056,8 @@ contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
     // Whitelisted
     false,
 
-    // price 1 ETH -> 100 ALT
-    uint(1 ether).div(100), 
+    // price 1 ETH -> 100000 ALT
+    uint(1 ether).div(100000), 
 
     // start
     block.timestamp + 60 days,
@@ -1090,7 +1090,7 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     false,
 
     // price 1 ETH -> 200 ALT
-    uint(1 ether).div(200), 
+    uint(1 ether).div(100000), 
 
     // start
     block.timestamp,
