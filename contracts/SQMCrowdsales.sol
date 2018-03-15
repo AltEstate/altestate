@@ -16,7 +16,7 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _altToken,
 
     // price 1 ETH -> 1 SQM
-    uint(1 ether).div(1), 
+    uint(1 ether), 
     // from now
     block.timestamp,
     // to 90 days in future
@@ -45,7 +45,7 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _altToken,
 
     // price 1 ETH -> 1 SQM
-    uint(1 ether).div(1), 
+    uint(1 ether), 
 
     // from now
     block.timestamp,
@@ -75,7 +75,7 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _altToken,
 
     // price 1 ETH -> 1 SQM
-    uint(1 ether).div(1), 
+    uint(1 ether), 
 
     // from now
     block.timestamp,
