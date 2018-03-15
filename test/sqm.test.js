@@ -88,11 +88,11 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
 
     let balance
     balance = await sqm.balanceOf(crowdsale.address)
-    console.log(balance.div(1e18).toString(10))
+    console.log(balance.toString(10))
     await registry.addSystem(crowdsale.address, { from: owner })
-    await sqm.transfer(crowdsale.address, ether(10000), { from: owner })
+    await sqm.transfer(crowdsale.address, 10000, { from: owner })
     balance = await sqm.balanceOf(crowdsale.address)
-    console.log(balance.div(1e18).toString(10))
+    console.log(balance.toString(10))
     await crowdsale.saneIt()
   })
 
@@ -106,15 +106,24 @@ contract('SQM1 crowdsale', ([owner, buyer, someOne]) => {
     await registry.addAddress(buyer, { from: owner })
     const rate = await crowdsale.tokensValues(alt.address)
     const bytes = toBytes(rate)
-    console.log(bytes, rate.toString(10))
-    console.log((await alt.balanceOf(buyer)).toString(10))
-    await alt.approveAndCall(crowdsale.address, ether(10), bytes, { from: buyer })
-
-    const balance = await sqm.balanceOf(buyer)
-    console.log(balance.div(1e18).toString(10))
+    await alt.approveAndCall(crowdsale.address, ether(1), bytes, { from: buyer })
   })
   
   it('should reject buy with ether', async () => {
     await expectThrow(crowdsale.buyTokens(buyer, { value: ether(1), from: buyer }))
+  })
+
+  it('should left decimal part', async () => {
+    const rate = await crowdsale.tokensValues(alt.address)
+    const bytes = toBytes(rate)
+
+    const initialBalanceALT = await alt.balanceOf(buyer)
+    const initialBalanceSQM = await sqm.balanceOf(buyer)
+    await alt.approveAndCall(crowdsale.address, ether(1.35), bytes, { from: buyer })
+    const afterBalanceALT = await alt.balanceOf(buyer)
+    const afterBalanceSQM = await sqm.balanceOf(buyer)
+
+    assert.equal(-1.3, afterBalanceALT.sub(initialBalanceALT).div(1e18).toNumber())
+    assert.equal(13, afterBalanceSQM.sub(initialBalanceSQM).toNumber())
   })
 })

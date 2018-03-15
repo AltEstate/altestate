@@ -1,10 +1,14 @@
 pragma solidity ^0.4.18;
 
+import './TokenRecipient.sol';
 import './ApproveAndCallToken.sol';
 import './TokenPolicy.sol';
 import 'zeppelin-solidity/contracts/token/MintableToken.sol';
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 
 contract DefaultToken is MintableToken, TokenPolicy, ApproveAndCallToken {
+  using SafeMath for uint;
+
   string public name;
   string public ticker;
   uint public decimals;

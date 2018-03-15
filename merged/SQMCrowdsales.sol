@@ -1,10 +1,113 @@
 pragma solidity ^0.4.18;
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-import 'zeppelin-solidity/contracts/token/ERC20.sol';
-import './UserRegistryInterface.sol';
-import './MultiOwners.sol';
-import './TokenRecipient.sol';
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
+library SafeMath {
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+    uint256 c = a * b;
+    assert(c / a == b);
+    return c;
+  }
+
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    // assert(b > 0); // Solidity automatically throws when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    return c;
+  }
+
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    assert(c >= a);
+    return c;
+  }
+}
+
+/**
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/179
+ */
+contract ERC20Basic {
+  uint256 public totalSupply;
+  function balanceOf(address who) public view returns (uint256);
+  function transfer(address to, uint256 value) public returns (bool);
+  event Transfer(address indexed from, address indexed to, uint256 value);
+}
+
+/**
+ * @title ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
+ */
+contract ERC20 is ERC20Basic {
+  function allowance(address owner, address spender) public view returns (uint256);
+  function transferFrom(address from, address to, uint256 value) public returns (bool);
+  function approve(address spender, uint256 value) public returns (bool);
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+contract UserRegistryInterface {
+  event AddAddress(address indexed who);
+  event AddIdentity(address indexed who);
+
+  function knownAddress(address _who) public constant returns(bool);
+  function hasIdentity(address _who) public constant returns(bool);
+  function systemAddresses(address _to, address _from) public constant returns(bool);
+}
+
+contract MultiOwners {
+
+    event AccessGrant(address indexed owner);
+    event AccessRevoke(address indexed owner);
+    
+    mapping(address => bool) owners;
+    address public publisher;
+
+    function MultiOwners() public {
+        owners[msg.sender] = true;
+        publisher = msg.sender;
+    }
+
+    modifier onlyOwner() { 
+        require(owners[msg.sender] == true);
+        _; 
+    }
+
+    function isOwner() public constant returns (bool) {
+        return owners[msg.sender] ? true : false;
+    }
+
+    function checkOwner(address maybe_owner) public constant returns (bool) {
+        return owners[maybe_owner] ? true : false;
+    }
+
+    function grant(address _owner) onlyOwner public {
+        owners[_owner] = true;
+        AccessGrant(_owner);
+    }
+
+    function revoke(address _owner) onlyOwner public {
+        require(_owner != publisher);
+        require(msg.sender != _owner);
+
+        owners[_owner] = false;
+        AccessRevoke(_owner);
+    }
+}
+
+contract TokenRecipient {
+  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+}
 
 contract TokenInterface is ERC20 {
   string public name;
@@ -865,4 +968,160 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
     str = string(s);
   }
+}
+
+contract BaseSqmCrowdsale is Crowdsale {
+  function BaseSqmCrowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken,
+    uint _price,
+    uint _start,
+    uint _end,
+    uint _softCap,
+    uint _hardCap
+  ) public {
+    setFlags(
+      // Should be whitelisted to buy tokens
+      // _isWhitelisted,
+      false,
+      // Should be known user to buy tokens
+      // _isKnownOnly,
+      true,
+      // Enable amount bonuses in crowdsale? 
+      // _isAmountBonus,
+      false,
+      // Enable early bird bonus in crowdsale?
+      // _isEarlyBonus,
+      false,
+      // Allow to buy tokens for another tokens?
+      // _isTokenExcange,
+      true,
+      // Allow to issue tokens with tx hash (ex bitcoin)
+      // _isAllowToIssue,
+      false,
+      // Should reject purchases with Ether?
+      // _isDisableEther,
+      true,
+      // Should mint extra tokens for future distribution?
+      // _isExtraDistribution,
+      false,
+      // Will ship token via minting? 
+      // _isTransferShipment,
+      true,
+      // Should be capped in ether
+      // bool _isCappedInEther,
+      false,
+      // Should check personal bonuses?
+      // _isPersonalBonuses
+      false,
+      // Should allow to claimFunds before finalizations?
+      false
+    );
+
+    setToken(_token); 
+    setTime(_start, _end);
+    setRegistry(_registry);
+    setWallet(_wallet);
+
+    setSoftHardCaps(
+      _softCap, // soft
+      _hardCap  // hard
+    );
+
+    setPrice(_price);
+
+    setTokenExcange(_altToken, 1 ether);
+  }
+}
+
+contract SQM1Crowdsale is BaseSqmCrowdsale {
+  function SQM1Crowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken
+  )
+  BaseSqmCrowdsale(
+    _registry,
+    _token,
+    _wallet,
+    _altToken,
+
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
+
+    // from now
+    block.timestamp,
+    // to 90 days in future
+    block.timestamp + 90 days,
+
+    // _softCap,
+    150,
+    // _hardCap
+    150
+  ) 
+  public {
+  } 
+}
+
+contract SQM2Crowdsale is BaseSqmCrowdsale {
+  function SQM2Crowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken
+  )
+  BaseSqmCrowdsale(
+    _registry,
+    _token,
+    _wallet,
+    _altToken,
+
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
+
+    // from now
+    block.timestamp,
+    // to 90 days in future
+    block.timestamp + 90 days,
+
+    // _softCap,
+    150,
+    // _hardCap
+    150
+  ) 
+  public {
+  } 
+}
+
+contract SQM3Crowdsale is BaseSqmCrowdsale {
+  function SQM3Crowdsale(
+    address _registry,
+    address _token,
+    address _wallet,
+    address _altToken
+  )
+  BaseSqmCrowdsale(
+    _registry,
+    _token,
+    _wallet,
+    _altToken,
+
+    // price 1 ALT -> 10 SQM
+    uint(1 ether).div(10), 
+
+    // from now
+    block.timestamp,
+    // to 90 days in future
+    block.timestamp + 90 days,
+
+    // _softCap,
+    150,
+    // _hardCap
+    150
+  ) 
+  public {
+  } 
 }

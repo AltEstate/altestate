@@ -1,10 +1,113 @@
 pragma solidity ^0.4.18;
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-import 'zeppelin-solidity/contracts/token/ERC20.sol';
-import './UserRegistryInterface.sol';
-import './MultiOwners.sol';
-import './TokenRecipient.sol';
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
+library SafeMath {
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+    uint256 c = a * b;
+    assert(c / a == b);
+    return c;
+  }
+
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    // assert(b > 0); // Solidity automatically throws when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    return c;
+  }
+
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    assert(c >= a);
+    return c;
+  }
+}
+
+/**
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/179
+ */
+contract ERC20Basic {
+  uint256 public totalSupply;
+  function balanceOf(address who) public view returns (uint256);
+  function transfer(address to, uint256 value) public returns (bool);
+  event Transfer(address indexed from, address indexed to, uint256 value);
+}
+
+/**
+ * @title ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
+ */
+contract ERC20 is ERC20Basic {
+  function allowance(address owner, address spender) public view returns (uint256);
+  function transferFrom(address from, address to, uint256 value) public returns (bool);
+  function approve(address spender, uint256 value) public returns (bool);
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+contract UserRegistryInterface {
+  event AddAddress(address indexed who);
+  event AddIdentity(address indexed who);
+
+  function knownAddress(address _who) public constant returns(bool);
+  function hasIdentity(address _who) public constant returns(bool);
+  function systemAddresses(address _to, address _from) public constant returns(bool);
+}
+
+contract MultiOwners {
+
+    event AccessGrant(address indexed owner);
+    event AccessRevoke(address indexed owner);
+    
+    mapping(address => bool) owners;
+    address public publisher;
+
+    function MultiOwners() public {
+        owners[msg.sender] = true;
+        publisher = msg.sender;
+    }
+
+    modifier onlyOwner() { 
+        require(owners[msg.sender] == true);
+        _; 
+    }
+
+    function isOwner() public constant returns (bool) {
+        return owners[msg.sender] ? true : false;
+    }
+
+    function checkOwner(address maybe_owner) public constant returns (bool) {
+        return owners[maybe_owner] ? true : false;
+    }
+
+    function grant(address _owner) onlyOwner public {
+        owners[_owner] = true;
+        AccessGrant(_owner);
+    }
+
+    function revoke(address _owner) onlyOwner public {
+        require(_owner != publisher);
+        require(msg.sender != _owner);
+
+        owners[_owner] = false;
+        AccessRevoke(_owner);
+    }
+}
+
+contract TokenRecipient {
+  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+}
 
 contract TokenInterface is ERC20 {
   string public name;
@@ -865,4 +968,140 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
     str = string(s);
   }
+}
+
+contract BaseAltCrowdsale is Crowdsale {
+  function BaseAltCrowdsale(
+    address _registry,
+    address _token,
+    address _extraTokensHolder,
+    address _wallet,
+    bool _isWhitelisted,
+    uint _price,
+    uint _start,
+    uint _end,
+    uint _softCap,
+    uint _hardCap
+  ) public {
+    setFlags(
+      // Should be whitelisted to buy tokens
+      // _isWhitelisted,
+      _isWhitelisted,
+      // Should be known user to buy tokens
+      // _isKnownOnly,
+      true,
+      // Enable amount bonuses in crowdsale? 
+      // _isAmountBonus,
+      true,
+      // Enable early bird bonus in crowdsale?
+      // _isEarlyBonus,
+      true,
+      // Allow to buy tokens for another tokens?
+      // _isTokenExcange,
+      false,
+      // Allow to issue tokens with tx hash (ex bitcoin)
+      // _isAllowToIssue,
+      true,
+      // Should reject purchases with Ether?
+      // _isDisableEther,
+      false,
+      // Should mint extra tokens for future distribution?
+      // _isExtraDistribution,
+      true,
+      // Will ship token via minting? 
+      // _isTransferShipment,
+      false,
+      // Should be capped in ether
+      // bool _isCappedInEther,
+      true,
+      // Should check personal bonuses?
+      // _isPersonalBonuses
+      true,
+      // Should allow to claimFunds before finalizations?
+      false
+    );
+
+    setToken(_token); 
+    setTime(_start, _end);
+    setRegistry(_registry);
+    setWallet(_wallet);
+    setExtraDistribution(
+      _extraTokensHolder,
+      6667 // 66.67%
+    );
+
+    setSoftHardCaps(
+      _softCap, // soft
+      _hardCap  // hard
+    );
+
+    // 200 ALT per 1 ETH
+    setPrice(_price);
+  }
+}
+
+contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
+  function AltCrowdsalePhaseTwo(
+    address _registry,
+    address _token,
+    address _extraTokensHolder,
+    address _wallet
+  )
+  BaseAltCrowdsale(
+    _registry,
+    _token,
+    _extraTokensHolder,
+    _wallet,
+
+    // Whitelisted
+    false,
+
+    // price 1 ETH -> 100 ALT
+    uint(1 ether).div(100), 
+
+    // start
+    block.timestamp + 60 days,
+    // end 
+    block.timestamp + 90 days,
+
+    // _softCap,
+    0,
+    // _hardCap
+    15000 ether
+  ) 
+  public {
+  } 
+}
+
+contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
+  function AltCrowdsalePhaseOne (
+    address _registry,
+    address _token,
+    address _extraTokensHolder,
+    address _wallet
+  )
+  BaseAltCrowdsale(
+    _registry,
+    _token,
+    _extraTokensHolder,
+    _wallet,
+
+    // Whitelisted
+    false,
+
+    // price 1 ETH -> 200 ALT
+    uint(1 ether).div(200), 
+
+    // start
+    block.timestamp,
+    // end 
+    block.timestamp + 10 days,
+
+    // _softCap,
+    0,
+    // _hardCap
+    1500 ether
+  ) 
+  public {
+  } 
 }
