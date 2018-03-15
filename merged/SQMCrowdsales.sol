@@ -1032,7 +1032,7 @@ contract BaseSqmCrowdsale is Crowdsale {
 
     setPrice(_price);
 
-    setTokenExcange(_altToken, 1 ether);
+    setTokenExcange(_altToken, 10 szabo);
   }
 }
 
@@ -1049,18 +1049,17 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ALT -> 10 SQM
-    uint(1 ether).div(10), 
-
+    // price 1 ETH -> 1 SQM
+    uint(1 ether).div(1), 
     // from now
     block.timestamp,
     // to 90 days in future
     block.timestamp + 90 days,
 
-    // _softCap,
-    150,
-    // _hardCap
-    150
+    // soft cap
+    ERC20Basic(_token).totalSupply(),
+    // hard cap
+    ERC20Basic(_token).totalSupply()
   ) 
   public {
   } 
@@ -1079,18 +1078,18 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ALT -> 10 SQM
-    uint(1 ether).div(10), 
+    // price 1 ETH -> 1 SQM
+    uint(1 ether).div(1), 
 
     // from now
     block.timestamp,
     // to 90 days in future
     block.timestamp + 90 days,
 
-    // _softCap,
-    150,
-    // _hardCap
-    150
+    // soft cap
+    ERC20Basic(_token).totalSupply(),
+    // hard cap
+    ERC20Basic(_token).totalSupply()
   ) 
   public {
   } 
@@ -1109,18 +1108,18 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ALT -> 10 SQM
-    uint(1 ether).div(10), 
+    // price 1 ETH -> 1 SQM
+    uint(1 ether).div(1), 
 
     // from now
     block.timestamp,
     // to 90 days in future
     block.timestamp + 90 days,
 
-    // _softCap,
-    150,
-    // _hardCap
-    150
+    // soft cap
+    ERC20Basic(_token).totalSupply(),
+    // hard cap
+    ERC20Basic(_token).totalSupply()
   ) 
   public {
   } 
