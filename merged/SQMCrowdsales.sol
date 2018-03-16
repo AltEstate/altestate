@@ -736,18 +736,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     // Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
     require(tokensValues[_token] > 0);
+    require(forwardTokens(_from, _token, _value));
 
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
-    require(
-      forwardTokens(
-        _from, 
-        _token, 
-        weiValue
-          .div(tokensValues[_token])
-          .mul(10 ** allowedTokens[_token].decimals())
-      )
-    );
-
     require(weiValue > 0);
 
     Debug(msg.sender, appendUintToString("Token to wei: ", weiValue));
@@ -1032,7 +1023,7 @@ contract BaseSqmCrowdsale is Crowdsale {
 
     setPrice(_price);
 
-    setTokenExcange(_altToken, 1 ether);
+    setTokenExcange(_altToken, 6 finney);
   }
 }
 
@@ -1049,18 +1040,18 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ALT -> 10 SQM
-    uint(1 ether).div(10), 
+    // price 1 ETH -> 1 SQM
+    450 ether,
 
     // from now
     block.timestamp,
     // to 90 days in future
     block.timestamp + 90 days,
 
-    // _softCap,
-    150,
-    // _hardCap
-    150
+    // soft cap
+    ERC20Basic(_token).totalSupply(),
+    // hard cap
+    ERC20Basic(_token).totalSupply()
   ) 
   public {
   } 
@@ -1079,18 +1070,18 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ALT -> 10 SQM
-    uint(1 ether).div(10), 
+    // price 1 ETH -> 1 SQM
+    1800 ether, 
 
     // from now
     block.timestamp,
     // to 90 days in future
     block.timestamp + 90 days,
 
-    // _softCap,
-    150,
-    // _hardCap
-    150
+    // soft cap
+    ERC20Basic(_token).totalSupply(),
+    // hard cap
+    ERC20Basic(_token).totalSupply()
   ) 
   public {
   } 
@@ -1109,18 +1100,18 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ALT -> 10 SQM
-    uint(1 ether).div(10), 
+    // price 1 ETH -> 1 SQM
+    5000 ether,
 
     // from now
     block.timestamp,
     // to 90 days in future
     block.timestamp + 90 days,
 
-    // _softCap,
-    150,
-    // _hardCap
-    150
+    // soft cap
+    ERC20Basic(_token).totalSupply(),
+    // hard cap
+    ERC20Basic(_token).totalSupply()
   ) 
   public {
   } 
