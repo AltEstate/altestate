@@ -743,8 +743,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
         _from, 
         _token, 
         weiValue
-          .div(tokensValues[_token])
-          .mul(10 ** allowedTokens[_token].decimals())
       )
     );
 
@@ -1032,7 +1030,7 @@ contract BaseSqmCrowdsale is Crowdsale {
 
     setPrice(_price);
 
-    setTokenExcange(_altToken, 10 szabo);
+    setTokenExcange(_altToken, 6 finney);
   }
 }
 
@@ -1050,7 +1048,8 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _altToken,
 
     // price 1 ETH -> 1 SQM
-    uint(1 ether).div(1), 
+    450 ether,
+
     // from now
     block.timestamp,
     // to 90 days in future
@@ -1079,7 +1078,7 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _altToken,
 
     // price 1 ETH -> 1 SQM
-    uint(1 ether).div(1), 
+    1800 ether, 
 
     // from now
     block.timestamp,
@@ -1109,7 +1108,7 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _altToken,
 
     // price 1 ETH -> 1 SQM
-    uint(1 ether).div(1), 
+    5000 ether,
 
     // from now
     block.timestamp,

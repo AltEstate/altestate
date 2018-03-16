@@ -1,5 +1,5 @@
 NETWORK:= "testrpc"
-TEST:= "test/crowdsale.test.js"
+TEST:= ""
 MERGE_PATH:=merged
 
 .PHONY: doc test clean

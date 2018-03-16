@@ -640,8 +640,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
         _from, 
         _token, 
         weiValue
-          .div(tokensValues[_token])
-          .mul(10 ** allowedTokens[_token].decimals())
       )
     );
 

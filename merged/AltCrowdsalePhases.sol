@@ -743,8 +743,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
         _from, 
         _token, 
         weiValue
-          .div(tokensValues[_token])
-          .mul(10 ** allowedTokens[_token].decimals())
       )
     );
 
@@ -1056,7 +1054,7 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     // Whitelisted
     false,
 
-    // price 1 ETH -> 200 ALT
+    // price 1 ETH -> 100000 ALT
     uint(1 ether).div(100000), 
 
     // start

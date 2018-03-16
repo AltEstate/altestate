@@ -64,6 +64,6 @@ contract BaseSqmCrowdsale is Crowdsale {
 
     setPrice(_price);
 
-    setTokenExcange(_altToken, 10 szabo);
+    setTokenExcange(_altToken, 6 finney);
   }
 }
