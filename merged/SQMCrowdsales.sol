@@ -840,8 +840,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     ShipTokens(_beneficiary, beneficiaryTokens);
 
     if (isExtraDistribution) {            // calculate and
-      shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)
-                 extraTokens);
+      //! Ship to crowdsale itself to transfer it against minting
+      shipTokens(address(this), extraTokens);
+      token.transfer(extraTokensHolder, extraTokens);
 
       // soldTokens = soldTokens.add(extraTokens);
       ShipTokens(extraTokensHolder, extraTokens);
@@ -852,7 +853,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       if (record.refererAddress != address(0) && record.refererBonus > 0) {
         shipTokens(record.refererAddress, refererTokens);
         // soldTokens = soldTokens.add(_amount);
-      ShipTokens(record.refererAddress, refererTokens);
+        ShipTokens(record.refererAddress, refererTokens);
       }
     }
 

@@ -65,10 +65,10 @@ contract ExtraHolderContract is TokenRecipient {
 
   /// @notice Map of recipients parts of total received tokens
   /// @dev Should be in range of 1 to 10000 (1 is 0.01% and 10000 is 100%)
-  mapping(address => uint) shares;
+  mapping(address => uint) public shares;
 
   /// @notice Map of total values at moment of latest withdrawal per each recipient
-  mapping(address => uint) totalAtWithdrawal;
+  mapping(address => uint) public totalAtWithdrawal;
 
   /// @notice Address of the affilated token
   /// @dev Should be defined at construction and no way to change in future
@@ -120,8 +120,7 @@ contract ExtraHolderContract is TokenRecipient {
     address _from, 
     uint256 _value,
     address _token,
-    bytes _extraData) 
-  public 
+    bytes _extraData) public
   {
     _extraData;
     require(_token == holdingToken);

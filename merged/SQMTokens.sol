@@ -206,7 +206,7 @@ contract ApproveAndCallToken is StandardToken {
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
-    if(isContract(_to)) {
+    if (isContract(_to)) {
         return transferToContract(_to, _value, empty);
     }
     else {
@@ -215,7 +215,7 @@ contract ApproveAndCallToken is StandardToken {
   }
 
   //assemble the given address bytecode. If bytecode exists then the _addr is a contract.
-  function isContract(address _addr) private view returns (bool is_contract) {
+  function isContract(address _addr) private view returns (bool) {
     uint length;
     assembly {
       //retrieve the size of the code on target address, this needs assembly
@@ -429,14 +429,14 @@ contract BaseSqmToken is DefaultToken {
 }
 
 contract SQM1Token is BaseSqmToken {
-  function SQM1Token(address _registry) BaseSqmToken("European Union SQM1t", "SQM1t", 121, 6, _registry) public {
+  function SQM1Token(address _registry) BaseSqmToken("European Union SQM1t", "SQM1t", 121 * 10 ** 6, 6, _registry) public {
   }
 }
 contract SQM2Token is BaseSqmToken {
-  function SQM2Token(address _registry) BaseSqmToken("USA SQM2t", "SQM2t", 120, 6, _registry) public {
+  function SQM2Token(address _registry) BaseSqmToken("USA SQM2t", "SQM2t", 120 * 10 ** 6, 6, _registry) public {
   }
 }
 contract SQM3Token is BaseSqmToken {
-  function SQM3Token(address _registry) BaseSqmToken("Japan SQM2t", "SQM3t", 26, 6, _registry) public {
+  function SQM3Token(address _registry) BaseSqmToken("Japan SQM2t", "SQM3t", 26 * 10 ** 6, 6, _registry) public {
   }
 }
