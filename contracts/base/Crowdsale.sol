@@ -749,7 +749,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       if (record.refererAddress != address(0) && record.refererBonus > 0) {
         shipTokens(record.refererAddress, refererTokens);
         // soldTokens = soldTokens.add(_amount);
-      ShipTokens(record.refererAddress, refererTokens);
+        ShipTokens(record.refererAddress, refererTokens);
       }
     }
 
