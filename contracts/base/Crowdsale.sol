@@ -737,8 +737,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     ShipTokens(_beneficiary, beneficiaryTokens);
 
     if (isExtraDistribution) {            // calculate and
-      shipTokens(extraTokensHolder,       // ship extra tokens (team, foundation and etc)
-                 extraTokens);
+      //! Ship to crowdsale itself to transfer it against minting
+      shipTokens(address(this), extraTokens);
+      token.transfer(extraTokensHolder, extraTokens);
 
       // soldTokens = soldTokens.add(extraTokens);
       ShipTokens(extraTokensHolder, extraTokens);
