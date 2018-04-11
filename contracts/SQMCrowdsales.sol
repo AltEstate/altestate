@@ -15,7 +15,7 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 450 USD -> 1 SQM1t
+    // price 450 USD -> 1 SQM1demo
     450 ether,
 
     // from now
@@ -45,7 +45,7 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1800 USD -> 1 SQM2t
+    // price 1800 USD -> 1 SQM2demo
     1800 ether, 
 
     // from now
@@ -75,7 +75,7 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 4000 USD -> 1 SQM3t
+    // price 4000 USD -> 1 SQM3demo
     4000 ether,
 
     // from now
