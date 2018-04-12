@@ -24,46 +24,13 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     // start
     block.timestamp,
     // end 
-    block.timestamp + 1 days,
+    block.timestamp + 48 days + 22 hours,
 
     // _softCap,
-    0,
+    2500 ether,
     // _hardCap
-    100 ether
+    7500 ether
   ) 
   public {
   } 
 } 
-
-contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
-  function AltCrowdsalePhaseTwo(
-    address _registry,
-    address _token,
-    address _extraTokensHolder,
-    address _wallet
-  )
-  BaseAltCrowdsale(
-    _registry,
-    _token,
-    _extraTokensHolder,
-    _wallet,
-
-    // Whitelisted
-    false,
-
-    // price 1 ETH -> 100000 ALT
-    uint(1 ether).div(100000), 
-
-    // start
-    block.timestamp + 1 days,
-    // end 
-    block.timestamp + 2 days,
-
-    // _softCap,
-    0,
-    // _hardCap
-    15000 ether
-  ) 
-  public {
-  } 
-}
