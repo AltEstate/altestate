@@ -7,7 +7,7 @@ contract demoAltCrowdsalePhaseOne is BaseAltCrowdsale {
     address _registry,
     address _token,
     address _extraTokensHolder,
-    0x07eBF23D47C16c9bfc5510C0E931e397a60F7F11
+    address _wallet
   )
   BaseAltCrowdsale(
     _registry,
