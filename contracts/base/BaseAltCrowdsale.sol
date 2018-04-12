@@ -23,7 +23,7 @@ contract BaseAltCrowdsale is Crowdsale {
       true,
       // Enable amount bonuses in crowdsale? 
       // _isAmountBonus,
-      true,
+      false,
       // Enable early bird bonus in crowdsale?
       // _isEarlyBonus,
       true,

@@ -1,5 +1,5 @@
-const AltCrowdsalePhaseOne = artifacts.require('./AltCrowdsalePhaseOne.sol')
-const AltCrowdsalePhaseTwo = artifacts.require('./AltCrowdsalePhaseTwo.sol')
+const AltCrowdsalePhaseOne = artifacts.require('./demoAltCrowdsalePhaseOne.sol')
+// const AltCrowdsalePhaseTwo = artifacts.require('./AltCrowdsalePhaseTwo.sol')
 const Crowdsale = artifacts.require('./Crowdsale.sol')
 const AltToken = artifacts.require('./AltToken.sol')
 const UserRegistry = artifacts.require('./UserRegistry.sol')
@@ -24,18 +24,12 @@ module.exports = async function (callback) {
     console.log(`Token owner is ${await token.owner()}`)
     console.log('transfer ownership of ALT token to crowdsale contract (Phase One)')
     await token.transferOwnership(crowdsale.address)
- 
-    console.log('Setup amount bonuses')
-    await crowdsale.setAmountBonuses(
-      [ ether(10), ether(30), ether(50) ],
-      [      1000,      1500,      2000 ]
-    )
 
     console.log('Setup tier 1 bonus')
     await crowdsale.setTimeBonuses(
-      [ duration.days(5) ],
-      [             1000 ]
-    )
+        [ duration.days(60) ],
+        [                 0 ]
+    );
 
     await crowdsale.saneIt()
 

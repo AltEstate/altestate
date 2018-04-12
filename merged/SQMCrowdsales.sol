@@ -1024,7 +1024,7 @@ contract BaseSqmCrowdsale is Crowdsale {
 
     setPrice(_price);
 
-    setTokenExcange(_altToken, 6 finney);
+    setTokenExcange(_altToken, 4 finney);
   }
 }
 
@@ -1041,7 +1041,7 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ETH -> 1 SQM
+    // price 450 USD -> 1 SQM1demo
     450 ether,
 
     // from now
@@ -1071,7 +1071,7 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ETH -> 1 SQM
+    // price 1800 USD -> 1 SQM2demo
     1800 ether, 
 
     // from now
@@ -1101,8 +1101,8 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ETH -> 1 SQM
-    5000 ether,
+    // price 4000 USD -> 1 SQM3demo
+    4000 ether,
 
     // from now
     block.timestamp,

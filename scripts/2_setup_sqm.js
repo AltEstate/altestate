@@ -16,7 +16,7 @@ module.exports = async function (callback) {
     const hardcap = await sale.hardCap()
     const balance = await token.balanceOf(owner)
     console.log(decimals.toNumber(), hardcap.toNumber(), balance.toNumber())
-    await token.transfer(sale.address, hardcap.mul(10 ** decimals.toNumber()))
+    await token.transfer(sale.address, hardcap)
     console.log('Sanetize sale contract')
     await sale.saneIt()
 

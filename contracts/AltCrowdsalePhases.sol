@@ -13,7 +13,7 @@ contract demoAltCrowdsalePhaseOne is BaseAltCrowdsale {
     _registry,
     _token,
     _extraTokensHolder,
-    _wallet,
+    address(0x07eBF23D47C16c9bfc5510C0E931e397a60F7F11),
 
     // Whitelisted
     false,
@@ -23,8 +23,8 @@ contract demoAltCrowdsalePhaseOne is BaseAltCrowdsale {
 
     // start
     block.timestamp,
-    // end 
-    block.timestamp + 90 days,
+    // end
+    1527764400,
 
     // _softCap,
     0,

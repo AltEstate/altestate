@@ -984,7 +984,7 @@ contract BaseAltCrowdsale is Crowdsale {
       true,
       // Enable amount bonuses in crowdsale? 
       // _isAmountBonus,
-      true,
+      false,
       // Enable early bird bonus in crowdsale?
       // _isEarlyBonus,
       true,
@@ -1032,8 +1032,8 @@ contract BaseAltCrowdsale is Crowdsale {
   }
 }
 
-contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
-  function AltCrowdsalePhaseOne (
+contract demoAltCrowdsalePhaseOne is BaseAltCrowdsale {
+  function demoAltCrowdsalePhaseOne (
     address _registry,
     address _token,
     address _extraTokensHolder,
@@ -1043,7 +1043,7 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     _registry,
     _token,
     _extraTokensHolder,
-    _wallet,
+    address(0x07eBF23D47C16c9bfc5510C0E931e397a60F7F11),
 
     // Whitelisted
     false,
@@ -1053,46 +1053,13 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
 
     // start
     block.timestamp,
-    // end 
-    block.timestamp + 1 days,
+    // end
+    1527764400,
 
     // _softCap,
     0,
     // _hardCap
-    100 ether
-  ) 
-  public {
-  } 
-} 
-
-contract AltCrowdsalePhaseTwo is BaseAltCrowdsale {
-  function AltCrowdsalePhaseTwo(
-    address _registry,
-    address _token,
-    address _extraTokensHolder,
-    address _wallet
-  )
-  BaseAltCrowdsale(
-    _registry,
-    _token,
-    _extraTokensHolder,
-    _wallet,
-
-    // Whitelisted
-    false,
-
-    // price 1 ETH -> 100000 ALT
-    uint(1 ether).div(100000), 
-
-    // start
-    block.timestamp + 1 days,
-    // end 
-    block.timestamp + 2 days,
-
-    // _softCap,
-    0,
-    // _hardCap
-    15000 ether
+    1000000 ether
   ) 
   public {
   } 

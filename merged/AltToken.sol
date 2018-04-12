@@ -390,6 +390,6 @@ contract DefaultToken is MintableToken, TokenPolicy, ApproveAndCallToken {
 }
 
 contract AltToken is DefaultToken {
-  function AltToken(address _registry) DefaultToken("ALT test", "ALTt", 18, _registry) public {
+  function AltToken(address _registry) DefaultToken("AltEstate DEMO token", "ALTdemo", 18, _registry) public {
   }
 }

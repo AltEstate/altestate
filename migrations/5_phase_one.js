@@ -1,5 +1,5 @@
-const AltCrowdsalePhaseOne = artifacts.require('./AltCrowdsalePhaseOne.sol')
-const AltCrowdsalePhaseTwo = artifacts.require('./AltCrowdsalePhaseTwo.sol')
+const AltCrowdsalePhaseOne = artifacts.require('./demoAltCrowdsalePhaseOne.sol')
+// const AltCrowdsalePhaseTwo = artifacts.require('./AltCrowdsalePhaseTwo.sol')
 const Crowdsale = artifacts.require('./Crowdsale.sol')
 const AltToken = artifacts.require('./AltToken.sol')
 const UserRegistry = artifacts.require('./UserRegistry.sol')
