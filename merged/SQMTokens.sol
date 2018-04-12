@@ -437,6 +437,6 @@ contract SQM2Token is BaseSqmToken {
   }
 }
 contract SQM3Token is BaseSqmToken {
-  function SQM3Token(address _registry) BaseSqmToken("Japan SQM2demo", "SQM3demo", 34 * 10 ** 6, 6, _registry) public {
+  function SQM3Token(address _registry) BaseSqmToken("Japan SQM3demo", "SQM3demo", 34 * 10 ** 6, 6, _registry) public {
   }
 }

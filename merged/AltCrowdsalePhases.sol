@@ -1043,7 +1043,7 @@ contract demoAltCrowdsalePhaseOne is BaseAltCrowdsale {
     _registry,
     _token,
     _extraTokensHolder,
-    address(0x07eBF23D47C16c9bfc5510C0E931e397a60F7F11),
+    _wallet,
 
     // Whitelisted
     false,
