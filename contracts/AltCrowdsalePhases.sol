@@ -24,7 +24,7 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     // start
     block.timestamp,
     // end 
-    block.timestamp + 48 days + 22 hours,
+    1527764400,
 
     // _softCap,
     2500 ether,
