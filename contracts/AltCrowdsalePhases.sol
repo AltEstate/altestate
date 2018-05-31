@@ -19,18 +19,18 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     false,
 
     // price 1 ETH -> 100000 ALT
-    uint(1 ether).div(100000), 
+    uint(1 ether).div(100000),
 
-    // start
-    block.timestamp,
-    // end 
-    1527764400,
+    // start - 13 Apr 2018 12:18:33 GMT
+    1523621913,
+    // end - 30 Jun 2018 23:59:59 GMT
+    1530403199,
 
     // _softCap,
     2500 ether,
     // _hardCap
     7500 ether
-  ) 
+  )
   public {
-  } 
+  }
 } 
