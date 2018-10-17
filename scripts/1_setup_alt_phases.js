@@ -27,15 +27,17 @@ module.exports = async function (callback) {
  
     console.log('Setup amount bonuses')
     await crowdsale.setAmountBonuses(
-      [ ether(10), ether(30), ether(50) ],
-      [      1000,      1500,      2000 ]
+      [ ether(3), ether(10) ],
+      [      500,      1000 ]
     )
 
     console.log('Setup tier 1 bonus')
-    await crowdsale.setTimeBonuses(
-      [ duration.days(5) ],
-      [             1000 ]
-    )
+    let now_utc = await phaseOne.startTime();
+    let timeBonusDuration = Math.round(Date.UTC(2018, 3, 20, 11)/1000) -  now_utc
+    await phaseOne.setTimeBonuses(
+        [ timeBonusDuration ],
+        [              2500 ]
+    );
 
     await crowdsale.saneIt()
 

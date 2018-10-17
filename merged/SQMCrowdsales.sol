@@ -353,15 +353,12 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Setup) onlyOwner public
   {
     require(_price > 0);
-    // SetPrice(msg.sender, price, _price);
     price = _price;
   }
 
   function setSoftHardCaps(uint _softCap, uint _hardCap)
     inState(State.Setup) onlyOwner public
   {
-    // SetSoftCap(msg.sender, softCap, _softCap);
-    // SetHardCap(msg.sender, hardCap, _hardCap);
     hardCap = _hardCap;
     softCap = _softCap;
   }
@@ -371,9 +368,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   {
     require(_start < _end);
     require(_end > block.timestamp);
-
-    // SetStartTime(msg.sender, startTime, _start);
-    // SetEndTime(msg.sender, endTime, _end);
     startTime = _start;
     endTime = _end;
   }
@@ -389,7 +383,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Setup) onlyOwner public 
   {
     require(_wallet != address(0));
-    // SetWallet(msg.sender, wallet, _wallet);
     wallet = _wallet;
   }
   
@@ -397,7 +390,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Setup) onlyOwner public 
   {
     require(_registry != address(0));
-    // SetRegistry(msg.sender, userRegistry, _registry);
     userRegistry = UserRegistryInterface(_registry);
   }
 
@@ -405,8 +397,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     inState(State.Setup) onlyOwner public
   {
     require(_holder != address(0));
-    // SetExtraTokensHolder(msg.sender, extraTokensHolder, _holder);
-    // SetExtraTokensPart(msg.sender, extraDistributionPart, _extraPart);
     extraTokensHolder = _holder;
     extraDistributionPart = _extraPart;
   }
@@ -422,8 +412,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       lastSlice = _amountSlices[index];
       amountSlices.push(lastSlice);
       amountBonuses[lastSlice] = _bonuses[index];
-
-      // AddAmountSlice(msg.sender, _amountSlices[index], _bonuses[index]);
     }
 
     amountSlicesCount = amountSlices.length;
@@ -455,7 +443,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       require(_bonuses[index] <= lastBonus);
 
       // ? Should we check bonus in a future
-
       lastSlice = _timeSlices[index];
       timeSlices.push(lastSlice);
       timeBonuses[lastSlice] = _bonuses[index];
@@ -488,11 +475,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     if (isAmountBonus) {
       require(amountSlicesCount > 0);
     }
-
-    // ! not needed anymore (since 02.2018 time bonuses isn't constant)
-    // if (isEarlyBonus) {
-    //   require(timeSlicesCount > 0);
-    // }
 
     if (isExtraDistribution) {
       require(extraTokensHolder != address(0));
@@ -732,8 +714,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
     require(isTokenExchange);
     
-    // Debug(msg.sender, appendUintToString("Should be equal: ", toUint(_extraData)));
-    // Debug(msg.sender, appendUintToString("and: ", tokensValues[_token]));
     require(toUint(_extraData) == tokensValues[_token]);
     require(tokensValues[_token] > 0);
     require(forwardTokens(_from, _token, _value));
@@ -741,7 +721,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint weiValue = _value.mul(tokensValues[_token]).div(10 ** allowedTokens[_token].decimals());
     require(weiValue > 0);
 
-    Debug(msg.sender, appendUintToString("Token to wei: ", weiValue));
     uint shipAmount = sellTokens(_from, weiValue, block.timestamp);
     require(shipAmount > 0);
 
@@ -832,7 +811,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     weiRaised = weiRaised.add(_weiAmount); // update state (wei amount)
     beneficiaryInvest[_beneficiary] = beneficiaryInvest[_beneficiary].add(_weiAmount);
     shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
-    // soldTokens = soldTokens.add(beneficiaryTokens);
     EthBuy(msg.sender,             // Fire purchase event
                   _beneficiary, 
                   _weiAmount, 
@@ -840,11 +818,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     ShipTokens(_beneficiary, beneficiaryTokens);
 
     if (isExtraDistribution) {            // calculate and
-      //! Ship to crowdsale itself to transfer it against minting
-      shipTokens(address(this), extraTokens);
-      token.transfer(extraTokensHolder, extraTokens);
-
-      // soldTokens = soldTokens.add(extraTokens);
+      shipTokens(extraTokensHolder, extraTokens);
       ShipTokens(extraTokensHolder, extraTokens);
     }
 
@@ -852,7 +826,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       PersonalBonusRecord storage record = personalBonuses[_beneficiary];
       if (record.refererAddress != address(0) && record.refererBonus > 0) {
         shipTokens(record.refererAddress, refererTokens);
-        // soldTokens = soldTokens.add(_amount);
         ShipTokens(record.refererAddress, refererTokens);
       }
     }
@@ -867,7 +840,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     if (isTransferShipment) {
       token.transfer(_beneficiary, _amount);
     } else {
-      token.mint(_beneficiary, _amount);
+      token.mint(address(this), _amount);
+      token.transfer(_beneficiary, _amount);
     }
   }
 
@@ -896,69 +870,6 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       }
       
       return out;
-  }
-
-
-  // ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
-  // ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
-  // ██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗
-  // ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
-  // ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
-  // ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ 
-  event Debug(address indexed sender, string message);
-  
-  function uintToString(uint v) public pure returns (string str) {
-    uint maxlength = 100;
-    bytes memory reversed = new bytes(maxlength);
-    uint i = 0;
-    while (v != 0) {
-      uint remainder = v % 10;
-      v = v / 10;
-      reversed[i++] = byte(48 + remainder);
-    }
-    bytes memory s = new bytes(i);
-    for (uint j = 0; j < i; j++) {
-      s[j] = reversed[i - 1 - j];
-    }
-    str = string(s);
-  }
-
-  function addressToString(address x) public pure returns (string) {
-    bytes memory s = new bytes(40);
-    for (uint i = 0; i < 20; i++) {
-      byte b = byte(uint8(uint(x) / (2**(8*(19 - i)))));
-      byte hi = byte(uint8(b) / 16);
-      byte lo = byte(uint8(b) - 16 * uint8(hi));
-      s[2*i] = char(hi);
-      s[2*i+1] = char(lo);            
-    }
-    return string(s);
-  }
-
-  function char(byte b) public pure returns (byte c) {
-    if (b < 10) return byte(uint8(b) + 0x30);
-    else return byte(uint8(b) + 0x57);
-  }
-
-  function appendUintToString(string inStr, uint v) public pure returns (string str) {
-    uint maxlength = 100;
-    bytes memory reversed = new bytes(maxlength);
-    uint i = 0;
-    while (v != 0) {
-      uint remainder = v % 10;
-      v = v / 10;
-      reversed[i++] = byte(48 + remainder);
-    }
-    bytes memory inStrb = bytes(inStr);
-    bytes memory s = new bytes(inStrb.length + i);
-    uint j;
-    for (j = 0; j < inStrb.length; j++) {
-      s[j] = inStrb[j];
-    }
-    for (j = 0; j < i; j++) {
-      s[j + inStrb.length] = reversed[i - 1 - j];
-    }
-    str = string(s);
   }
 }
 
@@ -1024,7 +935,7 @@ contract BaseSqmCrowdsale is Crowdsale {
 
     setPrice(_price);
 
-    setTokenExcange(_altToken, 6 finney);
+    setTokenExcange(_altToken, 4 finney);
   }
 }
 
@@ -1041,7 +952,7 @@ contract SQM1Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ETH -> 1 SQM
+    // price 450 USD -> 1 SQM1demo
     450 ether,
 
     // from now
@@ -1071,7 +982,7 @@ contract SQM2Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ETH -> 1 SQM
+    // price 1800 USD -> 1 SQM2demo
     1800 ether, 
 
     // from now
@@ -1101,8 +1012,8 @@ contract SQM3Crowdsale is BaseSqmCrowdsale {
     _wallet,
     _altToken,
 
-    // price 1 ETH -> 1 SQM
-    5000 ether,
+    // price 4000 USD -> 1 SQM3demo
+    4000 ether,
 
     // from now
     block.timestamp,
